@@ -19,7 +19,8 @@ public class MainWindowViewModel : ViewModelBase
     private QuranAya? _selectedAya;
     private int _repeatCount = 1;
     private string _statusMessage = "Ready";
-    private double _fontSize = 16;
+    private double _fontSize = 20;
+    private string _ruleDescription = string.Empty;
 
     public MainWindowViewModel()
     {
@@ -75,6 +76,14 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _fontSize, value);
     }
 
+    public string RuleDescription
+    {
+        get => _ruleDescription;
+        set => this.RaiseAndSetIfChanged(ref _ruleDescription, value);
+    }
+
+    public bool HasRuleDescription => !string.IsNullOrWhiteSpace(RuleDescription);
+
     public ICommand SearchCommand { get; }
     public ICommand PlaySingleCommand { get; }
     public ICommand PlayRepeatCommand { get; }
@@ -119,6 +128,11 @@ public class MainWindowViewModel : ViewModelBase
             // Update UI on main thread
             SearchResults = new ObservableCollection<QuranAya>(results);
             StatusMessage = $"Found {results.Count} matches";
+            
+            // Update rule description
+            var selectedRuleInfo = _searchService.GetRuleInfo(SelectedRule);
+            RuleDescription = selectedRuleInfo != null ? $"Rule: {selectedRuleInfo.Name}" : $"Rule: {SelectedRule}";
+            this.RaisePropertyChanged(nameof(HasRuleDescription));
         }
         catch (Exception ex)
         {

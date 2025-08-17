@@ -97,6 +97,11 @@ public class QuranSearchService
         return _rules.Select(r => r.Name).ToList();
     }
 
+    public TajweedRule? GetRuleInfo(string ruleName)
+    {
+        return _rules.FirstOrDefault(r => r.Name == ruleName);
+    }
+
     public List<QuranAya> SearchByRuleName(string ruleName)
     {
         if (string.IsNullOrWhiteSpace(ruleName))
@@ -120,6 +125,16 @@ public class QuranSearchService
                     // Add the aya once for each match found
                     foreach (Match match in matches)
                     {
+                        var matchPositions = new List<MatchPosition>
+                        {
+                            new MatchPosition
+                            {
+                                Start = match.Index,
+                                Length = match.Length,
+                                MatchedText = match.Value
+                            }
+                        };
+
                         results.Add(new QuranAya
                         {
                             SurahNumber = aya.SurahNumber,
@@ -127,7 +142,8 @@ public class QuranSearchService
                             Text = aya.Text,
                             FullLine = aya.FullLine,
                             MatchedCase = ruleCase.Description,
-                            MatchedText = match.Value
+                            MatchedText = match.Value,
+                            MatchPositions = matchPositions
                         });
                     }
                 }

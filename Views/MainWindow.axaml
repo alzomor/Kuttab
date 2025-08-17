@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:QuranSearchApp.ViewModels"
+        xmlns:views="using:QuranSearchApp.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
@@ -52,41 +53,50 @@
                    FontWeight="Bold"/>
 
         <!-- Search Results List -->
-        <Border Grid.Row="2" BorderBrush="Gray" BorderThickness="1" Margin="0,0,0,10">
-            <ListBox Name="ResultsListBox"
-                     ItemsSource="{Binding SearchResults}"
-                     SelectedItem="{Binding SelectedAya}"
-                     ScrollViewer.HorizontalScrollBarVisibility="Auto">
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <TextBlock Grid.Row="0"
+                       Text="{Binding RuleDescription}" 
+                       FontSize="14" 
+                       FontWeight="Bold"
+                       Foreground="DarkBlue"
+                       Margin="0,0,0,5"
+                       IsVisible="{Binding HasRuleDescription}"/>
+            
+            <Border Grid.Row="1" 
+                    BorderBrush="Gray" 
+                    BorderThickness="1" 
+                    Margin="0,0,0,10">
+                <ListBox Name="ResultsListBox"
+                         ItemsSource="{Binding SearchResults}"
+                         SelectedItem="{Binding SelectedAya}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Margin="5">
-                            <TextBlock Text="{Binding SurahNumber, StringFormat='Surah {0}'}" 
-                                       FontSize="12" 
-                                       Foreground="Gray"/>
-                            <TextBlock Text="{Binding Text}" 
-                                       FontSize="20" 
-                                       FontFamily="Scheherazade, Noto Sans Arabic, DejaVu Sans"
-                                       TextWrapping="Wrap"
-                                       FlowDirection="RightToLeft"/>
-                            <TextBlock Text="{Binding AyaNumber, StringFormat='Aya {0}'}" 
-                                       FontSize="10" 
-                                       Foreground="DarkGray"/>
-                            <TextBlock Text="{Binding MatchedCase}" 
-                                       FontSize="10" 
-                                       Foreground="Blue"
-                                       TextWrapping="Wrap"
-                                       Margin="0,2,0,0"/>
-                            <TextBlock Text="{Binding MatchedText, StringFormat='Match: {0}'}" 
-                                       FontSize="12" 
-                                       FontFamily="Scheherazade, Noto Sans Arabic, DejaVu Sans"
-                                       Foreground="Green"
-                                       FlowDirection="RightToLeft"
-                                       Margin="0,1,0,0"/>
+                        <StackPanel Margin="8">
+                            <!-- Sura and Aya on same line -->
+                            <TextBlock FontSize="16" Foreground="Gray" Margin="0,0,0,5">
+                                <Run Text="Surah "/>
+                                <Run Text="{Binding SurahNumber}"/>
+                                <Run Text=" - Aya "/>
+                                <Run Text="{Binding AyaNumber}"/>
+                            </TextBlock>
+                            
+                            <!-- Arabic text with highlighted matches -->
+                            <views:HighlightedTextBlock Text="{Binding Text}"
+                                                        MatchPositions="{Binding MatchPositions}"
+                                                        Margin="0,0,0,8"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-            </ListBox>
-        </Border>
+                </ListBox>
+            </Border>
+        </Grid>
 
         <!-- Audio Controls -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,10">
