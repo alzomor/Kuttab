@@ -1,0 +1,132 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuranSearchApp.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+        x:Class="QuranSearchApp.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Quran Pattern Search"
+        Width="1000" Height="700">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Search Controls -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="Select Rule:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <ComboBox Name="RulesComboBox" 
+                      ItemsSource="{Binding Rules}"
+                      SelectedItem="{Binding SelectedRule}"
+                      Width="200" Margin="0,0,10,0"/>
+            <Button Content="Search" 
+                    Command="{Binding SearchCommand}"
+                    Padding="15,5" Margin="0,0,20,0"/>
+            
+            <TextBlock Text="Font Size:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <Slider Value="{Binding FontSize}" 
+                    Minimum="12" Maximum="32" 
+                    Width="100" 
+                    VerticalAlignment="Center"
+                    Margin="0,0,10,0"/>
+            <TextBlock Text="{Binding FontSize, StringFormat=F0}" 
+                       VerticalAlignment="Center" 
+                       Width="25"/>
+        </StackPanel>
+
+        <!-- Results Count -->
+        <TextBlock Grid.Row="1" 
+                   Text="{Binding StatusMessage}" 
+                   Margin="0,0,0,10"
+                   FontWeight="Bold"/>
+
+        <!-- Search Results List -->
+        <Border Grid.Row="2" BorderBrush="Gray" BorderThickness="1" Margin="0,0,0,10">
+            <ListBox Name="ResultsListBox"
+                     ItemsSource="{Binding SearchResults}"
+                     SelectedItem="{Binding SelectedAya}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="5">
+                            <TextBlock Text="{Binding SurahNumber, StringFormat='Surah {0}'}" 
+                                       FontSize="12" 
+                                       Foreground="Gray"/>
+                            <TextBlock Text="{Binding Text}" 
+                                       FontSize="20" 
+                                       FontFamily="Scheherazade, Noto Sans Arabic, DejaVu Sans"
+                                       TextWrapping="Wrap"
+                                       FlowDirection="RightToLeft"/>
+                            <TextBlock Text="{Binding AyaNumber, StringFormat='Aya {0}'}" 
+                                       FontSize="10" 
+                                       Foreground="DarkGray"/>
+                            <TextBlock Text="{Binding MatchedCase}" 
+                                       FontSize="10" 
+                                       Foreground="Blue"
+                                       TextWrapping="Wrap"
+                                       Margin="0,2,0,0"/>
+                            <TextBlock Text="{Binding MatchedText, StringFormat='Match: {0}'}" 
+                                       FontSize="12" 
+                                       FontFamily="Scheherazade, Noto Sans Arabic, DejaVu Sans"
+                                       Foreground="Green"
+                                       FlowDirection="RightToLeft"
+                                       Margin="0,1,0,0"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <!-- Audio Controls -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="Play Single" 
+                    Command="{Binding PlaySingleCommand}"
+                    Margin="0,0,10,0" Padding="10,5"/>
+            
+            <StackPanel Orientation="Horizontal" Margin="0,0,10,0">
+                <TextBlock Text="Repeat:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <NumericUpDown Value="{Binding RepeatCount}" 
+                               Minimum="1" Maximum="100" 
+                               Width="60" Margin="0,0,5,0"/>
+                <Button Content="Play Repeat" 
+                        Command="{Binding PlayRepeatCommand}"
+                        Padding="10,5"/>
+            </StackPanel>
+            
+            <Button Content="Play All Sequence" 
+                    Command="{Binding PlayAllCommand}"
+                    Padding="10,5"/>
+        </StackPanel>
+
+        <!-- Picture Display Area -->
+        <Border Grid.Row="4" BorderBrush="Gray" BorderThickness="1">
+            <Grid>
+                <TextBlock Text="Picture will be displayed here for selected Aya" 
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center"
+                           Foreground="Gray"
+                           FontStyle="Italic"/>
+                <Image Name="AyaPictureBox" 
+                       Stretch="Uniform"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="5" Background="LightGray" Padding="5" Margin="0,10,0,0">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="12"/>
+        </Border>
+    </Grid>
+</Window>
