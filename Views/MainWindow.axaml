@@ -102,35 +102,59 @@
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,10">
             <Button Content="Play Single" 
                     Command="{Binding PlaySingleCommand}"
+                    IsEnabled="{Binding !IsPlaying}"
                     Margin="0,0,10,0" Padding="10,5"/>
             
-            <StackPanel Orientation="Horizontal" Margin="0,0,10,0">
-                <TextBlock Text="Repeat:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                <NumericUpDown Value="{Binding RepeatCount}" 
-                               Minimum="1" Maximum="100" 
-                               Width="60" Margin="0,0,5,0"/>
-                <Button Content="Play Repeat" 
-                        Command="{Binding PlayRepeatCommand}"
-                        Padding="10,5"/>
-            </StackPanel>
+            <Button Content="Play Repeat" 
+                    Command="{Binding PlayRepeatCommand}"
+                    IsEnabled="{Binding !IsPlaying}"
+                    Margin="0,0,10,0" Padding="10,5"/>
             
             <Button Content="Play All Sequence" 
                     Command="{Binding PlayAllCommand}"
-                    Padding="10,5"/>
+                    IsEnabled="{Binding !IsPlaying}"
+                    Margin="0,0,10,0" Padding="10,5"/>
+            
+            <Button Content="Stop" 
+                    Command="{Binding StopCommand}"
+                    IsEnabled="{Binding IsPlaying}"
+                    Background="Red"
+                    Foreground="White"
+                    Margin="0,0,10,0" Padding="10,5"/>
+            
+            <!-- Playback Status -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                <TextBlock Text="●" 
+                           Foreground="Red" 
+                           FontSize="16"
+                           IsVisible="{Binding IsPlaying}"
+                           Margin="0,0,5,0"/>
+                <TextBlock Text="Playing" 
+                           FontWeight="Bold"
+                           Foreground="Red"
+                           IsVisible="{Binding IsPlaying}"/>
+                <TextBlock Text="(Repeat)" 
+                           FontStyle="Italic"
+                           Foreground="Orange"
+                           Margin="5,0,0,0"
+                           IsVisible="{Binding IsRepeating}"/>
+            </StackPanel>
         </StackPanel>
 
         <!-- Picture Display Area -->
         <Border Grid.Row="4" BorderBrush="Gray" BorderThickness="1">
             <Grid>
-                <TextBlock Text="Picture will be displayed here for selected Aya" 
+                <TextBlock Text="Select an Aya to view its picture" 
                            HorizontalAlignment="Center" 
                            VerticalAlignment="Center"
                            Foreground="Gray"
-                           FontStyle="Italic"/>
-                <Image Name="AyaPictureBox" 
+                           FontStyle="Italic"
+                           IsVisible="{Binding CurrentPicturePath, Converter={x:Static ObjectConverters.IsNull}}"/>
+                <Image Source="{Binding CurrentPictureBitmap}" 
                        Stretch="Uniform"
                        HorizontalAlignment="Center"
-                       VerticalAlignment="Center"/>
+                       VerticalAlignment="Center"
+                       IsVisible="{Binding CurrentPicturePath, Converter={x:Static ObjectConverters.IsNotNull}}"/>
             </Grid>
         </Border>
 

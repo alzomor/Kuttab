@@ -70,7 +70,7 @@ public partial class HighlightedTextBlock : UserControl
                 textBlock.Inlines?.Add(new Run { Text = beforeText });
             }
 
-            // Add highlighted match
+            // Add highlighted match with yellow background
             var matchText = Text.Substring(match.Start, match.Length);
             var highlightedRun = new Run 
             { 
