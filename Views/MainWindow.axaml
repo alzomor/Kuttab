@@ -30,7 +30,8 @@
             <ComboBox Name="RulesComboBox" 
                       ItemsSource="{Binding Rules}"
                       SelectedItem="{Binding SelectedRule}"
-                      Width="200" Margin="0,0,10,0"/>
+                      Width="200" Margin="0,0,10,0"
+                      VerticalAlignment="Top"/>
             <Button Content="Search" 
                     Command="{Binding SearchCommand}"
                     Padding="15,5" Margin="0,0,20,0"/>
