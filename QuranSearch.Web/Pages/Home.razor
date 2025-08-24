@@ -1,0 +1,279 @@
+@page "/"
+@using QuranSearch.Core.Services
+@using QuranSearch.Core.Models
+@inject QuranSearchService QuranService
+@inject IAudioService AudioService
+@inject HttpClient Http
+
+<PageTitle>Quran Search - بحث القرآن الكريم</PageTitle>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4" style="color: #1976d2; font-weight: bold;">بحث القرآن الكريم</h1>
+            
+            <div class="search-section">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label fw-bold">اختر قاعدة التجويد:</label>
+                        <select class="form-select" @bind="selectedRule" @bind:after="OnRuleChanged">
+                            <option value="">-- اختر قاعدة التجويد --</option>
+                            @foreach (var rule in ruleNames)
+                            {
+                                <option value="@rule">@rule</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3 d-flex align-items-end">
+                        <button class="btn btn-primary w-100" @onclick="SearchByRule" disabled="@(string.IsNullOrEmpty(selectedRule) || isLoading)">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            }
+                            بحث
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            @if (selectedRuleInfo != null)
+            {
+                <div class="rule-info mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">@selectedRuleInfo.Name</h5>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var ruleCase in selectedRuleInfo.Cases)
+                            {
+                                <div class="mb-2">
+                                    <strong>الوصف:</strong> @ruleCase.Description
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (searchResults.Any())
+            {
+                <div class="results-section">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                        <h4 class="mb-2">النتائج (@searchResults.Count)</h4>
+                        <div class="audio-controls">
+                            <button class="btn btn-success btn-sm" @onclick="PlayAllSequence" disabled="@isPlaying">
+                                <i class="fas fa-play me-1"></i> تشغيل الكل
+                            </button>
+                            <button class="btn btn-danger btn-sm" @onclick="StopAudio" disabled="@(!isPlaying)">
+                                <i class="fas fa-stop me-1"></i> إيقاف
+                            </button>
+                            @if (isPlaying)
+                            {
+                                <span class="playing-indicator">● جاري التشغيل</span>
+                            }
+                        </div>
+                    </div>
+
+                    @foreach (var result in searchResults)
+                    {
+                        <div class="aya-result">
+                            <div class="aya-header">
+                                <i class="fas fa-book-open me-2"></i>
+                                سورة @result.SurahNumber - آية @result.AyaNumber
+                            </div>
+                            <div class="arabic-text mb-3">
+                                @((MarkupString)HighlightMatches(result.Text, result.MatchPositions))
+                            </div>
+                            <div class="match-info mb-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>الحالة المطابقة:</strong> @result.MatchedCase
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>النص المطابق:</strong> <span class="text-primary fw-bold">@result.MatchedText</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="audio-controls">
+                                <button class="btn btn-outline-primary btn-sm" @onclick="() => PlaySingle(result)">
+                                    <i class="fas fa-play me-1"></i> تشغيل
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" @onclick="() => PlayRepeat(result)">
+                                    <i class="fas fa-redo me-1"></i> تكرار
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (hasSearched && !isLoading)
+            {
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    لم يتم العثور على نتائج للقاعدة المحددة.
+                </div>
+            }
+
+            @if (errorMessage != null)
+            {
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @errorMessage
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<string> ruleNames = new();
+    private string selectedRule = "";
+    private TajweedRule? selectedRuleInfo;
+    private List<QuranAya> searchResults = new();
+    private bool hasSearched = false;
+    private bool isLoading = false;
+    private bool isPlaying = false;
+    private bool isRepeating = false;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            await LoadData();
+            ruleNames = QuranService.GetRuleNames();
+            AudioService.AudioStatusChanged += OnAudioStatusChanged;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"خطأ في تحميل البيانات: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadData()
+    {
+        // Load Quran text from web assets
+        var quranText = await Http.GetStringAsync("data/quran-uthmani.txt");
+        var rulesJson = await Http.GetStringAsync("data/rules.json");
+        
+        // Create temporary files for the service to read
+        var tempQuranPath = Path.GetTempFileName();
+        var tempRulesPath = Path.GetTempFileName();
+        
+        await File.WriteAllTextAsync(tempQuranPath, quranText);
+        await File.WriteAllTextAsync(tempRulesPath, rulesJson);
+        
+        await QuranService.LoadQuranTextAsync(tempQuranPath);
+        await QuranService.LoadRulesAsync(tempRulesPath);
+        
+        // Clean up temp files
+        File.Delete(tempQuranPath);
+        File.Delete(tempRulesPath);
+    }
+
+    private void OnRuleChanged()
+    {
+        selectedRuleInfo = QuranService.GetRuleInfo(selectedRule);
+        searchResults.Clear();
+        hasSearched = false;
+        errorMessage = null;
+    }
+
+    private async Task SearchByRule()
+    {
+        if (string.IsNullOrEmpty(selectedRule)) return;
+
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+            
+            await Task.Delay(100); // Small delay to show loading state
+            searchResults = QuranService.SearchByRuleName(selectedRule);
+            hasSearched = true;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"خطأ في البحث: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+        
+        StateHasChanged();
+    }
+
+    private string HighlightMatches(string text, List<MatchPosition>? matchPositions)
+    {
+        if (matchPositions == null || !matchPositions.Any())
+            return text;
+
+        var result = text;
+        var offset = 0;
+
+        foreach (var match in matchPositions.OrderBy(m => m.Start))
+        {
+            var startTag = "<span class=\"highlighted-text\">";
+            var endTag = "</span>";
+            
+            var insertStart = match.Start + offset;
+            var insertEnd = insertStart + match.Length;
+            
+            result = result.Insert(insertEnd, endTag);
+            result = result.Insert(insertStart, startTag);
+            
+            offset += startTag.Length + endTag.Length;
+        }
+
+        return result;
+    }
+
+    private async Task PlaySingle(QuranAya aya)
+    {
+        var audioPath = GetAudioPath(aya.SurahNumber, aya.AyaNumber);
+        await AudioService.PlayAudioAsync(audioPath);
+    }
+
+    private async Task PlayRepeat(QuranAya aya)
+    {
+        var audioPath = GetAudioPath(aya.SurahNumber, aya.AyaNumber);
+        await AudioService.PlayAudioRepeatAsync(audioPath);
+    }
+
+    private async Task PlayAllSequence()
+    {
+        var audioPaths = searchResults.Select(r => GetAudioPath(r.SurahNumber, r.AyaNumber));
+        await AudioService.PlaySequenceAsync(audioPaths);
+    }
+
+    private async Task StopAudio()
+    {
+        await AudioService.StopAudioAsync();
+    }
+
+    private string GetAudioPath(int surah, int aya)
+    {
+        return $"AL Husary/{surah:000}{aya:000}.mp3";
+    }
+
+    private void OnAudioStatusChanged(object? sender, AudioStatusEventArgs e)
+    {
+        isPlaying = e.IsPlaying;
+        isRepeating = e.IsRepeating;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        if (AudioService != null)
+        {
+            AudioService.AudioStatusChanged -= OnAudioStatusChanged;
+        }
+    }
+}

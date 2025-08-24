@@ -1,0 +1,223 @@
+@page "/"
+@using QuranSearch.Core.Services
+@using QuranSearch.Core.Models
+@inject QuranSearchService QuranService
+@inject IAudioService AudioService
+
+<PageTitle>Quran Search</PageTitle>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4">بحث القرآن الكريم</h1>
+            
+            <div class="search-section mb-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <select class="form-select" @bind="selectedRule" @bind:after="OnRuleChanged">
+                            <option value="">اختر قاعدة التجويد</option>
+                            @foreach (var rule in ruleNames)
+                            {
+                                <option value="@rule">@rule</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary w-100" @onclick="SearchByRule" disabled="@(string.IsNullOrEmpty(selectedRule))">
+                            بحث
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            @if (selectedRuleInfo != null)
+            {
+                <div class="rule-info mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>@selectedRuleInfo.Name</h5>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var ruleCase in selectedRuleInfo.Cases)
+                            {
+                                <p><strong>الوصف:</strong> @ruleCase.Description</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (searchResults.Any())
+            {
+                <div class="results-section">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4>النتائج (@searchResults.Count)</h4>
+                        <div class="audio-controls">
+                            <button class="btn btn-success btn-sm" @onclick="PlayAllSequence" disabled="@isPlaying">
+                                تشغيل الكل
+                            </button>
+                            <button class="btn btn-danger btn-sm" @onclick="StopAudio" disabled="@(!isPlaying)">
+                                إيقاف
+                            </button>
+                            @if (isPlaying)
+                            {
+                                <span class="playing-indicator">● جاري التشغيل</span>
+                            }
+                        </div>
+                    </div>
+
+                    @foreach (var result in searchResults)
+                    {
+                        <div class="aya-result">
+                            <div class="aya-header">
+                                سورة @result.SurahNumber - آية @result.AyaNumber
+                            </div>
+                            <div class="arabic-text">
+                                @((MarkupString)HighlightMatches(result.Text, result.MatchPositions))
+                            </div>
+                            <div class="match-info mt-2">
+                                <small class="text-muted">
+                                    <strong>الحالة المطابقة:</strong> @result.MatchedCase
+                                    <br />
+                                    <strong>النص المطابق:</strong> @result.MatchedText
+                                </small>
+                            </div>
+                            <div class="audio-controls mt-2">
+                                <button class="btn btn-outline-primary btn-sm" @onclick="() => PlaySingle(result)">
+                                    تشغيل
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" @onclick="() => PlayRepeat(result)">
+                                    تكرار
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (hasSearched)
+            {
+                <div class="alert alert-info">
+                    لم يتم العثور على نتائج للقاعدة المحددة.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<string> ruleNames = new();
+    private string selectedRule = "";
+    private TajweedRule? selectedRuleInfo;
+    private List<QuranAya> searchResults = new();
+    private bool hasSearched = false;
+    private bool isPlaying = false;
+    private bool isRepeating = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadData();
+            ruleNames = QuranService.GetRuleNames();
+            AudioService.AudioStatusChanged += OnAudioStatusChanged;
+        }
+        catch (Exception ex)
+        {
+            // Handle error - could show a toast or error message
+            Console.WriteLine($"Error initializing: {ex.Message}");
+        }
+    }
+
+    private async Task LoadData()
+    {
+        var quranPath = Path.Combine(FileSystem.Current.OpenAppPackageFileAsync("quran-uthmani.txt").Result.Name);
+        var rulesPath = Path.Combine(FileSystem.Current.OpenAppPackageFileAsync("rules.json").Result.Name);
+        
+        await QuranService.LoadQuranTextAsync(quranPath);
+        await QuranService.LoadRulesAsync(rulesPath);
+    }
+
+    private void OnRuleChanged()
+    {
+        selectedRuleInfo = QuranService.GetRuleInfo(selectedRule);
+        searchResults.Clear();
+        hasSearched = false;
+    }
+
+    private void SearchByRule()
+    {
+        if (string.IsNullOrEmpty(selectedRule)) return;
+
+        searchResults = QuranService.SearchByRuleName(selectedRule);
+        hasSearched = true;
+        StateHasChanged();
+    }
+
+    private string HighlightMatches(string text, List<MatchPosition>? matchPositions)
+    {
+        if (matchPositions == null || !matchPositions.Any())
+            return text;
+
+        var result = text;
+        var offset = 0;
+
+        foreach (var match in matchPositions.OrderBy(m => m.Start))
+        {
+            var startTag = "<span class=\"highlighted-text\">";
+            var endTag = "</span>";
+            
+            var insertStart = match.Start + offset;
+            var insertEnd = insertStart + match.Length;
+            
+            result = result.Insert(insertEnd, endTag);
+            result = result.Insert(insertStart, startTag);
+            
+            offset += startTag.Length + endTag.Length;
+        }
+
+        return result;
+    }
+
+    private async Task PlaySingle(QuranAya aya)
+    {
+        var audioPath = GetAudioPath(aya.SurahNumber, aya.AyaNumber);
+        await AudioService.PlayAudioAsync(audioPath);
+    }
+
+    private async Task PlayRepeat(QuranAya aya)
+    {
+        var audioPath = GetAudioPath(aya.SurahNumber, aya.AyaNumber);
+        await AudioService.PlayAudioRepeatAsync(audioPath);
+    }
+
+    private async Task PlayAllSequence()
+    {
+        var audioPaths = searchResults.Select(r => GetAudioPath(r.SurahNumber, r.AyaNumber));
+        await AudioService.PlaySequenceAsync(audioPaths);
+    }
+
+    private async Task StopAudio()
+    {
+        await AudioService.StopAudioAsync();
+    }
+
+    private string GetAudioPath(int surah, int aya)
+    {
+        return $"AL Husary/{surah:000}{aya:000}.mp3";
+    }
+
+    private void OnAudioStatusChanged(object? sender, AudioStatusEventArgs e)
+    {
+        isPlaying = e.IsPlaying;
+        isRepeating = e.IsRepeating;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        if (AudioService != null)
+        {
+            AudioService.AudioStatusChanged -= OnAudioStatusChanged;
+        }
+    }
+}
