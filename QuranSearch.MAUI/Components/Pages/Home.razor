@@ -130,11 +130,27 @@
 
     private async Task LoadData()
     {
-        var quranPath = Path.Combine(FileSystem.Current.OpenAppPackageFileAsync("quran-uthmani.txt").Result.Name);
-        var rulesPath = Path.Combine(FileSystem.Current.OpenAppPackageFileAsync("rules.json").Result.Name);
+        using var quranStream = await FileSystem.Current.OpenAppPackageFileAsync("quran-uthmani.txt");
+        using var rulesStream = await FileSystem.Current.OpenAppPackageFileAsync("rules.json");
         
-        await QuranService.LoadQuranTextAsync(quranPath);
-        await QuranService.LoadRulesAsync(rulesPath);
+        var tempQuranPath = Path.GetTempFileName();
+        var tempRulesPath = Path.GetTempFileName();
+        
+        using (var fileStream = File.Create(tempQuranPath))
+        {
+            await quranStream.CopyToAsync(fileStream);
+        }
+        
+        using (var fileStream = File.Create(tempRulesPath))
+        {
+            await rulesStream.CopyToAsync(fileStream);
+        }
+        
+        await QuranService.LoadQuranTextAsync(tempQuranPath);
+        await QuranService.LoadRulesAsync(tempRulesPath);
+        
+        File.Delete(tempQuranPath);
+        File.Delete(tempRulesPath);
     }
 
     private void OnRuleChanged()

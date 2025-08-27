@@ -9,6 +9,7 @@ public class QuranAya
     public string? MatchedCase { get; set; }
     public string? MatchedText { get; set; }
     public List<MatchPosition>? MatchPositions { get; set; }
+    public List<MatchPosition>? Matches { get; set; }
 }
 
 public class MatchPosition
@@ -16,4 +17,6 @@ public class MatchPosition
     public int Start { get; set; }
     public int Length { get; set; }
     public string MatchedText { get; set; } = string.Empty;
+    public string RuleName { get; set; } = string.Empty;
+    public string CaseName { get; set; } = string.Empty;
 }

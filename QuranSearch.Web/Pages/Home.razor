@@ -1,11 +1,12 @@
 @page "/"
 @using QuranSearch.Core.Services
+@using QuranSearch.Web.Services
 @using QuranSearch.Core.Models
-@inject QuranSearchService QuranService
+@inject WebQuranSearchService QuranSearchService
 @inject IAudioService AudioService
 @inject HttpClient Http
 
-<PageTitle>Quran Search - بحث القرآن الكريم</PageTitle>
+@* <PageTitle>Quran Search - بحث القرآن الكريم</PageTitle> *@
 
 <div class="container-fluid">
     <div class="row">
@@ -36,20 +37,12 @@
                 </div>
             </div>
 
-            @if (selectedRuleInfo != null)
+            @if (!string.IsNullOrEmpty(selectedRuleInfo))
             {
                 <div class="rule-info mb-4">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="mb-0">@selectedRuleInfo.Name</h5>
-                        </div>
-                        <div class="card-body">
-                            @foreach (var ruleCase in selectedRuleInfo.Cases)
-                            {
-                                <div class="mb-2">
-                                    <strong>الوصف:</strong> @ruleCase.Description
-                                </div>
-                            }
+                            <h5 class="mb-0">@selectedRuleInfo</h5>
                         </div>
                     </div>
                 </div>
@@ -128,7 +121,7 @@
 @code {
     private List<string> ruleNames = new();
     private string selectedRule = "";
-    private TajweedRule? selectedRuleInfo;
+    private string selectedRuleInfo = "";
     private List<QuranAya> searchResults = new();
     private bool hasSearched = false;
     private bool isLoading = false;
@@ -142,7 +135,6 @@
         {
             isLoading = true;
             await LoadData();
-            ruleNames = QuranService.GetRuleNames();
             AudioService.AudioStatusChanged += OnAudioStatusChanged;
         }
         catch (Exception ex)
@@ -157,28 +149,15 @@
 
     private async Task LoadData()
     {
-        // Load Quran text from web assets
-        var quranText = await Http.GetStringAsync("data/quran-uthmani.txt");
-        var rulesJson = await Http.GetStringAsync("data/rules.json");
-        
-        // Create temporary files for the service to read
-        var tempQuranPath = Path.GetTempFileName();
-        var tempRulesPath = Path.GetTempFileName();
-        
-        await File.WriteAllTextAsync(tempQuranPath, quranText);
-        await File.WriteAllTextAsync(tempRulesPath, rulesJson);
-        
-        await QuranService.LoadQuranTextAsync(tempQuranPath);
-        await QuranService.LoadRulesAsync(tempRulesPath);
-        
-        // Clean up temp files
-        File.Delete(tempQuranPath);
-        File.Delete(tempRulesPath);
+        await QuranSearchService.LoadQuranTextAsync();
+        await QuranSearchService.LoadRulesAsync();
+        ruleNames = QuranSearchService.GetRuleNames();
+        StateHasChanged(); // Force UI update after data loads
     }
 
     private void OnRuleChanged()
     {
-        selectedRuleInfo = QuranService.GetRuleInfo(selectedRule);
+        selectedRuleInfo = "";
         searchResults.Clear();
         hasSearched = false;
         errorMessage = null;
@@ -194,7 +173,7 @@
             errorMessage = null;
             
             await Task.Delay(100); // Small delay to show loading state
-            searchResults = QuranService.SearchByRuleName(selectedRule);
+            searchResults = QuranSearchService.SearchByRuleName(selectedRule);
             hasSearched = true;
         }
         catch (Exception ex)

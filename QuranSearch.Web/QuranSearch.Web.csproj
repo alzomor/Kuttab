@@ -15,9 +15,5 @@
     <ProjectReference Include="..\QuranSearch.Core\QuranSearch.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="..\quran-uthmani.txt" Link="wwwroot\data\quran-uthmani.txt" />
-    <Content Include="..\rules.json" Link="wwwroot\data\rules.json" />
-  </ItemGroup>
 
 </Project>

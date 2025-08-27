@@ -11,7 +11,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 // Register services
-builder.Services.AddSingleton<QuranSearchService>();
-builder.Services.AddSingleton<IAudioService, WebAudioService>();
+builder.Services.AddScoped<WebQuranSearchService>();
+builder.Services.AddScoped<IAudioService, WebAudioService>();
 
 await builder.Build().RunAsync();
