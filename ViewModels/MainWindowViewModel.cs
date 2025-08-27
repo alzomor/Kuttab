@@ -26,6 +26,7 @@ public class MainWindowViewModel : ViewModelBase
     private string _ruleDescription = string.Empty;
     private bool _isPlaying = false;
     private bool _isRepeating = false;
+    private bool _isPlayingSequence = false;
     private string? _currentPicturePath;
     private Bitmap? _currentPictureBitmap;
 
@@ -229,30 +230,47 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
         
+        _isPlayingSequence = true;
         StatusMessage = $"Playing all {SearchResults.Count} found ayas in sequence";
         _audioService.SetRepeatMode(false);
         
         // Play each Aya in sequence
         foreach (var aya in SearchResults)
         {
+            // Check if stop was requested
+            if (!_isPlayingSequence)
+            {
+                StatusMessage = "Sequence playback stopped";
+                return;
+            }
+            
             if (_audioService.AudioFileExists(aya.SurahNumber, aya.AyaNumber))
             {
                 StatusMessage = $"Playing Aya {aya.SurahNumber}:{aya.AyaNumber}";
                 await _audioService.PlayAyaAsync(aya.SurahNumber, aya.AyaNumber);
                 
-                // Wait for current audio to finish before playing next
-                while (_audioService.IsPlaying)
+                // Wait for current audio to finish before playing next, but check for stop
+                while (_audioService.IsPlaying && _isPlayingSequence)
                 {
                     await Task.Delay(100);
+                }
+                
+                // If stop was requested during playback, exit immediately
+                if (!_isPlayingSequence)
+                {
+                    StatusMessage = "Sequence playback stopped";
+                    return;
                 }
             }
         }
         
+        _isPlayingSequence = false;
         StatusMessage = "Finished playing all ayas";
     }
 
     private async void StopPlayback()
     {
+        _isPlayingSequence = false; // Stop sequence playback immediately
         await _audioService.StopAsync();
         StatusMessage = "Playback stopped";
     }

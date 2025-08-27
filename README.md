@@ -1,44 +1,73 @@
 # Quran Pattern Search Application
 
-An Avalonia-based GUI application for searching Arabic text patterns in the Quran with multimedia support.
+A cross-platform application suite for searching Arabic text patterns in the Quran with multimedia support. Available as Avalonia desktop app, MAUI mobile app, and web application.
 
 ## Features
 
-- **Pattern Search**: Search for predefined Arabic patterns in the Quran text
-- **Dropdown Selection**: Choose from predefined rules/patterns stored in `rules.txt`
-- **Search Results**: Display all matching Ayahs (verses) with full text
+- **Pattern Search**: Search for predefined Arabic patterns in the Quran text using Tajweed rules
+- **Dropdown Selection**: Choose from predefined rules/patterns stored in `rules.json`
+- **Search Results**: Display all matching Ayahs (verses) with full text and highlighting
 - **Multiple Occurrences**: If a pattern appears multiple times in one Aya, it's displayed multiple times
 - **Audio Controls**: 
-  - Play single Aya
-  - Repeat selected Aya multiple times
+  - Play single Aya with Al-Husary recitation
+  - Repeat selected Aya continuously
   - Play all found Ayahs in sequence
-- **Picture Display**: Area for displaying images related to selected Aya
+  - Cross-platform audio support (Linux/macOS/Windows)
+- **Picture Display**: Display Quranic text images for selected Ayahs
 - **RTL Support**: Right-to-left text display for Arabic content
+- **Cross-Platform**: Desktop (Avalonia), Mobile (MAUI), and Web versions
 
-## Files Structure
+## Project Structure
 
-- `QuranSearchApp.csproj` - Project configuration
+### Core Components
+- `QuranSearchApp.csproj` - Avalonia desktop application
+- `QuranSearch.Core/` - Shared business logic and models
+- `QuranSearch.MAUI/` - Cross-platform mobile application
+- `QuranSearch.Web/` - ASP.NET Core web application
+- `QuranSearchWebApi/` - Web API backend
+
+### Data Files
 - `quran-uthmani.txt` - Quranic text in Uthmani script
-- `rules.txt` - Predefined search patterns
-- `Models/QuranAya.cs` - Data model for Quranic verses
-- `Services/QuranSearchService.cs` - Core search functionality
-- `ViewModels/MainWindowViewModel.cs` - UI logic and data binding
-- `Views/MainWindow.axaml` - Main window UI layout
-- `Program.cs` - Application entry point
+- `rules.json` - Tajweed rules and search patterns with metadata
+- `AL Husary/` - Audio files for verse-by-verse recitation
+- `QuranText_jpg/` - Quranic text images
+
+### Shared Components
+- `Models/` - Data models (QuranAya, TajweedRule)
+- `Services/` - Core services (QuranSearchService, AudioService, PictureService)
+- `ViewModels/` - MVVM view models for desktop app
+- `Views/` - Avalonia UI views and controls
 
 ## How to Run
 
 ### Prerequisites
 - .NET 8.0 SDK
-- Linux desktop environment with X11 or Wayland
+- For desktop: Linux/Windows/macOS desktop environment
+- For mobile: Android SDK or iOS development tools
+- For web: Any modern web browser
 
-### Build and Run
+### Avalonia Desktop Application
 ```bash
-# Build the application
-dotnet build QuranSearchApp.csproj
-
-# Run the application
+# Clean and run the desktop app
+rm -rf obj bin
 dotnet run --project QuranSearchApp.csproj
+```
+
+### MAUI Mobile Application
+```bash
+# For Android
+dotnet build QuranSearch.MAUI/QuranSearch.MAUI.csproj -f net8.0-android
+dotnet run --project QuranSearch.MAUI/QuranSearch.MAUI.csproj -f net8.0-android
+
+# For iOS (macOS only)
+dotnet build QuranSearch.MAUI/QuranSearch.MAUI.csproj -f net8.0-ios
+```
+
+### Web Application
+```bash
+# Run the web version
+dotnet run --project QuranSearch.Web/QuranSearch.Web.csproj
+# Access at http://localhost:5000
 ```
 
 ### Usage
@@ -51,23 +80,57 @@ dotnet run --project QuranSearchApp.csproj
 
 ## Technical Details
 
+### Avalonia Desktop App
 - **Framework**: .NET 8.0
 - **UI Framework**: Avalonia UI 11.0.10
 - **Architecture**: MVVM pattern with ReactiveUI
+- **Audio**: Cross-platform system command integration
+- **Text Rendering**: RTL support for Arabic text
+
+### MAUI Mobile App
+- **Framework**: .NET 8.0 MAUI
+- **Platforms**: Android, iOS
+- **Shared Logic**: QuranSearch.Core library
+- **UI**: Native platform controls
+
+### Web Application
+- **Framework**: ASP.NET Core 8.0
+- **Frontend**: Blazor Server/WebAssembly
+- **API**: RESTful web services
+- **Deployment**: Cross-platform web hosting
+
+### Data Format
 - **Text Format**: Pipe-separated format (Surah|Aya|Text)
-- **Search Algorithm**: Case-insensitive string matching with occurrence counting
+- **Rules Format**: JSON with pattern metadata and descriptions
+- **Audio Format**: MP3 files with 6-digit naming (SSS+AAA)
+- **Images**: JPG format for Quranic text visualization
 
-## Future Enhancements
+### Search Algorithm
+- **Pattern Matching**: Regex-based with Tajweed rule support
+- **Highlighting**: Multi-occurrence text highlighting
+- **Performance**: Optimized for large text corpus search
 
-- Audio file integration and playback
-- Image loading and display
-- Custom pattern creation
-- Export/import functionality
-- Multi-language support
+## Audio Integration
+
+The application includes full audio playback capabilities:
+- **Reciter**: Sheikh Mahmoud Khalil Al-Husary
+- **Format**: Verse-by-verse MP3 files
+- **Controls**: Play, repeat, sequence playback, stop
+- **Cross-platform**: Linux (paplay), macOS (afplay), Windows (PowerShell)
 
 ## Troubleshooting
 
-If you encounter display issues:
-- Ensure you have a GUI environment running
-- Try running with `DISPLAY=:0 dotnet run --project QuranSearchApp.csproj`
-- For headless systems, consider using X11 forwarding or VNC
+### Desktop Application
+- Ensure GUI environment is running
+- For headless systems: `DISPLAY=:0 dotnet run --project QuranSearchApp.csproj`
+- Clean build artifacts if encountering errors: `rm -rf obj bin`
+
+### MAUI Application
+- Install required workloads: `dotnet workload install maui`
+- For Android: Ensure Android SDK is properly configured
+- For iOS: Requires macOS with Xcode
+
+### Web Application
+- Check port availability (default: 5000)
+- Ensure firewall allows web traffic
+- For production: Configure proper hosting environment
