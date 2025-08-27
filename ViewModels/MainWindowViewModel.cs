@@ -30,6 +30,7 @@ public class MainWindowViewModel : ViewModelBase
     private bool _isSequencePaused = false;
     private int _lastPlayedAyaIndex = -1;
     private int _currentPlayingAyaIndex = -1;
+    private QuranAya? _currentPlayingAya;
     private string? _currentPicturePath;
     private Bitmap? _currentPictureBitmap;
 
@@ -145,6 +146,12 @@ public class MainWindowViewModel : ViewModelBase
     public bool CanPauseSequence => _isPlayingSequence && !_isSequencePaused;
 
     public bool IsSequenceActive => _isPlayingSequence; // Button should be visible when sequence is active (playing or paused)
+
+    public QuranAya? CurrentPlayingAya
+    {
+        get => _currentPlayingAya;
+        set => this.RaiseAndSetIfChanged(ref _currentPlayingAya, value);
+    }
 
     public string PauseResumeButtonText => _isSequencePaused ? "Resume Sequence" : "Pause Sequence";
 
@@ -276,6 +283,7 @@ public class MainWindowViewModel : ViewModelBase
         _isSequencePaused = false;
         _lastPlayedAyaIndex = -1;
         _currentPlayingAyaIndex = -1;
+        CurrentPlayingAya = null;
         IsPlayingSequence = true;
         IsSequencePaused = false;
         
@@ -310,6 +318,18 @@ public class MainWindowViewModel : ViewModelBase
             if (_audioService.AudioFileExists(aya.SurahNumber, aya.AyaNumber))
             {
                 _currentPlayingAyaIndex = i; // Track currently playing Aya
+                
+                // Clear previous highlighting
+                if (CurrentPlayingAya != null)
+                    CurrentPlayingAya.IsCurrentlyPlaying = false;
+                
+                // Set current playing Aya and highlight it
+                CurrentPlayingAya = aya;
+                aya.IsCurrentlyPlaying = true;
+                
+                // Auto-select the currently playing Aya to make it scroll into view
+                SelectedAya = aya;
+                
                 StatusMessage = $"Playing Aya {aya.SurahNumber}:{aya.AyaNumber} ({i + 1}/{SearchResults.Count})";
                 await _audioService.PlayAyaAsync(aya.SurahNumber, aya.AyaNumber);
                 
@@ -357,6 +377,10 @@ public class MainWindowViewModel : ViewModelBase
         IsSequencePaused = false;
         _lastPlayedAyaIndex = -1;
         _currentPlayingAyaIndex = -1;
+        // Clear highlighting from previous playing Aya
+        if (CurrentPlayingAya != null)
+            CurrentPlayingAya.IsCurrentlyPlaying = false;
+        CurrentPlayingAya = null;
         await _audioService.StopAsync();
         StatusMessage = "Playback stopped";
     }

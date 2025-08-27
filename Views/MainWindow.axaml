@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:QuranSearchApp.ViewModels"
         xmlns:views="using:QuranSearchApp.Views"
+        xmlns:models="using:QuranSearchApp.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
@@ -79,20 +80,37 @@
                          ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Margin="8">
-                            <!-- Sura and Aya on same line -->
-                            <TextBlock FontSize="16" Foreground="Gray" Margin="0,0,0,5">
-                                <Run Text="Surah "/>
-                                <Run Text="{Binding SurahNumber}"/>
-                                <Run Text=" - Aya "/>
-                                <Run Text="{Binding AyaNumber}"/>
-                            </TextBlock>
-                            
-                            <!-- Arabic text with highlighted matches -->
-                            <views:HighlightedTextBlock Text="{Binding Text}"
-                                                        MatchPositions="{Binding MatchPositions}"
-                                                        Margin="0,0,0,8"/>
-                        </StackPanel>
+                        <Border Margin="4" Padding="8" CornerRadius="5"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                BorderThickness="0">
+                            <Border.Styles>
+                                <Style Selector="Border" x:DataType="models:QuranAya">
+                                    <Style Selector="^[Tag=True]">
+                                        <Setter Property="Background" Value="LightBlue"/>
+                                        <Setter Property="BorderBrush" Value="Blue"/>
+                                        <Setter Property="BorderThickness" Value="2"/>
+                                    </Style>
+                                </Style>
+                            </Border.Styles>
+                            <Border.Tag>
+                                <Binding Path="IsCurrentlyPlaying"/>
+                            </Border.Tag>
+                            <StackPanel>
+                                <!-- Sura and Aya on same line -->
+                                <TextBlock FontSize="16" Foreground="Gray" Margin="0,0,0,5">
+                                    <Run Text="Surah "/>
+                                    <Run Text="{Binding SurahNumber}"/>
+                                    <Run Text=" - Aya "/>
+                                    <Run Text="{Binding AyaNumber}"/>
+                                </TextBlock>
+                                
+                                <!-- Arabic text with highlighted matches -->
+                                <views:HighlightedTextBlock Text="{Binding Text}"
+                                                            MatchPositions="{Binding MatchPositions}"
+                                                            Margin="0,0,0,8"/>
+                            </StackPanel>
+                        </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
                 </ListBox>
