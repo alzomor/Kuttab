@@ -113,7 +113,15 @@
             
             <Button Content="Play All Sequence" 
                     Command="{Binding PlayAllCommand}"
-                    IsEnabled="{Binding !IsPlaying}"
+                    IsEnabled="{Binding !IsPlayingSequence}"
+                    Margin="0,0,10,0" Padding="10,5"/>
+            
+            <!-- Pause/Resume toggle button -->
+            <Button Content="{Binding PauseResumeButtonText}"
+                    Command="{Binding PauseResumeCommand}"
+                    IsVisible="{Binding IsSequenceActive}"
+                    Background="{Binding PauseResumeButtonColor}"
+                    Foreground="White"
                     Margin="0,0,10,0" Padding="10,5"/>
             
             <Button Content="Stop" 
@@ -139,6 +147,15 @@
                            Foreground="Orange"
                            Margin="5,0,0,0"
                            IsVisible="{Binding IsRepeating}"/>
+                <TextBlock Text="⏸" 
+                           Foreground="Orange" 
+                           FontSize="16"
+                           IsVisible="{Binding IsSequencePaused}"
+                           Margin="10,0,5,0"/>
+                <TextBlock Text="Sequence Paused" 
+                           FontWeight="Bold"
+                           Foreground="Orange"
+                           IsVisible="{Binding IsSequencePaused}"/>
             </StackPanel>
         </StackPanel>
 

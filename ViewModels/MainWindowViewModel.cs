@@ -27,6 +27,9 @@ public class MainWindowViewModel : ViewModelBase
     private bool _isPlaying = false;
     private bool _isRepeating = false;
     private bool _isPlayingSequence = false;
+    private bool _isSequencePaused = false;
+    private int _lastPlayedAyaIndex = -1;
+    private int _currentPlayingAyaIndex = -1;
     private string? _currentPicturePath;
     private Bitmap? _currentPictureBitmap;
 
@@ -45,6 +48,8 @@ public class MainWindowViewModel : ViewModelBase
         PlayRepeatCommand = new SimpleCommand(PlayRepeat);
         PlayAllCommand = new SimpleCommand(PlayAll);
         StopCommand = new SimpleCommand(StopPlayback);
+        PauseSequenceCommand = new SimpleCommand(PauseSequence);
+        ResumeSequenceCommand = new SimpleCommand(ResumeSequence);
         
         _ = LoadDataAsync();
     }
@@ -113,6 +118,40 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isRepeating, value);
     }
 
+    public bool IsPlayingSequence
+    {
+        get => _isPlayingSequence;
+        set 
+        { 
+            this.RaiseAndSetIfChanged(ref _isPlayingSequence, value);
+            this.RaisePropertyChanged(nameof(CanPauseSequence));
+            this.RaisePropertyChanged(nameof(IsSequenceActive));
+        }
+    }
+
+    public bool IsSequencePaused
+    {
+        get => _isSequencePaused;
+        set 
+        { 
+            this.RaiseAndSetIfChanged(ref _isSequencePaused, value);
+            this.RaisePropertyChanged(nameof(CanPauseSequence));
+            this.RaisePropertyChanged(nameof(PauseResumeButtonText));
+            this.RaisePropertyChanged(nameof(PauseResumeCommand));
+            this.RaisePropertyChanged(nameof(PauseResumeButtonColor));
+        }
+    }
+
+    public bool CanPauseSequence => _isPlayingSequence && !_isSequencePaused;
+
+    public bool IsSequenceActive => _isPlayingSequence; // Button should be visible when sequence is active (playing or paused)
+
+    public string PauseResumeButtonText => _isSequencePaused ? "Resume Sequence" : "Pause Sequence";
+
+    public ICommand PauseResumeCommand => _isSequencePaused ? ResumeSequenceCommand : PauseSequenceCommand;
+
+    public string PauseResumeButtonColor => _isSequencePaused ? "Green" : "Orange";
+
     public string? CurrentPicturePath
     {
         get => _currentPicturePath;
@@ -132,6 +171,8 @@ public class MainWindowViewModel : ViewModelBase
     public ICommand PlayRepeatCommand { get; }
     public ICommand PlayAllCommand { get; }
     public ICommand StopCommand { get; }
+    public ICommand PauseSequenceCommand { get; }
+    public ICommand ResumeSequenceCommand { get; }
 
     private async Task LoadDataAsync()
     {
@@ -230,27 +271,50 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
         
+        // Reset sequence state
         _isPlayingSequence = true;
+        _isSequencePaused = false;
+        _lastPlayedAyaIndex = -1;
+        _currentPlayingAyaIndex = -1;
+        IsPlayingSequence = true;
+        IsSequencePaused = false;
+        
         StatusMessage = $"Playing all {SearchResults.Count} found ayas in sequence";
         _audioService.SetRepeatMode(false);
         
-        // Play each Aya in sequence
-        foreach (var aya in SearchResults)
+        await PlaySequenceFromIndex(0);
+    }
+    
+    private async Task PlaySequenceFromIndex(int startIndex)
+    {
+        // Play each Aya in sequence starting from the given index
+        for (int i = startIndex; i < SearchResults.Count; i++)
         {
             // Check if stop was requested
             if (!_isPlayingSequence)
             {
                 StatusMessage = "Sequence playback stopped";
+                IsPlayingSequence = false;
                 return;
             }
             
+            // Check if pause was requested
+            if (_isSequencePaused)
+            {
+                _lastPlayedAyaIndex = i - 1; // Save the last completed Aya
+                StatusMessage = "Sequence playback paused";
+                return;
+            }
+            
+            var aya = SearchResults[i];
             if (_audioService.AudioFileExists(aya.SurahNumber, aya.AyaNumber))
             {
-                StatusMessage = $"Playing Aya {aya.SurahNumber}:{aya.AyaNumber}";
+                _currentPlayingAyaIndex = i; // Track currently playing Aya
+                StatusMessage = $"Playing Aya {aya.SurahNumber}:{aya.AyaNumber} ({i + 1}/{SearchResults.Count})";
                 await _audioService.PlayAyaAsync(aya.SurahNumber, aya.AyaNumber);
                 
-                // Wait for current audio to finish before playing next, but check for stop
-                while (_audioService.IsPlaying && _isPlayingSequence)
+                // Wait for current audio to finish before playing next, but check for stop/pause
+                while (_audioService.IsPlaying && _isPlayingSequence && !_isSequencePaused)
                 {
                     await Task.Delay(100);
                 }
@@ -259,20 +323,91 @@ public class MainWindowViewModel : ViewModelBase
                 if (!_isPlayingSequence)
                 {
                     StatusMessage = "Sequence playback stopped";
+                    IsPlayingSequence = false;
                     return;
                 }
+                
+                // If pause was requested during playback, save position and exit
+                if (_isSequencePaused)
+                {
+                    _lastPlayedAyaIndex = i - 1; // Save the Aya before current as last completed
+                    StatusMessage = "Sequence playback paused";
+                    return;
+                }
+                
+                // Mark this Aya as completed
+                _lastPlayedAyaIndex = i;
             }
         }
         
+        // Sequence completed
         _isPlayingSequence = false;
+        _isSequencePaused = false;
+        IsPlayingSequence = false;
+        IsSequencePaused = false;
+        _lastPlayedAyaIndex = -1;
         StatusMessage = "Finished playing all ayas";
     }
 
     private async void StopPlayback()
     {
         _isPlayingSequence = false; // Stop sequence playback immediately
+        _isSequencePaused = false;
+        IsPlayingSequence = false;
+        IsSequencePaused = false;
+        _lastPlayedAyaIndex = -1;
+        _currentPlayingAyaIndex = -1;
         await _audioService.StopAsync();
         StatusMessage = "Playback stopped";
+    }
+    
+    private async void PauseSequence()
+    {
+        if (!_isPlayingSequence || _isSequencePaused)
+        {
+            StatusMessage = "No sequence playback to pause";
+            return;
+        }
+        
+        // Save the current playing Aya as the last position to resume from
+        if (_currentPlayingAyaIndex >= 0)
+        {
+            _lastPlayedAyaIndex = _currentPlayingAyaIndex - 1; // Resume from current Aya
+        }
+        
+        _isSequencePaused = true;
+        IsSequencePaused = true;
+        await _audioService.StopAsync(); // Stop current audio
+        StatusMessage = "Sequence playback paused";
+    }
+    
+    private async void ResumeSequence()
+    {
+        if (!_isSequencePaused || !_isPlayingSequence)
+        {
+            StatusMessage = "No paused sequence to resume";
+            return;
+        }
+        
+        _isSequencePaused = false;
+        IsSequencePaused = false;
+        
+        // Resume from the next Aya after the last completed one
+        int resumeIndex = _lastPlayedAyaIndex + 1;
+        
+        if (resumeIndex < SearchResults.Count)
+        {
+            StatusMessage = $"Resuming sequence from Aya {resumeIndex + 1}/{SearchResults.Count}";
+            await PlaySequenceFromIndex(resumeIndex);
+        }
+        else
+        {
+            // All ayas were completed
+            _isPlayingSequence = false;
+            IsPlayingSequence = false;
+            _lastPlayedAyaIndex = -1;
+            StatusMessage = "Sequence already completed";
+        }
     }
 
     private void OnPlaybackStateChanged(object? sender, bool isPlaying)
