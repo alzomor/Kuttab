@@ -46,6 +46,11 @@
             <TextBlock Text="{Binding FontSize, StringFormat=F0}" 
                        VerticalAlignment="Center" 
                        Width="25"/>
+            
+            <CheckBox Content="Use Online Images" 
+                      IsChecked="{Binding UseRemoteImages}"
+                      VerticalAlignment="Center"
+                      Margin="20,0,0,0"/>
         </StackPanel>
 
         <!-- Results Count -->

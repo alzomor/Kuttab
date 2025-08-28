@@ -33,6 +33,7 @@ public class MainWindowViewModel : ViewModelBase
     private QuranAya? _currentPlayingAya;
     private string? _currentPicturePath;
     private Bitmap? _currentPictureBitmap;
+    private bool _useRemoteImages = false;
 
     public MainWindowViewModel()
     {
@@ -79,7 +80,27 @@ public class MainWindowViewModel : ViewModelBase
         set 
         { 
             this.RaiseAndSetIfChanged(ref _selectedAya, value);
-            UpdatePictureForSelectedAya();
+            OnSelectedAyaChanged();
+        }
+    }
+
+    private void OnSelectedAyaChanged()
+    {
+        if (SelectedAya != null)
+        {
+            // Get the rule description if available
+            RuleDescription = string.Empty;
+            if (!string.IsNullOrEmpty(SelectedRule))
+            {
+                var rule = _searchService.GetRuleInfo(SelectedRule);
+                if (rule != null && rule.Cases.Count > 0)
+                {
+                    RuleDescription = rule.Cases[0].Description;
+                }
+            }
+            
+            this.RaisePropertyChanged(nameof(HasRuleDescription));
+            _ = UpdatePictureForSelectedAyaAsync();
         }
     }
 
@@ -158,6 +179,21 @@ public class MainWindowViewModel : ViewModelBase
     public ICommand PauseResumeCommand => _isSequencePaused ? ResumeSequenceCommand : PauseSequenceCommand;
 
     public string PauseResumeButtonColor => _isSequencePaused ? "Green" : "Orange";
+
+    public bool UseRemoteImages
+    {
+        get => _useRemoteImages;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _useRemoteImages, value);
+            _pictureService.UseRemoteSource = value;
+            // Update the current picture when the source changes
+            if (SelectedAya != null)
+            {
+                _ = UpdatePictureForSelectedAyaAsync();
+            }
+        }
+    }
 
     public string? CurrentPicturePath
     {
@@ -446,7 +482,7 @@ public class MainWindowViewModel : ViewModelBase
         IsPlaying = false;
     }
 
-    private void UpdatePictureForSelectedAya()
+    private async Task UpdatePictureForSelectedAyaAsync()
     {
         if (SelectedAya == null)
         {
@@ -458,28 +494,46 @@ public class MainWindowViewModel : ViewModelBase
 
         Console.WriteLine($"[ViewModel] Updating picture for Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}");
         
-        if (_pictureService.PictureFileExists(SelectedAya.SurahNumber, SelectedAya.AyaNumber))
+        try
         {
-            CurrentPicturePath = _pictureService.GetPictureFilePath(SelectedAya.SurahNumber, SelectedAya.AyaNumber);
-            
-            try
+            if (await _pictureService.PictureExistsAsync(SelectedAya.SurahNumber, SelectedAya.AyaNumber))
             {
-                CurrentPictureBitmap = new Bitmap(CurrentPicturePath);
-                Console.WriteLine($"[ViewModel] Picture loaded successfully: {CurrentPicturePath}");
+                var picturePath = _pictureService.GetPicturePath(SelectedAya.SurahNumber, SelectedAya.AyaNumber);
+                CurrentPicturePath = picturePath;
+                
+                var bitmap = await _pictureService.LoadBitmapAsync(picturePath);
+                if (bitmap != null)
+                {
+                    CurrentPictureBitmap = bitmap;
+                    Console.WriteLine($"[ViewModel] Picture loaded successfully: {picturePath}");
+                }
+                else
+                {
+                    CurrentPictureBitmap = null;
+                    StatusMessage = "Error: Could not load image";
+                    Console.WriteLine($"[ViewModel] Failed to load bitmap for: {picturePath}");
+                }
             }
-            catch (Exception ex)
+            else
             {
+                CurrentPicturePath = null;
                 CurrentPictureBitmap = null;
-                StatusMessage = $"Error loading picture: {ex.Message}";
-                Console.WriteLine($"[ViewModel] Error loading picture: {ex.Message}");
+                StatusMessage = $"Picture not found for Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
+                Console.WriteLine($"[ViewModel] Picture not found for Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}");
             }
         }
-        else
+        catch (Exception ex)
         {
             CurrentPicturePath = null;
             CurrentPictureBitmap = null;
-            StatusMessage = $"Picture not found for Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
-            Console.WriteLine($"[ViewModel] Picture not found for Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}");
+            StatusMessage = $"Error loading picture: {ex.Message}";
+            Console.WriteLine($"[ViewModel] Error in UpdatePictureForSelectedAyaAsync: {ex.Message}");
         }
+    }
+    
+    // Keep the old method for backward compatibility
+    private void UpdatePictureForSelectedAya()
+    {
+        _ = UpdatePictureForSelectedAyaAsync();
     }
 }
