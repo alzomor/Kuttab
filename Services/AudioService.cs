@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -9,11 +10,20 @@ namespace QuranSearchApp.Services
     public class AudioService
     {
         private readonly string _audioBasePath;
+        private readonly string _remoteAudioBaseUrl = "https://everyayah.com/data/Husary_128kbps";
+        private readonly HttpClient _httpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(30) };
+        private bool _useRemoteSource = false;
         private Process? _audioProcess;
         private bool _isPlaying;
         private bool _isRepeating;
         private string? _currentAudioFile;
         private bool _shouldStop;
+
+        public bool UseRemoteSource
+        {
+            get => _useRemoteSource;
+            set => _useRemoteSource = value;
+        }
 
         public AudioService()
         {
@@ -40,15 +50,19 @@ namespace QuranSearchApp.Services
         public bool IsRepeating => _isRepeating;
 
         /// <summary>
-        /// Gets the audio file path for a specific Sura and Aya
+        /// Gets the audio source (local file path or remote URL) for a specific Sura and Aya
         /// </summary>
         /// <param name="suraNumber">Sura number (1-114)</param>
         /// <param name="ayaNumber">Aya number</param>
-        /// <returns>Full path to the MP3 file</returns>
-        public string GetAudioFilePath(int suraNumber, int ayaNumber)
+        /// <returns>Full path or URL to the MP3 file</returns>
+        public string GetAudioSource(int suraNumber, int ayaNumber)
         {
             // Format: SSSAAA.mp3 (6 digits, no underscore, zero-padded)
             string fileName = $"{suraNumber:D3}{ayaNumber:D3}.mp3";
+            if (_useRemoteSource)
+            {
+                return $"{_remoteAudioBaseUrl.TrimEnd('/')}/{fileName}";
+            }
             return Path.Combine(_audioBasePath, fileName);
         }
 
@@ -57,7 +71,12 @@ namespace QuranSearchApp.Services
         /// </summary>
         public bool AudioFileExists(int suraNumber, int ayaNumber)
         {
-            string filePath = GetAudioFilePath(suraNumber, ayaNumber);
+            if (_useRemoteSource)
+            {
+                // Avoid blocking the UI with network I/O. Assume remote exists; errors will surface on playback.
+                return true;
+            }
+            string filePath = GetAudioSource(suraNumber, ayaNumber);
             return File.Exists(filePath);
         }
 
@@ -68,18 +87,49 @@ namespace QuranSearchApp.Services
         {
             try
             {
-                string filePath = GetAudioFilePath(suraNumber, ayaNumber);
-                
-                if (!File.Exists(filePath))
-                {
-                    PlaybackError?.Invoke(this, $"Audio file not found: {Path.GetFileName(filePath)}");
-                    return;
-                }
+                string source = GetAudioSource(suraNumber, ayaNumber);
 
                 await StopAsync();
 
-                _currentAudioFile = filePath;
-                await StartAudioPlaybackAsync(filePath);
+                string pathToPlay = source;
+                string? tempFile = null;
+
+                if (_useRemoteSource)
+                {
+                    // Download to a temp file, then play locally
+                    try
+                    {
+                        tempFile = Path.Combine(Path.GetTempPath(), $"{suraNumber:D3}{ayaNumber:D3}_{Guid.NewGuid():N}.mp3");
+                        using var response = await _httpClient.GetAsync(source, HttpCompletionOption.ResponseHeadersRead);
+                        response.EnsureSuccessStatusCode();
+                        await using (var fs = File.Create(tempFile))
+                        {
+                            await response.Content.CopyToAsync(fs);
+                        }
+                        pathToPlay = tempFile;
+                    }
+                    catch (Exception ex)
+                    {
+                        PlaybackError?.Invoke(this, $"Failed to download audio: {ex.Message}");
+                        // Cleanup temp file if partially created
+                        if (tempFile != null && File.Exists(tempFile))
+                        {
+                            try { File.Delete(tempFile); } catch { }
+                        }
+                        return;
+                    }
+                }
+                else
+                {
+                    if (!File.Exists(pathToPlay))
+                    {
+                        PlaybackError?.Invoke(this, $"Audio file not found: {Path.GetFileName(pathToPlay)}");
+                        return;
+                    }
+                }
+
+                _currentAudioFile = pathToPlay;
+                await StartAudioPlaybackAsync(pathToPlay);
             }
             catch (Exception ex)
             {
@@ -218,6 +268,21 @@ namespace QuranSearchApp.Services
                 // Restart the same audio after a short delay
                 Task.Delay(100).ContinueWith(_ => StartAudioPlaybackAsync(_currentAudioFile));
             }
+
+            // If the current file is a temp file (remote download), try to delete it
+            try
+            {
+                if (!string.IsNullOrEmpty(_currentAudioFile))
+                {
+                    var tempPath = Path.GetFullPath(Path.GetTempPath());
+                    var playedPath = Path.GetFullPath(_currentAudioFile);
+                    if (playedPath.StartsWith(tempPath, StringComparison.OrdinalIgnoreCase) && File.Exists(playedPath))
+                    {
+                        try { File.Delete(playedPath); } catch { /* ignore */ }
+                    }
+                }
+            }
+            catch { /* ignore */ }
         }
 
         public void Dispose()
@@ -226,3 +291,4 @@ namespace QuranSearchApp.Services
         }
     }
 }
+

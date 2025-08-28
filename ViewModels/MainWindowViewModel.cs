@@ -34,12 +34,15 @@ public class MainWindowViewModel : ViewModelBase
     private string? _currentPicturePath;
     private Bitmap? _currentPictureBitmap;
     private bool _useRemoteImages = false;
+    private bool _useRemoteAudio = false;
 
     public MainWindowViewModel()
     {
         _searchService = new QuranSearchService();
         _audioService = new AudioService();
         _pictureService = new PictureService();
+        // Initialize audio remote source setting
+        _audioService.UseRemoteSource = _useRemoteAudio;
         
         // Subscribe to audio service events
         _audioService.PlaybackStateChanged += OnPlaybackStateChanged;
@@ -192,6 +195,16 @@ public class MainWindowViewModel : ViewModelBase
             {
                 _ = UpdatePictureForSelectedAyaAsync();
             }
+        }
+    }
+
+    public bool UseRemoteAudio
+    {
+        get => _useRemoteAudio;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _useRemoteAudio, value);
+            _audioService.UseRemoteSource = value;
         }
     }
 

@@ -51,6 +51,11 @@
                       IsChecked="{Binding UseRemoteImages}"
                       VerticalAlignment="Center"
                       Margin="20,0,0,0"/>
+                      
+            <CheckBox Content="Use Online Audio" 
+                      IsChecked="{Binding UseRemoteAudio}"
+                      VerticalAlignment="Center"
+                      Margin="20,0,0,0"/>
         </StackPanel>
 
         <!-- Results Count -->
