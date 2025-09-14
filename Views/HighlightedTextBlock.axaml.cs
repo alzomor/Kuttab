@@ -44,15 +44,15 @@ public partial class HighlightedTextBlock : UserControl
 
     private void UpdateHighlightedText()
     {
-        var textBlock = this.FindControl<TextBlock>("MainTextBlock");
-        if (textBlock == null) return;
+        var textBlock = this.FindControl<TextBlock>("MainTextBlock");  // find MainTextBlock  in the XAML
+        if (textBlock == null) return;                                                  //return if not found
 
-        textBlock.Inlines?.Clear();
+        textBlock.Inlines?.Clear();                                                    // Clear existing text and formatting
 
-        if (string.IsNullOrEmpty(Text))
+        if (string.IsNullOrEmpty(Text))                                             //if no text ,then no need for highlighting
             return;
 
-        if (MatchPositions == null || !MatchPositions.Any())
+        if (MatchPositions == null || !MatchPositions.Any())                     //if no matches, just display the text as is   
         {
             textBlock.Inlines?.Add(new Run { Text = Text });
             return;
@@ -71,6 +71,12 @@ public partial class HighlightedTextBlock : UserControl
             }
 
             // Add highlighted match with yellow background
+            if (match.Length == 1)
+            {
+                match.Length = 3; // to make it more visible, highlight 2 characters if only one character is matched
+                if (match.Start > 0)
+                    match.Start--;
+            }
             var matchText = Text.Substring(match.Start, match.Length);
             var highlightedRun = new Run 
             { 

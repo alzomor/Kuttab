@@ -112,6 +112,10 @@ public class QuranSearchService
             return new List<QuranAya>();
 
         var results = new List<QuranAya>();
+        
+        // Define the stop sign characters we want to highlight
+        var stopSigns = new[] { 'ۚ', 'ۖ', 'ۗ', 'ۙ', 'ۘ', 'ۛ' };
+        bool isStopSignRule = rule.Name.Contains("وقف") || rule.Name.Contains("وصل");
 
         foreach (var aya in _quranText)
         {
@@ -119,32 +123,68 @@ public class QuranSearchService
             {
                 try
                 {
-                    var regex = new Regex(ruleCase.Regex, RegexOptions.IgnoreCase);
-                    var matches = regex.Matches(aya.Text);
-                    
-                    // Add the aya once for each match found
-                    foreach (Match match in matches)
+                    if (isStopSignRule && ruleCase.Regex.Length == 1 && stopSigns.Contains(ruleCase.Regex[0]))
                     {
-                        var matchPositions = new List<MatchPosition>
+                        // Direct character matching for stop signs
+                        var matches = new List<MatchPosition>();
+                        char searchChar = ruleCase.Regex[0];
+                        
+                        // Find all occurrences using IndexOf
+                        int index = aya.Text.IndexOf(searchChar);
+                        while (index != -1)
                         {
-                            new MatchPosition
+                            matches.Add(new MatchPosition
                             {
-                                Start = match.Index,
-                                Length = match.Length,
-                                MatchedText = match.Value
-                            }
-                        };
+                                Start = index,
+                                Length = 1,
+                                MatchedText = searchChar.ToString()
+                            });
+                            index = aya.Text.IndexOf(searchChar, index + 1);
+                        }
 
-                        results.Add(new QuranAya
+                        if (matches.Count > 0)
                         {
-                            SurahNumber = aya.SurahNumber,
-                            AyaNumber = aya.AyaNumber,
-                            Text = aya.Text,
-                            FullLine = aya.FullLine,
-                            MatchedCase = ruleCase.Description,
-                            MatchedText = match.Value,
-                            MatchPositions = matchPositions
-                        });
+                            results.Add(new QuranAya
+                            {
+                                SurahNumber = aya.SurahNumber,
+                                AyaNumber = aya.AyaNumber,
+                                Text = aya.Text,
+                                FullLine = aya.FullLine,
+                                MatchedCase = ruleCase.Description,
+                                MatchedText = searchChar.ToString(),
+                                MatchPositions = matches
+                            });
+                        }
+                    }
+                    else
+                    {
+                        // Original regex handling for other rules
+                        var regex = new Regex(ruleCase.Regex, RegexOptions.IgnoreCase);
+                        var regexMatches = regex.Matches(aya.Text);
+                        
+                        foreach (Match match in regexMatches)
+                        {
+                            var matchPositions = new List<MatchPosition>
+                            {
+                                new MatchPosition
+                                {
+                                    Start = match.Index,
+                                    Length = match.Length,
+                                    MatchedText = match.Value
+                                }
+                            };
+
+                            results.Add(new QuranAya
+                            {
+                                SurahNumber = aya.SurahNumber,
+                                AyaNumber = aya.AyaNumber,
+                                Text = aya.Text,
+                                FullLine = aya.FullLine,
+                                MatchedCase = ruleCase.Description,
+                                MatchedText = match.Value,
+                                MatchPositions = matchPositions
+                            });
+                        }
                     }
                 }
                 catch (Exception)
