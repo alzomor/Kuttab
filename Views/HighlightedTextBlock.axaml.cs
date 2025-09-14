@@ -81,8 +81,9 @@ public partial class HighlightedTextBlock : UserControl
             var highlightedRun = new Run 
             { 
                 Text = matchText,
-                Background = Brushes.Yellow,
-                Foreground = Brushes.DarkBlue
+                Background = Brushes.Orange,  // Changed from Yellow to Orange for better visibility
+                Foreground = Brushes.Black,   // Changed from DarkBlue to Black for better contrast
+                FontWeight = FontWeight.Bold  // Added bold to make stop signs more prominent
             };
             textBlock.Inlines?.Add(highlightedRun);
 

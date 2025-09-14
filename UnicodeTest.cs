@@ -1,39 +1,11 @@
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Markup.Xaml;
-using QuranSearchApp.ViewModels;
-using QuranSearchApp.Views;
 using System;
 using System.Text;
 
-namespace QuranSearchApp;
-
-public partial class App : Application
+namespace QuranSearchApp
 {
-    public override void Initialize()
+    public class UnicodeTest
     {
-        AvaloniaXamlLoader.Load(this);
-        
-        // Run Unicode test on startup (commented out for production)
-        // TestUnicodePreservation();
-    }
-
-    public override void OnFrameworkInitializationCompleted()
-    {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainWindowViewModel(),
-            };
-        }
-
-        base.OnFrameworkInitializationCompleted();
-    }
-    
-    private void TestUnicodePreservation()
-    {
-        try
+        public static void TestUnicodePreservation()
         {
             // Test the specific characters you mentioned
             var testChars = new[] { 'ۘ', 'ۛ' };
@@ -85,22 +57,5 @@ public partial class App : Application
                 }
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Unicode test error: {ex.Message}");
-        }
     }
-}
-
-class Program
-{
-    [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
-        .StartWithClassicDesktopLifetime(args);
-
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace();
 }

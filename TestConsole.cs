@@ -6,7 +6,7 @@ namespace QuranSearchApp;
 
 public class TestConsole
 {
-    public static async Task Main(string[] args)
+    public static async Task TestMain(string[] args)
     {
         Console.WriteLine("Testing Quran Search Service...");
         
