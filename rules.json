@@ -184,7 +184,8 @@
             "cases": [
               {
                 "description": "علامة ج الصغيرة",
-                "regex": "\\u06DA"  // ۚ
+                "regex": "\\u06DA",
+                "comment": "ۚ"
               }
             ]
           },
@@ -193,7 +194,8 @@
             "cases": [
               {
                 "description": "علامة صلى الصغيرة",
-                "regex": "\\u06D6"  // ۖ
+                "regex": "\\u06D6",
+                "comment": "ۖ"
               }
             ]
           },
@@ -202,7 +204,8 @@
             "cases": [
               {
                 "description": "علامة قلى الصغيرة",
-                "regex": "\\u06D7"  // ۗ
+                "regex": "\\u06D7",
+                "comment": "ۗ"
               }
             ]
           },
@@ -211,7 +214,8 @@
             "cases": [
               {
                 "description": "علامة لا الصغيرة",
-                "regex": "\\u06D9"  // ۙ
+                "regex": "\\u06D9",
+                "comment": "ۙ"
               }
             ]
           },
@@ -220,7 +224,8 @@
             "cases": [
               {
                 "description": "علامة م الصغيرة",
-                "regex": "\\u06D8"  // ۘ
+                "regex": "\\u06D8",
+                "comment": "ۘ"
               }
             ]
           },
@@ -229,7 +234,8 @@
             "cases": [
               {
                 "description": "علامة ثلاث نقاط مثلثة (ۛ)",
-                "regex": "\\u06DB"  // ۛ
+                "regex": "\\u06DB",
+                "comment": "ۛ"
               }
             ]
           }
