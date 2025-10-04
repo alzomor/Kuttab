@@ -104,18 +104,9 @@ public class QuranSearchService
 
     public List<QuranAya> SearchByRuleName(string ruleName)
     {
-        if (string.IsNullOrWhiteSpace(ruleName))
-            return new List<QuranAya>();
-
-        var rule = _rules.FirstOrDefault(r => r.Name == ruleName);
-        if (rule == null)
-            return new List<QuranAya>();
-
         var results = new List<QuranAya>();
-        
-        // Define the stop sign characters we want to highlight
-        var stopSigns = new[] { 'ۚ', 'ۖ', 'ۗ', 'ۙ', 'ۘ', 'ۛ' };
-        bool isStopSignRule = rule.Name.Contains("وقف") || rule.Name.Contains("وصل");
+        var rule = _rules.FirstOrDefault(r => r.Name == ruleName);
+        if (rule == null) return results;
 
         foreach (var aya in _quranText)
         {
@@ -123,78 +114,40 @@ public class QuranSearchService
             {
                 try
                 {
-                    if (isStopSignRule && ruleCase.Regex.Length == 1 && stopSigns.Contains(ruleCase.Regex[0]))
+                    var matches = new List<MatchPosition>();
+                    var regex = new Regex(ruleCase.Regex);
+                    var regexMatches = regex.Matches(aya.Text);
+                    
+                    foreach (Match match in regexMatches)
                     {
-                        // Direct character matching for stop signs
-                        var matches = new List<MatchPosition>();
-                        char searchChar = ruleCase.Regex[0];
-                        
-                        // Find all occurrences using IndexOf
-                        int index = aya.Text.IndexOf(searchChar);
-                        while (index != -1)
+                        // Automatically filter for 'لام لفظ الجلالة المفخمة' rule
+                        if (ruleName == "لام لفظ الجلالة المفخمة")
                         {
-                            matches.Add(new MatchPosition
-                            {
-                                Start = index,
-                                Length = 1,
-                                MatchedText = searchChar.ToString()
-                            });
-                            index = aya.Text.IndexOf(searchChar, index + 1);
-                        }
-
-                        if (matches.Count > 0)
-                        {
-                            results.Add(new QuranAya
-                            {
-                                SurahNumber = aya.SurahNumber,
-                                AyaNumber = aya.AyaNumber,
-                                Text = aya.Text,
-                                FullLine = aya.FullLine,
-                                MatchedCase = ruleCase.Description,
-                                MatchedText = searchChar.ToString(),
-                                MatchPositions = matches
-                            });
-                        }
-                    }
-                    else
-                    {
-                        // Original regex handling for other rules
-                        var regex = new Regex(ruleCase.Regex, RegexOptions.IgnoreCase);
-                        var regexMatches = regex.Matches(aya.Text);
-                        
-                        foreach (Match match in regexMatches)
-                        {
-                            // استثناء الكلمات المركبة من المد المتصل (يجب أن تكون مد منفصل)
-                            // هَـٰٓؤُلَآءِ (ها + أولاء)، يَـٰٓأَيُّهَا (يا + أيها)، هَـٰٓأَنتُمْ (ها + أنتم)
-                            // ملاحظة: أُو۟لَـٰٓئِكَ هي مد متصل لأنها كلمة واحدة
-                            if (rule.Name == "المد المتصل" && 
-                                (match.Value.StartsWith("هَـٰٓ") || match.Value.StartsWith("يَـٰٓ")))
-                            {
-                                // تخطي هذه الكلمات المركبة فقط - هي في الحقيقة مد منفصل
+                            // Check if the match is for 'الله' and has Tafkheem
+                            if (!AllahFilter.IsLamMufakhkham(aya.Text, match.Index + 1)) // +1 because the regex matches the whole word
                                 continue;
-                            }
-                            
-                            var matchPositions = new List<MatchPosition>
-                            {
-                                new MatchPosition
-                                {
-                                    Start = match.Index,
-                                    Length = match.Length,
-                                    MatchedText = match.Value
-                                }
-                            };
-
-                            results.Add(new QuranAya
-                            {
-                                SurahNumber = aya.SurahNumber,
-                                AyaNumber = aya.AyaNumber,
-                                Text = aya.Text,
-                                FullLine = aya.FullLine,
-                                MatchedCase = ruleCase.Description,
-                                MatchedText = match.Value,
-                                MatchPositions = matchPositions
-                            });
                         }
+                        
+                        matches.Add(new MatchPosition
+                        {
+                            Start = match.Index,
+                            Length = match.Length,
+                            MatchedText = match.Value
+                        });
+                    }
+
+                    if (matches.Count > 0)
+                    {
+                        results.Add(new QuranAya
+                        {
+                            SurahNumber = aya.SurahNumber,
+                            AyaNumber = aya.AyaNumber,
+                            Text = aya.Text,
+                            FullLine = aya.FullLine,
+                            MatchedCase = ruleCase.Description,
+                            MatchedText = string.Join(" | ", matches.Select(m => m.MatchedText)),
+                            MatchPositions = matches
+                        });
                     }
                 }
                 catch (Exception)
@@ -208,7 +161,6 @@ public class QuranSearchService
         return results;
     }
 
-    // Keep the old method for backward compatibility
     public List<QuranAya> SearchPattern(string pattern)
     {
         return SearchByRuleName(pattern);

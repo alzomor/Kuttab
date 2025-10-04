@@ -262,7 +262,6 @@ public class MainWindowViewModel : ViewModelBase
         try
         {
             StatusMessage = "Searching...";
-            
             // Run search on background thread
             var results = await Task.Run(() => _searchService.SearchPattern(SelectedRule));
             
