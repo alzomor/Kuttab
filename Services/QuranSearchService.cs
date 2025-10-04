@@ -164,6 +164,16 @@ public class QuranSearchService
                         
                         foreach (Match match in regexMatches)
                         {
+                            // استثناء الكلمات المركبة من المد المتصل (يجب أن تكون مد منفصل)
+                            // هَـٰٓؤُلَآءِ (ها + أولاء)، يَـٰٓأَيُّهَا (يا + أيها)، هَـٰٓأَنتُمْ (ها + أنتم)
+                            // ملاحظة: أُو۟لَـٰٓئِكَ هي مد متصل لأنها كلمة واحدة
+                            if (rule.Name == "المد المتصل" && 
+                                (match.Value.StartsWith("هَـٰٓ") || match.Value.StartsWith("يَـٰٓ")))
+                            {
+                                // تخطي هذه الكلمات المركبة فقط - هي في الحقيقة مد منفصل
+                                continue;
+                            }
+                            
                             var matchPositions = new List<MatchPosition>
                             {
                                 new MatchPosition
