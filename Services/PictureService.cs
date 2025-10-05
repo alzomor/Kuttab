@@ -28,20 +28,13 @@ namespace QuranSearchApp.Services
                 Timeout = TimeSpan.FromSeconds(10) // 10 second timeout for image loading
             };
 
-            // Use the project directory structure
-            var projectDir = AppDomain.CurrentDomain.BaseDirectory;
+            // Look for picture files in the same directory as the executable
+            var exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            _pictureBasePath = Path.Combine(exeDirectory, "QuranText_jpg");
             
-            // Navigate to the picture folder in the project
-            _pictureBasePath = Path.Combine(projectDir, "..", "..", "..", "..", "QuranText_jpg");
-            
-            // If that doesn't work, try relative to current directory
-            if (!Directory.Exists(_pictureBasePath))
-            {
-                _pictureBasePath = Path.Combine(Directory.GetCurrentDirectory(), "QuranText_jpg");
-            }
-            
-            // Normalize the path
-            _pictureBasePath = Path.GetFullPath(_pictureBasePath);
+            // Log the path for debugging
+            Console.WriteLine($"[PictureService] Looking for picture files in: {_pictureBasePath}");
+            Console.WriteLine($"[PictureService] Directory exists: {Directory.Exists(_pictureBasePath)}");
         }
 
         /// <summary>
@@ -106,11 +99,20 @@ namespace QuranSearchApp.Services
             {
                 if (_useRemoteSource && pathOrUrl.StartsWith("http"))
                 {
-                    using var response = await _httpClient.GetAsync(pathOrUrl);
-                    if (response.IsSuccessStatusCode)
+                    // Extract sura and aya numbers from the URL
+                    string fileName = Path.GetFileName(pathOrUrl);
+                    if (fileName.EndsWith(".jpg"))
                     {
-                        using var stream = await response.Content.ReadAsStreamAsync();
-                        return new Bitmap(stream);
+                        var parts = fileName.Replace(".jpg", "").Split('_');
+                        if (parts.Length == 2 && int.TryParse(parts[0], out int sura) && int.TryParse(parts[1], out int aya))
+                        {
+                            // Use cache system
+                            string? cachedPath = await GetOrDownloadPictureFileAsync(sura, aya);
+                            if (!string.IsNullOrEmpty(cachedPath) && File.Exists(cachedPath))
+                            {
+                                return new Bitmap(cachedPath);
+                            }
+                        }
                     }
                     return null;
                 }
@@ -123,6 +125,56 @@ namespace QuranSearchApp.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"[PictureService] Error loading bitmap: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets picture file from cache or downloads it if not cached
+        /// </summary>
+        private async Task<string?> GetOrDownloadPictureFileAsync(int suraNumber, int ayaNumber)
+        {
+            try
+            {
+                // Ensure cache directory exists
+                if (!Directory.Exists(_pictureBasePath))
+                {
+                    Console.WriteLine($"[PictureService] Creating cache directory: {_pictureBasePath}");
+                    Directory.CreateDirectory(_pictureBasePath);
+                }
+
+                // Check if file exists in cache
+                string fileName = $"{suraNumber}_{ayaNumber}.jpg";
+                string cachedFilePath = Path.Combine(_pictureBasePath, fileName);
+
+                if (File.Exists(cachedFilePath))
+                {
+                    Console.WriteLine($"[PictureService] Using cached file: {cachedFilePath}");
+                    return cachedFilePath;
+                }
+
+                // Download to cache
+                string remoteUrl = new Uri(new Uri(_remoteBaseUrl), fileName).ToString();
+                Console.WriteLine($"[PictureService] Downloading from: {remoteUrl}");
+                Console.WriteLine($"[PictureService] Caching to: {cachedFilePath}");
+
+                using var response = await _httpClient.GetAsync(remoteUrl, HttpCompletionOption.ResponseHeadersRead);
+                Console.WriteLine($"[PictureService] Response status: {response.StatusCode}");
+                response.EnsureSuccessStatusCode();
+
+                await using (var fs = File.Create(cachedFilePath))
+                {
+                    await response.Content.CopyToAsync(fs);
+                }
+
+                var fileInfo = new FileInfo(cachedFilePath);
+                Console.WriteLine($"[PictureService] Downloaded and cached file size: {fileInfo.Length} bytes");
+
+                return cachedFilePath;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[PictureService] Failed to get or download picture: {ex.Message}");
                 return null;
             }
         }

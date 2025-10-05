@@ -34,7 +34,7 @@ public class MainWindowViewModel : ViewModelBase
     private string? _currentPicturePath;
     private Bitmap? _currentPictureBitmap;
     private bool _useRemoteImages = false;
-    private bool _useRemoteAudio = false;
+    private bool _useRemoteAudio = true; // Default to online audio for portability
 
     public MainWindowViewModel()
     {
@@ -419,15 +419,26 @@ public class MainWindowViewModel : ViewModelBase
 
     private async void StopPlayback()
     {
-        _isPlayingSequence = false; // Stop sequence playback immediately
+        // Reset all playback states
+        _isPlayingSequence = false;
         _isSequencePaused = false;
-        IsPlayingSequence = false;
-        IsSequencePaused = false;
+        _isPlaying = false;
+        _isRepeating = false;
         _lastPlayedAyaIndex = -1;
         _currentPlayingAyaIndex = -1;
+        
+        // Update properties with change notifications
+        IsPlaying = false;
+        IsPlayingSequence = false;
+        IsSequencePaused = false;
+        IsRepeating = false;
+        
         // Clear highlighting from previous playing Aya
         if (CurrentPlayingAya != null)
+        {
             CurrentPlayingAya.IsCurrentlyPlaying = false;
+            this.RaisePropertyChanged(nameof(CurrentPlayingAya));
+        }
         CurrentPlayingAya = null;
         await _audioService.StopAsync();
         StatusMessage = "Playback stopped";
@@ -484,14 +495,36 @@ public class MainWindowViewModel : ViewModelBase
 
     private void OnPlaybackStateChanged(object? sender, bool isPlaying)
     {
-        IsPlaying = isPlaying;
-        IsRepeating = _audioService.IsRepeating;
+        // Update the properties on the UI thread
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            IsPlaying = isPlaying;
+            IsRepeating = _audioService.IsRepeating;
+            
+            // Force UI update by raising property changed for IsPlaying
+            this.RaisePropertyChanged(nameof(IsPlaying));
+            
+            // If playback stopped, ensure the UI reflects this immediately
+            if (!isPlaying)
+            {
+                _isPlaying = false;
+                this.RaisePropertyChanged(nameof(IsPlaying));
+            }
+        });
     }
 
     private void OnPlaybackError(object? sender, string error)
     {
-        StatusMessage = $"Audio error: {error}";
-        IsPlaying = false;
+        // Update the UI on the UI thread
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            StatusMessage = $"Audio error: {error}";
+            IsPlaying = false;
+            
+            // Ensure the UI is updated immediately
+            this.RaisePropertyChanged(nameof(StatusMessage));
+            this.RaisePropertyChanged(nameof(IsPlaying));
+        });
     }
 
     private async Task UpdatePictureForSelectedAyaAsync()

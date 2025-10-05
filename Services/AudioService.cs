@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -27,20 +28,13 @@ namespace QuranSearchApp.Services
 
         public AudioService()
         {
-            // Use the project directory structure
-            var projectDir = AppDomain.CurrentDomain.BaseDirectory;
+            // Look for audio files in the same directory as the executable
+            var exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            _audioBasePath = Path.Combine(exeDirectory, "AL Husary");
             
-            // Navigate to the audio folder in the project
-            _audioBasePath = Path.Combine(projectDir, "..", "..", "..", "..", "AL Husary");
-            
-            // If that doesn't work, try relative to current directory
-            if (!Directory.Exists(_audioBasePath))
-            {
-                _audioBasePath = Path.Combine(Directory.GetCurrentDirectory(), "AL Husary");
-            }
-            
-            // Normalize the path
-            _audioBasePath = Path.GetFullPath(_audioBasePath);
+            // Log the path for debugging
+            Console.WriteLine($"[AudioService] Looking for audio files in: {_audioBasePath}");
+            Console.WriteLine($"[AudioService] Directory exists: {Directory.Exists(_audioBasePath)}");
         }
 
         public event EventHandler<bool>? PlaybackStateChanged;
@@ -87,40 +81,24 @@ namespace QuranSearchApp.Services
         {
             try
             {
-                string source = GetAudioSource(suraNumber, ayaNumber);
-
                 await StopAsync();
 
-                string pathToPlay = source;
-                string? tempFile = null;
+                string pathToPlay;
 
                 if (_useRemoteSource)
                 {
-                    // Download to a temp file, then play locally
-                    try
+                    // Try to get from local cache first, download if needed
+                    pathToPlay = await GetOrDownloadAudioFileAsync(suraNumber, ayaNumber);
+                    if (string.IsNullOrEmpty(pathToPlay))
                     {
-                        tempFile = Path.Combine(Path.GetTempPath(), $"{suraNumber:D3}{ayaNumber:D3}_{Guid.NewGuid():N}.mp3");
-                        using var response = await _httpClient.GetAsync(source, HttpCompletionOption.ResponseHeadersRead);
-                        response.EnsureSuccessStatusCode();
-                        await using (var fs = File.Create(tempFile))
-                        {
-                            await response.Content.CopyToAsync(fs);
-                        }
-                        pathToPlay = tempFile;
-                    }
-                    catch (Exception ex)
-                    {
-                        PlaybackError?.Invoke(this, $"Failed to download audio: {ex.Message}");
-                        // Cleanup temp file if partially created
-                        if (tempFile != null && File.Exists(tempFile))
-                        {
-                            try { File.Delete(tempFile); } catch { }
-                        }
+                        PlaybackError?.Invoke(this, $"Failed to get audio for Aya {suraNumber}:{ayaNumber}");
                         return;
                     }
                 }
                 else
                 {
+                    // Use local file directly
+                    pathToPlay = GetAudioSource(suraNumber, ayaNumber);
                     if (!File.Exists(pathToPlay))
                     {
                         PlaybackError?.Invoke(this, $"Audio file not found: {Path.GetFileName(pathToPlay)}");
@@ -129,11 +107,69 @@ namespace QuranSearchApp.Services
                 }
 
                 _currentAudioFile = pathToPlay;
+                
+                // Set playing state immediately before starting playback
+                _isPlaying = true;
+                PlaybackStateChanged?.Invoke(this, true);
+                
                 await StartAudioPlaybackAsync(pathToPlay);
             }
             catch (Exception ex)
             {
+                // Ensure we clear the playing state on error
+                _isPlaying = false;
+                PlaybackStateChanged?.Invoke(this, false);
                 PlaybackError?.Invoke(this, $"Error playing audio: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Gets audio file from cache or downloads it if not cached
+        /// </summary>
+        private async Task<string?> GetOrDownloadAudioFileAsync(int suraNumber, int ayaNumber)
+        {
+            try
+            {
+                // Ensure cache directory exists
+                if (!Directory.Exists(_audioBasePath))
+                {
+                    Console.WriteLine($"[AudioService] Creating cache directory: {_audioBasePath}");
+                    Directory.CreateDirectory(_audioBasePath);
+                }
+
+                // Check if file exists in cache
+                string fileName = $"{suraNumber:D3}{ayaNumber:D3}.mp3";
+                string cachedFilePath = Path.Combine(_audioBasePath, fileName);
+
+                if (File.Exists(cachedFilePath))
+                {
+                    Console.WriteLine($"[AudioService] Using cached file: {cachedFilePath}");
+                    return cachedFilePath;
+                }
+
+                // Download to cache
+                string remoteUrl = $"{_remoteAudioBaseUrl.TrimEnd('/')}/{fileName}";
+                Console.WriteLine($"[AudioService] Downloading from: {remoteUrl}");
+                Console.WriteLine($"[AudioService] Caching to: {cachedFilePath}");
+
+                using var response = await _httpClient.GetAsync(remoteUrl, HttpCompletionOption.ResponseHeadersRead);
+                Console.WriteLine($"[AudioService] Response status: {response.StatusCode}");
+                response.EnsureSuccessStatusCode();
+
+                await using (var fs = File.Create(cachedFilePath))
+                {
+                    await response.Content.CopyToAsync(fs);
+                }
+
+                var fileInfo = new FileInfo(cachedFilePath);
+                Console.WriteLine($"[AudioService] Downloaded and cached file size: {fileInfo.Length} bytes");
+
+                return cachedFilePath;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AudioService] Failed to get or download audio: {ex.Message}");
+                return null;
             }
         }
 
@@ -143,32 +179,67 @@ namespace QuranSearchApp.Services
             {
                 _shouldStop = false;
                 
-                string command;
-                string arguments;
+                string? command = null;
+                string arguments = "";
+                List<string> errors = new List<string>();
 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 {
-                    // Use aplay or paplay for Linux
-                    command = "paplay";
-                    arguments = $"\"{filePath}\"";
+                    // Try multiple players in order of preference for Linux
+                    string[] linuxPlayers = { "mpg123", "paplay", "ffplay", "aplay" };
+                    
+                    foreach (var player in linuxPlayers)
+                    {
+                        if (IsCommandAvailable(player))
+                        {
+                            command = player;
+                            arguments = player switch
+                            {
+                                "mpg123" => $"-q \"{filePath}\"",  // -q for quiet mode
+                                "paplay" => $"\"{filePath}\"",
+                                "ffplay" => $"-nodisp -autoexit -loglevel quiet \"{filePath}\"",
+                                "aplay" => $"\"{filePath}\"",
+                                _ => $"\"{filePath}\""
+                            };
+                            Console.WriteLine($"[AudioService] Using audio player: {command}");
+                            break;
+                        }
+                        else
+                        {
+                            errors.Add($"{player} not available");
+                        }
+                    }
+                    
+                    if (command == null)
+                    {
+                        PlaybackError?.Invoke(this, $"No audio player found on Linux. Tried: {string.Join(", ", linuxPlayers)}");
+                        return;
+                    }
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    // Use Windows Media Player or PowerShell
+                    // Try multiple options for Windows
+                    // First try PowerShell with MediaPlayer (supports MP3)
                     command = "powershell";
-                    arguments = $"-Command \"(New-Object Media.SoundPlayer '{filePath}').PlaySync()\"";
+                    arguments = $"-Command \"Add-Type -AssemblyName PresentationCore; $player = New-Object System.Windows.Media.MediaPlayer; $player.Open('{filePath}'); $player.Play(); while($player.NaturalDuration.TimeSpan.TotalSeconds -eq 0){{Start-Sleep -Milliseconds 100}}; Start-Sleep -Seconds $player.NaturalDuration.TimeSpan.TotalSeconds\"";
+                    Console.WriteLine($"[AudioService] Using PowerShell MediaPlayer for Windows");
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
-                    // Use afplay for macOS
+                    // Use afplay for macOS (built-in)
                     command = "afplay";
                     arguments = $"\"{filePath}\"";
+                    Console.WriteLine($"[AudioService] Using afplay for macOS");
                 }
                 else
                 {
                     PlaybackError?.Invoke(this, "Unsupported operating system for audio playback");
                     return;
                 }
+
+                Console.WriteLine($"[AudioService] Starting playback: {command} {arguments}");
+                Console.WriteLine($"[AudioService] File path: {filePath}");
+                Console.WriteLine($"[AudioService] File exists: {File.Exists(filePath)}");
 
                 _audioProcess = new Process
                 {
@@ -187,14 +258,59 @@ namespace QuranSearchApp.Services
                 _audioProcess.EnableRaisingEvents = true;
 
                 _audioProcess.Start();
-                _isPlaying = true;
-                PlaybackStateChanged?.Invoke(this, true);
+                
+                // Read error output in case of issues
+                var errorOutput = await _audioProcess.StandardError.ReadToEndAsync();
+                if (!string.IsNullOrEmpty(errorOutput))
+                {
+                    Console.WriteLine($"[AudioService] Player error output: {errorOutput}");
+                }
+                
+                // Only update state if it's not already set
+                if (!_isPlaying)
+                {
+                    _isPlaying = true;
+                    PlaybackStateChanged?.Invoke(this, true);
+                }
 
                 await Task.CompletedTask;
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[AudioService] Exception in StartAudioPlaybackAsync: {ex.Message}");
+                Console.WriteLine($"[AudioService] Stack trace: {ex.StackTrace}");
                 PlaybackError?.Invoke(this, $"Error starting audio playback: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// Checks if a command is available on the system
+        /// </summary>
+        private bool IsCommandAvailable(string command)
+        {
+            try
+            {
+                var processStartInfo = new ProcessStartInfo
+                {
+                    FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "where" : "which",
+                    Arguments = command,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+
+                using var process = Process.Start(processStartInfo);
+                if (process != null)
+                {
+                    process.WaitForExit(1000); // Wait up to 1 second
+                    return process.ExitCode == 0;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
             }
         }
 
@@ -257,32 +373,41 @@ namespace QuranSearchApp.Services
             _isRepeating = repeat;
         }
 
-        private void OnAudioProcessExited(object? sender, EventArgs e)
+        private async void OnAudioProcessExited(object? sender, EventArgs e)
         {
-            _isPlaying = false;
-            PlaybackStateChanged?.Invoke(this, false);
-
-            // Only restart if we're in repeat mode AND haven't been told to stop
-            if (_isRepeating && !_shouldStop && !string.IsNullOrEmpty(_currentAudioFile))
-            {
-                // Restart the same audio after a short delay
-                Task.Delay(100).ContinueWith(_ => StartAudioPlaybackAsync(_currentAudioFile));
-            }
-
-            // If the current file is a temp file (remote download), try to delete it
             try
             {
-                if (!string.IsNullOrEmpty(_currentAudioFile))
+                // Update the state immediately
+                _isPlaying = false;
+                
+                // Notify UI about the state change
+                // The MainWindowViewModel will handle the UI thread dispatching
+                PlaybackStateChanged?.Invoke(this, false);
+
+                // Only restart if we're in repeat mode AND haven't been told to stop
+                if (_isRepeating && !_shouldStop && !string.IsNullOrEmpty(_currentAudioFile))
                 {
-                    var tempPath = Path.GetFullPath(Path.GetTempPath());
-                    var playedPath = Path.GetFullPath(_currentAudioFile);
-                    if (playedPath.StartsWith(tempPath, StringComparison.OrdinalIgnoreCase) && File.Exists(playedPath))
+                    // Add a small delay before restarting to prevent CPU thrashing
+                    await Task.Delay(100);
+                    if (!_shouldStop) // Check again in case stop was requested during delay
                     {
-                        try { File.Delete(playedPath); } catch { /* ignore */ }
+                        await StartAudioPlaybackAsync(_currentAudioFile);
                     }
                 }
+                
+                // Clear the current audio file reference when playback completes naturally
+                if (!_isRepeating)
+                {
+                    _currentAudioFile = null;
+                }
             }
-            catch { /* ignore */ }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AudioService] Error in OnAudioProcessExited: {ex}");
+                // Ensure we still update the state even if there's an error
+                _isPlaying = false;
+                PlaybackStateChanged?.Invoke(this, false);
+            }
         }
 
         public void Dispose()
