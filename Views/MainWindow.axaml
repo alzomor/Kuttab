@@ -5,11 +5,11 @@
         xmlns:models="using:QuranSearchApp.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
         x:Class="QuranSearchApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="القرآن الكريم - Quran Pattern Search"
-        Width="1200" Height="800"
+        Width="1280" Height="720"
         Background="#F5F5DC">
 
     <Design.DataContext>
@@ -89,19 +89,19 @@
         
         <ScrollViewer HorizontalScrollBarVisibility="Auto" 
                       VerticalScrollBarVisibility="Auto">
-            <Grid Margin="20" MinWidth="1160">
+            <Grid Margin="10" MinWidth="1260">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="300"/>
+                <RowDefinition Height="200"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="250"/>
+                <RowDefinition Height="150"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
             <!-- Header with Islamic Design -->
-            <Border Grid.Row="0" Classes="islamic-card" Margin="0,0,0,20">
+            <Border Grid.Row="0" Classes="islamic-card" Margin="0,0,0,8">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -110,13 +110,13 @@
                     
                     <StackPanel Grid.Column="0" Orientation="Vertical">
                         <TextBlock Text="بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ" 
-                                   FontSize="24" 
+                                   FontSize="20" 
                                    FontWeight="Bold"
                                    Foreground="#2C5F2D"
                                    HorizontalAlignment="Center"
-                                   Margin="0,0,0,8"/>
+                                   Margin="0,0,0,5"/>
                         <TextBlock Text="Quran Tajweed Pattern Search" 
-                                   FontSize="18" 
+                                   FontSize="15" 
                                    FontWeight="SemiBold"
                                    Foreground="#8B7355"
                                    HorizontalAlignment="Center"/>
@@ -133,7 +133,7 @@
             </Border>
             
             <!-- Search Controls -->
-            <Border Grid.Row="1" Classes="islamic-card" Margin="0,0,0,15">
+            <Border Grid.Row="1" Classes="islamic-card" Margin="0,0,0,6">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="📖 Select Tajweed Rule:" 
                                VerticalAlignment="Center" 
@@ -157,8 +157,8 @@
             <Border Grid.Row="2" 
                     Background="#2C5F2D" 
                     CornerRadius="8"
-                    Padding="12,8" 
-                    Margin="0,0,0,15">
+                    Padding="6,4" 
+                    Margin="0,0,0,6">
                 <TextBlock Text="{Binding StatusMessage}" 
                            Foreground="White"
                            FontWeight="SemiBold"
@@ -166,7 +166,7 @@
             </Border>
 
             <!-- Search Results List -->
-            <Border Grid.Row="3" Classes="islamic-card" Margin="0,0,0,15">
+            <Border Grid.Row="3" Classes="islamic-card" Margin="0,0,0,6">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -176,8 +176,8 @@
                     <Border Grid.Row="0"
                             Background="#8B7355"
                             CornerRadius="6"
-                            Padding="10,6"
-                            Margin="0,0,0,12"
+                            Padding="8,4"
+                            Margin="0,0,0,8"
                             IsVisible="{Binding HasRuleDescription}">
                         <TextBlock Text="{Binding RuleDescription}" 
                                    FontSize="14" 
@@ -243,7 +243,7 @@
             </Border>
 
             <!-- Audio Controls -->
-            <Border Grid.Row="4" Classes="islamic-card" Margin="0,0,0,15">
+            <Border Grid.Row="4" Classes="islamic-card" Margin="0,0,0,6">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -252,10 +252,10 @@
                     
                     <TextBlock Grid.Row="0" 
                                Text="🎵 Audio Controls" 
-                               FontSize="15" 
+                               FontSize="14" 
                                FontWeight="SemiBold"
                                Foreground="#2C5F2D"
-                               Margin="0,0,0,12"/>
+                               Margin="0,0,0,8"/>
                     
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
                         <Button Content="▶️ Play Single" 
@@ -347,17 +347,17 @@
                     
                     <TextBlock Grid.Row="0" 
                                Text="📷 Quranic Page View" 
-                               FontSize="15" 
+                               FontSize="14" 
                                FontWeight="SemiBold"
                                Foreground="#2C5F2D"
-                               Margin="0,0,0,12"/>
+                               Margin="0,0,0,8"/>
                     
                     <Border Grid.Row="1" 
                             Background="#FAFAF8"
                             BorderBrush="#D4C5B0"
                             BorderThickness="2"
                             CornerRadius="8"
-                            MinHeight="200">
+                            Height="100">
                         <Grid>
                             <TextBlock Text="اختر آية لعرض صورتها 📖" 
                                        HorizontalAlignment="Center" 
@@ -368,6 +368,8 @@
                                        IsVisible="{Binding CurrentPicturePath, Converter={x:Static ObjectConverters.IsNull}}"/>
                             <Image Source="{Binding CurrentPictureBitmap}" 
                                    Stretch="Uniform"
+                                   MaxHeight="100"
+                                   MaxWidth="1240"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    IsVisible="{Binding CurrentPicturePath, Converter={x:Static ObjectConverters.IsNotNull}}"/>
@@ -380,7 +382,7 @@
             <Border Grid.Row="6" 
                     Background="#2C5F2D" 
                     CornerRadius="8"
-                    Padding="12,8">
+                    Padding="8,5">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="ℹ️" 
                                FontSize="14" 
