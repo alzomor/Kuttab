@@ -83,7 +83,7 @@ namespace QuranSearchApp.Services
             {
                 await StopAsync();
 
-                string pathToPlay;
+                string? pathToPlay;
 
                 if (_useRemoteSource)
                 {

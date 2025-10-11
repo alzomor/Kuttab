@@ -22,7 +22,6 @@ public class MainWindowViewModel : ViewModelBase
     private QuranAya? _selectedAya;
     private int _repeatCount = 1;
     private string _statusMessage = "Ready";
-    private double _fontSize = 20;
     private string _ruleDescription = string.Empty;
     private bool _isPlaying = false;
     private bool _isRepeating = false;
@@ -117,12 +116,6 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _statusMessage;
         set => this.RaiseAndSetIfChanged(ref _statusMessage, value);
-    }
-
-    public double FontSize
-    {
-        get => _fontSize;
-        set => this.RaiseAndSetIfChanged(ref _fontSize, value);
     }
 
     public string RuleDescription
@@ -294,8 +287,26 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
         
-        StatusMessage = $"Playing Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
         _audioService.SetRepeatMode(false);
+        
+        // Check if this is Aya 1 from any Sura (except Sura 1 and Sura 9)
+        // If so, play Basmala (Sura 1, Aya 1) first
+        if (SelectedAya.AyaNumber == 1 && SelectedAya.SurahNumber != 1 && SelectedAya.SurahNumber != 9)
+        {
+            if (_audioService.AudioFileExists(1, 1))
+            {
+                StatusMessage = $"Playing Basmala before Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
+                await _audioService.PlayAyaAsync(1, 1);
+                
+                // Wait for Basmala to finish
+                while (_audioService.IsPlaying)
+                {
+                    await Task.Delay(100);
+                }
+            }
+        }
+        
+        StatusMessage = $"Playing Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
         await _audioService.PlayAyaAsync(SelectedAya.SurahNumber, SelectedAya.AyaNumber);
     }
 
@@ -311,6 +322,24 @@ public class MainWindowViewModel : ViewModelBase
         {
             StatusMessage = $"Audio file not found for Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
             return;
+        }
+        
+        // Check if this is Aya 1 from any Sura (except Sura 1 and Sura 9)
+        // If so, play Basmala (Sura 1, Aya 1) first (only once, not repeated)
+        if (SelectedAya.AyaNumber == 1 && SelectedAya.SurahNumber != 1 && SelectedAya.SurahNumber != 9)
+        {
+            if (_audioService.AudioFileExists(1, 1))
+            {
+                StatusMessage = $"Playing Basmala before Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
+                _audioService.SetRepeatMode(false);
+                await _audioService.PlayAyaAsync(1, 1);
+                
+                // Wait for Basmala to finish
+                while (_audioService.IsPlaying)
+                {
+                    await Task.Delay(100);
+                }
+            }
         }
         
         StatusMessage = $"Playing Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber} on repeat";
@@ -378,6 +407,38 @@ public class MainWindowViewModel : ViewModelBase
                 // Auto-select the currently playing Aya to make it scroll into view
                 SelectedAya = aya;
                 
+                // Check if this is Aya 1 from any Sura (except Sura 1 and Sura 9)
+                // If so, play Basmala (Sura 1, Aya 1) first
+                if (aya.AyaNumber == 1 && aya.SurahNumber != 1 && aya.SurahNumber != 9)
+                {
+                    if (_audioService.AudioFileExists(1, 1))
+                    {
+                        StatusMessage = $"Playing Basmala before Aya {aya.SurahNumber}:{aya.AyaNumber}";
+                        await _audioService.PlayAyaAsync(1, 1);
+                        
+                        // Wait for Basmala to finish
+                        while (_audioService.IsPlaying && _isPlayingSequence && !_isSequencePaused)
+                        {
+                            await Task.Delay(100);
+                        }
+                        
+                        // Check if stop/pause was requested during Basmala
+                        if (!_isPlayingSequence)
+                        {
+                            StatusMessage = "Sequence playback stopped";
+                            IsPlayingSequence = false;
+                            return;
+                        }
+                        
+                        if (_isSequencePaused)
+                        {
+                            _lastPlayedAyaIndex = i - 1;
+                            StatusMessage = "Sequence playback paused";
+                            return;
+                        }
+                    }
+                }
+                
                 StatusMessage = $"Playing Aya {aya.SurahNumber}:{aya.AyaNumber} ({i + 1}/{SearchResults.Count})";
                 await _audioService.PlayAyaAsync(aya.SurahNumber, aya.AyaNumber);
                 
@@ -419,29 +480,41 @@ public class MainWindowViewModel : ViewModelBase
 
     private async void StopPlayback()
     {
-        // Reset all playback states
-        _isPlayingSequence = false;
-        _isSequencePaused = false;
-        _isPlaying = false;
-        _isRepeating = false;
-        _lastPlayedAyaIndex = -1;
-        _currentPlayingAyaIndex = -1;
-        
-        // Update properties with change notifications
-        IsPlaying = false;
-        IsPlayingSequence = false;
-        IsSequencePaused = false;
-        IsRepeating = false;
-        
-        // Clear highlighting from previous playing Aya
-        if (CurrentPlayingAya != null)
-        {
-            CurrentPlayingAya.IsCurrentlyPlaying = false;
-            this.RaisePropertyChanged(nameof(CurrentPlayingAya));
-        }
-        CurrentPlayingAya = null;
+        // Stop audio first
         await _audioService.StopAsync();
-        StatusMessage = "Playback stopped";
+        
+        // Update UI state on the UI thread
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            // Reset all playback states
+            _isPlayingSequence = false;
+            _isSequencePaused = false;
+            _isPlaying = false;
+            _isRepeating = false;
+            _lastPlayedAyaIndex = -1;
+            _currentPlayingAyaIndex = -1;
+            
+            // Update properties with change notifications
+            IsPlaying = false;
+            IsPlayingSequence = false;
+            IsSequencePaused = false;
+            IsRepeating = false;
+            
+            // Clear highlighting from previous playing Aya
+            if (CurrentPlayingAya != null)
+            {
+                CurrentPlayingAya.IsCurrentlyPlaying = false;
+                this.RaisePropertyChanged(nameof(CurrentPlayingAya));
+            }
+            CurrentPlayingAya = null;
+            
+            // Force UI updates
+            this.RaisePropertyChanged(nameof(IsPlaying));
+            this.RaisePropertyChanged(nameof(IsRepeating));
+            this.RaisePropertyChanged(nameof(IsPlayingSequence));
+            
+            StatusMessage = "Playback stopped";
+        });
     }
     
     private async void PauseSequence()
@@ -508,7 +581,10 @@ public class MainWindowViewModel : ViewModelBase
             if (!isPlaying)
             {
                 _isPlaying = false;
+                _isRepeating = false;
+                IsRepeating = false;
                 this.RaisePropertyChanged(nameof(IsPlaying));
+                this.RaisePropertyChanged(nameof(IsRepeating));
             }
         });
     }
