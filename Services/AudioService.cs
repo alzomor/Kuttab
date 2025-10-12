@@ -30,7 +30,7 @@ namespace QuranSearchApp.Services
         {
             // Look for audio files in the same directory as the executable
             var exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            _audioBasePath = Path.Combine(exeDirectory, "AL Husary");
+            _audioBasePath = Path.Combine(exeDirectory, "Alhusary");
             
             // Log the path for debugging
             Console.WriteLine($"[AudioService] Looking for audio files in: {_audioBasePath}");
@@ -39,6 +39,7 @@ namespace QuranSearchApp.Services
 
         public event EventHandler<bool>? PlaybackStateChanged;
         public event EventHandler<string>? PlaybackError;
+        public event EventHandler? SequencePlaybackEnded;
 
         public bool IsPlaying => _isPlaying;
         public bool IsRepeating => _isRepeating;
@@ -192,7 +193,8 @@ namespace QuranSearchApp.Services
                     {
                         if (IsCommandAvailable(player))
                         {
-                            command = player;
+                            // Get the full path to the player for reliability
+                            command = GetFullPathToPlayer(player) ?? player;
                             arguments = player switch
                             {
                                 "mpg123" => $"-q \"{filePath}\"",  // -q for quiet mode
@@ -202,6 +204,7 @@ namespace QuranSearchApp.Services
                                 _ => $"\"{filePath}\""
                             };
                             Console.WriteLine($"[AudioService] Using audio player: {command}");
+                            Console.WriteLine($"[AudioService] Arguments: {arguments}");
                             break;
                         }
                         else
@@ -284,34 +287,43 @@ namespace QuranSearchApp.Services
         }
         
         /// <summary>
+        /// Gets the full path to a command/player on the system
+        /// </summary>
+        private string? GetFullPathToPlayer(string command)
+        {
+            try
+            {
+                using var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "where" : "which",
+                        Arguments = command,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardError = true
+                    }
+                };
+
+                process.Start();
+                string? result = process.StandardOutput.ReadLine()?.Trim();
+                process.WaitForExit();
+
+                return !string.IsNullOrEmpty(result) && process.ExitCode == 0 ? result : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Checks if a command is available on the system
         /// </summary>
         private bool IsCommandAvailable(string command)
         {
-            try
-            {
-                var processStartInfo = new ProcessStartInfo
-                {
-                    FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "where" : "which",
-                    Arguments = command,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
-                };
-
-                using var process = Process.Start(processStartInfo);
-                if (process != null)
-                {
-                    process.WaitForExit(1000); // Wait up to 1 second
-                    return process.ExitCode == 0;
-                }
-                return false;
-            }
-            catch
-            {
-                return false;
-            }
+            return GetFullPathToPlayer(command) != null;
         }
 
         /// <summary>
@@ -381,7 +393,6 @@ namespace QuranSearchApp.Services
                 _isPlaying = false;
                 
                 // Notify UI about the state change
-                // The MainWindowViewModel will handle the UI thread dispatching
                 PlaybackStateChanged?.Invoke(this, false);
 
                 // Only restart if we're in repeat mode AND haven't been told to stop
@@ -392,13 +403,21 @@ namespace QuranSearchApp.Services
                     if (!_shouldStop) // Check again in case stop was requested during delay
                     {
                         await StartAudioPlaybackAsync(_currentAudioFile);
+                        return;
                     }
                 }
                 
                 // Clear the current audio file reference when playback completes naturally
                 if (!_isRepeating)
                 {
+                    string? completedFile = _currentAudioFile;
                     _currentAudioFile = null;
+                    
+                    // Notify that the current audio in sequence has ended
+                    if (completedFile != null)
+                    {
+                        SequencePlaybackEnded?.Invoke(this, EventArgs.Empty);
+                    }
                 }
             }
             catch (Exception ex)
@@ -407,6 +426,12 @@ namespace QuranSearchApp.Services
                 // Ensure we still update the state even if there's an error
                 _isPlaying = false;
                 PlaybackStateChanged?.Invoke(this, false);
+                
+                // Even on error, notify that the sequence playback has ended
+                if (!_isRepeating)
+                {
+                    SequencePlaybackEnded?.Invoke(this, EventArgs.Empty);
+                }
             }
         }
 

@@ -29,6 +29,7 @@ public class MainWindowViewModel : ViewModelBase
     private bool _isSequencePaused = false;
     private int _lastPlayedAyaIndex = -1;
     private int _currentPlayingAyaIndex = -1;
+    private bool _isPlayingBasmala = false;
     private QuranAya? _currentPlayingAya;
     private string? _currentPicturePath;
     private Bitmap? _currentPictureBitmap;
@@ -46,6 +47,7 @@ public class MainWindowViewModel : ViewModelBase
         // Subscribe to audio service events
         _audioService.PlaybackStateChanged += OnPlaybackStateChanged;
         _audioService.PlaybackError += OnPlaybackError;
+        _audioService.SequencePlaybackEnded += OnSequencePlaybackEnded;
         
         SearchCommand = new AsyncCommand(SearchAsync);
         PlaySingleCommand = new SimpleCommand(PlaySingle);
@@ -144,6 +146,7 @@ public class MainWindowViewModel : ViewModelBase
             this.RaiseAndSetIfChanged(ref _isPlayingSequence, value);
             this.RaisePropertyChanged(nameof(CanPauseSequence));
             this.RaisePropertyChanged(nameof(IsSequenceActive));
+            this.RaisePropertyChanged(nameof(CanStartSequence));
         }
     }
 
@@ -163,6 +166,8 @@ public class MainWindowViewModel : ViewModelBase
     public bool CanPauseSequence => _isPlayingSequence && !_isSequencePaused;
 
     public bool IsSequenceActive => _isPlayingSequence; // Button should be visible when sequence is active (playing or paused)
+
+    public bool CanStartSequence => !_isPlayingSequence; // Play All button should only be enabled when no sequence is playing
 
     public QuranAya? CurrentPlayingAya
     {
@@ -367,115 +372,119 @@ public class MainWindowViewModel : ViewModelBase
         StatusMessage = $"Playing all {SearchResults.Count} found ayas in sequence";
         _audioService.SetRepeatMode(false);
         
-        await PlaySequenceFromIndex(0);
+        await PlaySingleAyaInSequence(0);
     }
     
-    private async Task PlaySequenceFromIndex(int startIndex)
+    private async Task PlaySingleAyaInSequence(int index)
     {
-        // Play each Aya in sequence starting from the given index
-        for (int i = startIndex; i < SearchResults.Count; i++)
+        // Check if we've reached the end
+        if (index >= SearchResults.Count)
         {
-            // Check if stop was requested
-            if (!_isPlayingSequence)
-            {
-                StatusMessage = "Sequence playback stopped";
-                IsPlayingSequence = false;
-                return;
-            }
+            // Sequence completed
+            _isPlayingSequence = false;
+            _isSequencePaused = false;
+            IsPlayingSequence = false;
+            IsSequencePaused = false;
+            _lastPlayedAyaIndex = -1;
+            _currentPlayingAyaIndex = -1;
+            StatusMessage = "Finished playing all ayas";
             
-            // Check if pause was requested
-            if (_isSequencePaused)
+            // Clear highlighting
+            if (CurrentPlayingAya != null)
             {
-                _lastPlayedAyaIndex = i - 1; // Save the last completed Aya
-                StatusMessage = "Sequence playback paused";
-                return;
+                CurrentPlayingAya.IsCurrentlyPlaying = false;
+                CurrentPlayingAya = null;
             }
-            
-            var aya = SearchResults[i];
-            if (_audioService.AudioFileExists(aya.SurahNumber, aya.AyaNumber))
+            return;
+        }
+        
+        // Check if stop was requested
+        if (!_isPlayingSequence)
+        {
+            StatusMessage = "Sequence playback stopped";
+            IsPlayingSequence = false;
+            return;
+        }
+        
+        // Check if pause was requested
+        if (_isSequencePaused)
+        {
+            _lastPlayedAyaIndex = index - 1;
+            StatusMessage = "Sequence playback paused";
+            return;
+        }
+        
+        var aya = SearchResults[index];
+        if (!_audioService.AudioFileExists(aya.SurahNumber, aya.AyaNumber))
+        {
+            // Skip this Aya and move to next
+            await PlaySingleAyaInSequence(index + 1);
+            return;
+        }
+        
+        _currentPlayingAyaIndex = index;
+        
+        // Clear previous highlighting
+        if (CurrentPlayingAya != null)
+            CurrentPlayingAya.IsCurrentlyPlaying = false;
+        
+        // Set current playing Aya and highlight it
+        CurrentPlayingAya = aya;
+        aya.IsCurrentlyPlaying = true;
+        
+        // Auto-select the currently playing Aya to make it scroll into view
+        SelectedAya = aya;
+        
+        // Play Basmala before Aya 1 of any Surah (except Surah 1 and 9)
+        if (aya.AyaNumber == 1 && aya.SurahNumber != 1 && aya.SurahNumber != 9)
+        {
+            if (_audioService.AudioFileExists(1, 1))
             {
-                _currentPlayingAyaIndex = i; // Track currently playing Aya
+                StatusMessage = $"Playing Basmala before Aya {aya.SurahNumber}:{aya.AyaNumber}";
                 
-                // Clear previous highlighting
-                if (CurrentPlayingAya != null)
-                    CurrentPlayingAya.IsCurrentlyPlaying = false;
+                // Set flag to prevent sequence from advancing after Basmala
+                _isPlayingBasmala = true;
                 
-                // Set current playing Aya and highlight it
-                CurrentPlayingAya = aya;
-                aya.IsCurrentlyPlaying = true;
+                // Play Basmala
+                _audioService.SetRepeatMode(false);
+                await _audioService.PlayAyaAsync(1, 1);
                 
-                // Auto-select the currently playing Aya to make it scroll into view
-                SelectedAya = aya;
-                
-                // Check if this is Aya 1 from any Sura (except Sura 1 and Sura 9)
-                // If so, play Basmala (Sura 1, Aya 1) first
-                if (aya.AyaNumber == 1 && aya.SurahNumber != 1 && aya.SurahNumber != 9)
-                {
-                    if (_audioService.AudioFileExists(1, 1))
-                    {
-                        StatusMessage = $"Playing Basmala before Aya {aya.SurahNumber}:{aya.AyaNumber}";
-                        await _audioService.PlayAyaAsync(1, 1);
-                        
-                        // Wait for Basmala to finish
-                        while (_audioService.IsPlaying && _isPlayingSequence && !_isSequencePaused)
-                        {
-                            await Task.Delay(100);
-                        }
-                        
-                        // Check if stop/pause was requested during Basmala
-                        if (!_isPlayingSequence)
-                        {
-                            StatusMessage = "Sequence playback stopped";
-                            IsPlayingSequence = false;
-                            return;
-                        }
-                        
-                        if (_isSequencePaused)
-                        {
-                            _lastPlayedAyaIndex = i - 1;
-                            StatusMessage = "Sequence playback paused";
-                            return;
-                        }
-                    }
-                }
-                
-                StatusMessage = $"Playing Aya {aya.SurahNumber}:{aya.AyaNumber} ({i + 1}/{SearchResults.Count})";
-                await _audioService.PlayAyaAsync(aya.SurahNumber, aya.AyaNumber);
-                
-                // Wait for current audio to finish before playing next, but check for stop/pause
+                // Wait for Basmala to finish
                 while (_audioService.IsPlaying && _isPlayingSequence && !_isSequencePaused)
                 {
                     await Task.Delay(100);
                 }
                 
-                // If stop was requested during playback, exit immediately
-                if (!_isPlayingSequence)
+                // Clear the Basmala flag
+                _isPlayingBasmala = false;
+                
+                // Check if stop/pause was requested during Basmala
+                if (!_isPlayingSequence || _isSequencePaused)
                 {
-                    StatusMessage = "Sequence playback stopped";
-                    IsPlayingSequence = false;
+                    if (!_isPlayingSequence)
+                    {
+                        StatusMessage = "Sequence playback stopped";
+                        IsPlayingSequence = false;
+                    }
+                    else
+                    {
+                        _lastPlayedAyaIndex = index - 1;
+                        StatusMessage = "Sequence playback paused";
+                    }
                     return;
                 }
-                
-                // If pause was requested during playback, save position and exit
-                if (_isSequencePaused)
-                {
-                    _lastPlayedAyaIndex = i - 1; // Save the Aya before current as last completed
-                    StatusMessage = "Sequence playback paused";
-                    return;
-                }
-                
-                // Mark this Aya as completed
-                _lastPlayedAyaIndex = i;
             }
         }
         
-        // Sequence completed
-        _isPlayingSequence = false;
-        _isSequencePaused = false;
-        IsPlayingSequence = false;
-        IsSequencePaused = false;
-        _lastPlayedAyaIndex = -1;
-        StatusMessage = "Finished playing all ayas";
+        // Play the actual Aya
+        StatusMessage = $"Playing Aya {aya.SurahNumber}:{aya.AyaNumber} ({index + 1}/{SearchResults.Count})";
+        _audioService.SetRepeatMode(false);
+        await _audioService.PlayAyaAsync(aya.SurahNumber, aya.AyaNumber);
+        
+        // Mark this Aya as completed (will be used when resuming)
+        _lastPlayedAyaIndex = index;
+        
+        // Note: The OnSequencePlaybackEnded event will handle playing the next Aya
     }
 
     private async void StopPlayback()
@@ -554,7 +563,7 @@ public class MainWindowViewModel : ViewModelBase
         if (resumeIndex < SearchResults.Count)
         {
             StatusMessage = $"Resuming sequence from Aya {resumeIndex + 1}/{SearchResults.Count}";
-            await PlaySequenceFromIndex(resumeIndex);
+            await PlaySingleAyaInSequence(resumeIndex);
         }
         else
         {
@@ -585,6 +594,26 @@ public class MainWindowViewModel : ViewModelBase
                 IsRepeating = false;
                 this.RaisePropertyChanged(nameof(IsPlaying));
                 this.RaisePropertyChanged(nameof(IsRepeating));
+            }
+        });
+    }
+
+    private async void OnSequencePlaybackEnded(object? sender, EventArgs e)
+    {
+        // Run on UI thread
+        await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            // Don't advance if we're playing Basmala - wait for the actual Aya to finish
+            if (_isPlayingBasmala)
+            {
+                return; // Don't clear the flag or advance - just wait
+            }
+            
+            // Only advance if we're in sequence mode
+            if (_isPlayingSequence && !_isSequencePaused && _currentPlayingAyaIndex >= 0)
+            {
+                int nextIndex = _currentPlayingAyaIndex + 1;
+                await PlaySingleAyaInSequence(nextIndex);
             }
         });
     }

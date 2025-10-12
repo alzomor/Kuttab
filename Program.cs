@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using QuranSearchApp.ViewModels;
 using QuranSearchApp.Views;
 using System;
@@ -12,7 +13,24 @@ public partial class App : Application
 {
     public override void Initialize()
     {
+        // Load XAML resources
         AvaloniaXamlLoader.Load(this);
+        
+        // Set up theme resources
+        if (Current != null)
+        {
+            // Set light theme by default
+            RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Light;
+            
+            // Add theme resources if not already present
+            if (!Current.Resources.TryGetResource("ThemeBackgroundBrush", null, out _))
+            {
+                Current.Resources.Add("ThemeBackgroundBrush", new SolidColorBrush(Color.Parse("#F5F5DC")));
+                Current.Resources.Add("CardBackground", new SolidColorBrush(Colors.White));
+                Current.Resources.Add("TextColor", new SolidColorBrush(Color.Parse("#333333")));
+                Current.Resources.Add("SecondaryTextColor", new SolidColorBrush(Color.Parse("#555555")));
+            }
+        }
         
         // Run Unicode test on startup (commented out for production)
         // TestUnicodePreservation();
@@ -101,6 +119,17 @@ class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace();
+            .With(new FontManagerOptions
+            {
+                DefaultFamilyName = "Arial,Segoe UI Emoji,Segoe UI Symbol"
+            })
+            .LogToTrace()
+            .AfterSetup(builder =>
+            {
+                // Ensure default theme is set after setup
+                if (builder.Instance is App app)
+                {
+                    app.RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Light;
+                }
+            });
 }

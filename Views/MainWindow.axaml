@@ -10,7 +10,8 @@
         x:DataType="vm:MainWindowViewModel"
         Title="القرآن الكريم - Quran Pattern Search"
         Width="1280" Height="720"
-        Background="#F5F5DC">
+        Background="{DynamicResource ThemeBackgroundBrush}"
+        RequestedThemeVariant="Light">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
@@ -18,8 +19,25 @@
 
     <Window.Styles>
         <!-- Modern Islamic Style -->
+        <!-- Base text style for all text elements -->
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextColor}"/>
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="Foreground" Value="{DynamicResource TextColor}"/>
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="Foreground" Value="{DynamicResource TextColor}"/>
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Foreground" Value="{DynamicResource TextColor}"/>
+        </Style>
+        <Style Selector="Label">
+            <Setter Property="Foreground" Value="{DynamicResource TextColor}"/>
+        </Style>
+        
         <Style Selector="Border.islamic-card">
-            <Setter Property="Background" Value="White"/>
+            <Setter Property="Background" Value="{DynamicResource CardBackground}"/>
             <Setter Property="CornerRadius" Value="12"/>
             <Setter Property="BoxShadow" Value="0 4 12 0 #20000000"/>
             <Setter Property="Padding" Value="16"/>
@@ -32,6 +50,7 @@
             <Setter Property="Padding" Value="20,10"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
         </Style>
         
         <Style Selector="Button.primary:pointerover">
@@ -80,11 +99,22 @@
 
     <!-- Main Container with Islamic Pattern Background -->
     <Grid>
+        <Grid.Resources>
+            <!-- Define theme colors -->
+            <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#F5F5DC"/>
+            <SolidColorBrush x:Key="CardBackground" Color="White"/>
+            <SolidColorBrush x:Key="TextColor" Color="#333333"/>
+            <SolidColorBrush x:Key="SecondaryTextColor" Color="#555555"/>
+        </Grid.Resources>
+        
+        <Grid.Styles>
+            <Style Selector="TextBlock.secondary">
+                <Setter Property="Foreground" Value="{DynamicResource SecondaryTextColor}"/>
+            </Style>
+        </Grid.Styles>
+        
         <Grid.Background>
-            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                <GradientStop Color="#F5F5DC" Offset="0"/>
-                <GradientStop Color="#E8DCC4" Offset="1"/>
-            </LinearGradientBrush>
+            <SolidColorBrush Color="#F5F5DC"/>
         </Grid.Background>
         
         <ScrollViewer HorizontalScrollBarVisibility="Auto" 
@@ -263,7 +293,7 @@
                     </Grid.RowDefinitions>
                     
                     <TextBlock Grid.Row="0" 
-                               Text="🎵 Audio Controls" 
+                               Text="Audio Controls" 
                                FontSize="14" 
                                FontWeight="SemiBold"
                                Foreground="#2C5F2D"
@@ -285,7 +315,7 @@
                         <Button Content="📋 Play All Sequence" 
                                 Classes="secondary"
                                 Command="{Binding PlayAllCommand}"
-                                IsEnabled="{Binding !IsPlayingSequence}"
+                                IsEnabled="{Binding CanStartSequence}"
                                 Margin="0,0,10,0"/>
                         
                         <!-- Pause/Resume toggle button -->
