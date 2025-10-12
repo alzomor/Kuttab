@@ -12,6 +12,17 @@ namespace QuranSearchApp.Services;
 
 public class QuranSearchService
 {
+    // List of exceptions for Idgham Bighunnah (words that should not be considered for Idgham)
+    private static readonly List<string> IdghamBighunnahExceptions = new()
+    {
+        "صنوان", "قنوان", "الدنيا", "بنيان",
+        // Add more exceptions here if needed
+    };
+
+    // Compile the exceptions into a regex pattern for matching
+    private static readonly string IdghamBighunnahExceptionsPattern = 
+        $"\\b({string.Join("|", IdghamBighunnahExceptions.Select(Regex.Escape))})\\b";
+
     private List<QuranAya> _quranText = new();
     private List<TajweedRule> _rules = new();
 
@@ -120,6 +131,24 @@ public class QuranSearchService
                     
                     foreach (Match match in regexMatches)
                     {
+                        // Check for Idgham Bighunnah exceptions
+                        if (ruleName == "إدغام النون الساكنة والتنوين - بغنة")
+                        {
+                            // Get the full word containing the match
+                            var wordStart = aya.Text.LastIndexOf(' ', match.Index) + 1;
+                            if (wordStart < 0) wordStart = 0;
+                            var nextSpace = aya.Text.IndexOf(' ', match.Index + match.Length);
+                            if (nextSpace < 0) nextSpace = aya.Text.Length;
+                            var wordLength = nextSpace - wordStart;
+                            var word = aya.Text.Substring(wordStart, wordLength);
+
+                            // Check if this word is in our exceptions list
+                            if (IdghamBighunnahExceptions.Any(ex => word.Contains(ex)))
+                            {
+                                continue; // Skip this match as it's an exception
+                            }
+                        }
+                        
                         // Automatically filter for 'لام لفظ الجلالة المفخمة' rule
                         if (ruleName == "لام لفظ الجلالة المفخمة")
                         {
