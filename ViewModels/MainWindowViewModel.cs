@@ -35,6 +35,7 @@ public class MainWindowViewModel : ViewModelBase
     private Bitmap? _currentPictureBitmap;
     private bool _useRemoteImages = false;
     private bool _useRemoteAudio = true; // Default to online audio for portability
+    private bool _ignoreNextPlaybackCompleted = false;
 
     public MainWindowViewModel()
     {
@@ -489,25 +490,19 @@ public class MainWindowViewModel : ViewModelBase
 
     private async void StopPlayback()
     {
-        // Stop audio first and clear repeat mode
-        _audioService.SetRepeatMode(false);
+        _ignoreNextPlaybackCompleted = true;
+        CancelSequence();
         await _audioService.StopAsync();
         
         // Update UI state on the UI thread
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
             // Reset all playback states
-            _isPlayingSequence = false;
-            _isSequencePaused = false;
             _isPlaying = false;
             _isRepeating = false;
-            _lastPlayedAyaIndex = -1;
-            _currentPlayingAyaIndex = -1;
             
             // Update properties with change notifications
             IsPlaying = false;
-            IsPlayingSequence = false;
-            IsSequencePaused = false;
             IsRepeating = false;
             
             // Clear highlighting from previous playing Aya
@@ -521,10 +516,10 @@ public class MainWindowViewModel : ViewModelBase
             // Force UI updates
             this.RaisePropertyChanged(nameof(IsPlaying));
             this.RaisePropertyChanged(nameof(IsRepeating));
-            this.RaisePropertyChanged(nameof(IsPlayingSequence));
             
             StatusMessage = "Playback stopped";
         });
+        _ignoreNextPlaybackCompleted = false;
     }
     
     private async void PauseSequence()
@@ -601,6 +596,9 @@ public class MainWindowViewModel : ViewModelBase
 
     private async void OnSequencePlaybackEnded(object? sender, EventArgs e)
     {
+        if (_ignoreNextPlaybackCompleted)
+            return;
+
         // Run on UI thread
         await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
         {
@@ -686,5 +684,16 @@ public class MainWindowViewModel : ViewModelBase
     private void UpdatePictureForSelectedAya()
     {
         _ = UpdatePictureForSelectedAyaAsync();
+    }
+
+    private void CancelSequence()
+    {
+        _isPlayingSequence = false;
+        _isSequencePaused = false;
+        _lastPlayedAyaIndex = -1;
+        _currentPlayingAyaIndex = -1;
+        CurrentPlayingAya = null;
+        IsPlayingSequence = false;
+        IsSequencePaused = false;
     }
 }
