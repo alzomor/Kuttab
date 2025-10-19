@@ -157,7 +157,7 @@
                                 CornerRadius="6"
                                 Padding="10,4"
                                 HorizontalAlignment="Center">
-                            <TextBlock Text="🔬 نسخة تجريبية v0.2 - TEST VERSION" 
+                            <TextBlock Text="🔬 نسخة تجريبية v0.3 - TEST VERSION" 
                                        FontSize="13" 
                                        FontWeight="Bold"
                                        Foreground="#856404"/>
