@@ -386,6 +386,13 @@ FodyWeavers.xsd
 # Log files
 *.log
 
+# Build artifacts
+*.tar.gz
+
+# Backup files
+*.backup
+*.bak
+
 # Application specific - keep important files
 !quran-uthmani.txt
 !rules.json
