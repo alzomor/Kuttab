@@ -10,16 +10,4 @@
             <Setter Property="FontFamily" Value="Scheherazade, Noto Sans Arabic, DejaVu Sans, sans-serif"/>
         </Style>
     </Application.Styles>
-
-    <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="avares://Avalonia.Themes.Fluent/FluentLight.axaml"/>
-                <ResourceInclude Source="avares://Avalonia.Themes.Fluent/FluentLight.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-            
-            <!-- Embedded Fonts -->
-            <FontFamily x:Key="DefaultFontFamily">resm:QuranSearchApp.Fonts.NotoSansArabic-Regular.ttf?assembly=QuranSearchApp#Noto Sans Arabic</FontFamily>
-        </ResourceDictionary>
-    </Application.Resources>
 </Application>
