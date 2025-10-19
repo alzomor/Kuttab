@@ -7,7 +7,7 @@ from pathlib import Path
 
 # Configuration
 PROJECT_NAME = "Quraan"
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 TARGETS = [
     {"rid": "win-x64", "ext": "zip"},
     {"rid": "linux-x64", "ext": "tar.gz"},
