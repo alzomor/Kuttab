@@ -256,7 +256,18 @@ namespace QuranSearchApp.Services
                     command = "powershell";
                     // Escape single quotes in file path for PowerShell
                     string escapedPath = filePath.Replace("'", "''");
-                    arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"Add-Type -AssemblyName PresentationCore; $player = New-Object System.Windows.Media.MediaPlayer; $player.Open('{escapedPath}'); $player.Play(); $player.MediaEnded.Add({{ $player.Stop(); $player.Close(); [System.Windows.Threading.Dispatcher]::CurrentDispatcher.InvokeShutdown(); }}); [System.Windows.Threading.Dispatcher]::Run()\"";
+                    // Improved PowerShell script that ensures clean exit
+                    arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"" +
+                        $"Add-Type -AssemblyName PresentationCore; " +
+                        $"$player = New-Object System.Windows.Media.MediaPlayer; " +
+                        $"$player.Open('{escapedPath}'); " +
+                        $"$player.Play(); " +
+                        $"while($player.NaturalDuration.HasTimeSpan -eq $false){{ Start-Sleep -Milliseconds 100 }}; " +
+                        $"$duration = $player.NaturalDuration.TimeSpan.TotalMilliseconds; " +
+                        $"Start-Sleep -Milliseconds $duration; " +
+                        $"$player.Stop(); " +
+                        $"$player.Close(); " +
+                        $"exit\"";
                     LogDebug($"Using PowerShell MediaPlayer for Windows");
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -294,12 +305,22 @@ namespace QuranSearchApp.Services
 
                 _audioProcess.Start();
                 
-                // Read error output in case of issues
-                var errorOutput = await _audioProcess.StandardError.ReadToEndAsync();
-                if (!string.IsNullOrEmpty(errorOutput))
+                // Read error output asynchronously without blocking
+                _ = Task.Run(async () =>
                 {
-                    LogDebug($"Player error output: {errorOutput}");
-                }
+                    try
+                    {
+                        var errorOutput = await _audioProcess.StandardError.ReadToEndAsync();
+                        if (!string.IsNullOrEmpty(errorOutput))
+                        {
+                            LogDebug($"Player error output: {errorOutput}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogDebug($"Error reading process output: {ex.Message}");
+                    }
+                });
                 
                 // Only update state if it's not already set
                 if (!_isPlaying)
@@ -364,17 +385,28 @@ namespace QuranSearchApp.Services
         public async Task StopAsync()
         {
             _shouldStop = true;
-            _isRepeating = false;
+            // Don't reset _isRepeating here - it should only be controlled by SetRepeatMode()
+            // Otherwise, calling PlayAyaAsync() in repeat mode will clear the flag
 
-            if (_audioProcess != null && !_audioProcess.HasExited)
+            if (_audioProcess != null)
             {
                 try
                 {
-                    _audioProcess.Kill();
-                    _audioProcess.WaitForExit(1000);
+                    // Check if process has already exited (common on Windows)
+                    if (_audioProcess.HasExited)
+                    {
+                        LogDebug("Process already exited, cleaning up");
+                    }
+                    else
+                    {
+                        LogDebug("Killing active audio process");
+                        _audioProcess.Kill();
+                        _audioProcess.WaitForExit(1000);
+                    }
                 }
                 catch (Exception ex)
                 {
+                    LogDebug($"Error stopping audio: {ex.Message}");
                     PlaybackError?.Invoke(this, $"Error stopping audio: {ex.Message}");
                 }
                 finally
@@ -384,8 +416,14 @@ namespace QuranSearchApp.Services
                 }
             }
 
-            _isPlaying = false;
-            PlaybackStateChanged?.Invoke(this, false);
+            // Always update state, even if process was already gone
+            if (_isPlaying)
+            {
+                _isPlaying = false;
+                PlaybackStateChanged?.Invoke(this, false);
+                LogDebug("Playback state cleared in StopAsync");
+            }
+            
             await Task.CompletedTask;
         }
 

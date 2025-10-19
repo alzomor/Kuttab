@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <!-- Use Exe for Debug (shows console), WinExe for Release (no console) -->
+    <OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>
+    <OutputType Condition="'$(Configuration)' == 'Release'">WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>

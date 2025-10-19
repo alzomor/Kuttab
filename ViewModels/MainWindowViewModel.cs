@@ -489,7 +489,8 @@ public class MainWindowViewModel : ViewModelBase
 
     private async void StopPlayback()
     {
-        // Stop audio first
+        // Stop audio first and clear repeat mode
+        _audioService.SetRepeatMode(false);
         await _audioService.StopAsync();
         
         // Update UI state on the UI thread

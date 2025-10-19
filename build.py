@@ -52,7 +52,7 @@ def build_for_platform(target):
     # Build command
     cmd = [
         "dotnet", "publish",
-        "-c", "Release",
+        "-c", "Debug",
         "-r", rid,
         "--self-contained", "true",
         "-p:PublishSingleFile=true",
@@ -69,7 +69,31 @@ def build_for_platform(target):
         return False
     
     print(f"✅ Successfully built for {rid}")
+    # Ensure extra non-code assets are present in publish folder (Windows specific as requested)
+    ensure_extra_files(output_dir, rid)
     return True
+
+def ensure_extra_files(output_dir: str, rid: str) -> None:
+    """Copy required extra files into the publish directory.
+    Currently ensures `quran-uthmani.txt` is present for Windows builds.
+    """
+    try:
+        # Only for Windows publish as requested
+        if rid.startswith("win"):
+            src_candidates = [
+                Path("quran-uthmani.txt"),
+                Path("Quran_uthmani.txt"),
+            ]
+            src_path = next((p for p in src_candidates if p.exists()), None)
+            if src_path is None:
+                print("⚠️  quran-uthmani.txt not found at repo root; skipping copy.")
+                return
+            dest_path = Path(output_dir) / "quran-uthmani.txt"
+            os.makedirs(output_dir, exist_ok=True)
+            shutil.copy2(src_path, dest_path)
+            print(f"📄 Copied '{src_path.name}' to publish folder: {dest_path}")
+    except Exception as e:
+        print(f"⚠️  Failed to copy extra files: {e}")
 
 def create_archive(rid, ext):
     """Create an archive for the built files."""
