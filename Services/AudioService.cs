@@ -5,6 +5,7 @@ using System.IO;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Text;
 
 namespace QuranSearchApp.Services
 {
@@ -19,6 +20,8 @@ namespace QuranSearchApp.Services
         private bool _isRepeating;
         private string? _currentAudioFile;
         private bool _shouldStop;
+        private static readonly string _logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "audio_debug.log");
+        private static readonly object _logLock = new object();
 
         public bool UseRemoteSource
         {
@@ -33,8 +36,36 @@ namespace QuranSearchApp.Services
             _audioBasePath = Path.Combine(exeDirectory, "Alhusary");
             
             // Log the path for debugging
-            Console.WriteLine($"[AudioService] Looking for audio files in: {_audioBasePath}");
-            Console.WriteLine($"[AudioService] Directory exists: {Directory.Exists(_audioBasePath)}");
+            LogDebug($"Looking for audio files in: {_audioBasePath}");
+            LogDebug($"Directory exists: {Directory.Exists(_audioBasePath)}");
+        }
+
+        /// <summary>
+        /// Logs debug information to both Debug output and a log file
+        /// </summary>
+        private static void LogDebug(string message)
+        {
+            string logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [AudioService] {message}";
+            
+            // Write to Debug output (visible in debuggers and DebugView on Windows)
+            Debug.WriteLine(logMessage);
+            Trace.WriteLine(logMessage);
+            
+            // Also write to console (works on Linux when run from terminal)
+            Console.WriteLine(logMessage);
+            
+            // Write to log file for persistent debugging
+            try
+            {
+                lock (_logLock)
+                {
+                    File.AppendAllText(_logFilePath, logMessage + Environment.NewLine);
+                }
+            }
+            catch
+            {
+                // Ignore file write errors to prevent crashes
+            }
         }
 
         public event EventHandler<bool>? PlaybackStateChanged;
@@ -134,7 +165,7 @@ namespace QuranSearchApp.Services
                 // Ensure cache directory exists
                 if (!Directory.Exists(_audioBasePath))
                 {
-                    Console.WriteLine($"[AudioService] Creating cache directory: {_audioBasePath}");
+                    LogDebug($"Creating cache directory: {_audioBasePath}");
                     Directory.CreateDirectory(_audioBasePath);
                 }
 
@@ -144,17 +175,17 @@ namespace QuranSearchApp.Services
 
                 if (File.Exists(cachedFilePath))
                 {
-                    Console.WriteLine($"[AudioService] Using cached file: {cachedFilePath}");
+                    LogDebug($"Using cached file: {cachedFilePath}");
                     return cachedFilePath;
                 }
 
                 // Download to cache
                 string remoteUrl = $"{_remoteAudioBaseUrl.TrimEnd('/')}/{fileName}";
-                Console.WriteLine($"[AudioService] Downloading from: {remoteUrl}");
-                Console.WriteLine($"[AudioService] Caching to: {cachedFilePath}");
+                LogDebug($"Downloading from: {remoteUrl}");
+                LogDebug($"Caching to: {cachedFilePath}");
 
                 using var response = await _httpClient.GetAsync(remoteUrl, HttpCompletionOption.ResponseHeadersRead);
-                Console.WriteLine($"[AudioService] Response status: {response.StatusCode}");
+                LogDebug($"Response status: {response.StatusCode}");
                 response.EnsureSuccessStatusCode();
 
                 await using (var fs = File.Create(cachedFilePath))
@@ -163,13 +194,13 @@ namespace QuranSearchApp.Services
                 }
 
                 var fileInfo = new FileInfo(cachedFilePath);
-                Console.WriteLine($"[AudioService] Downloaded and cached file size: {fileInfo.Length} bytes");
+                LogDebug($"Downloaded and cached file size: {fileInfo.Length} bytes");
 
                 return cachedFilePath;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[AudioService] Failed to get or download audio: {ex.Message}");
+                LogDebug($"Failed to get or download audio: {ex.Message}");
                 return null;
             }
         }
@@ -203,8 +234,8 @@ namespace QuranSearchApp.Services
                                 "aplay" => $"\"{filePath}\"",
                                 _ => $"\"{filePath}\""
                             };
-                            Console.WriteLine($"[AudioService] Using audio player: {command}");
-                            Console.WriteLine($"[AudioService] Arguments: {arguments}");
+                            LogDebug($"Using audio player: {command}");
+                            LogDebug($"Arguments: {arguments}");
                             break;
                         }
                         else
@@ -221,18 +252,19 @@ namespace QuranSearchApp.Services
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    // Try multiple options for Windows
-                    // First try PowerShell with MediaPlayer (supports MP3)
+                    // Use PowerShell with MediaPlayer (supports MP3)
                     command = "powershell";
-                    arguments = $"-Command \"Add-Type -AssemblyName PresentationCore; $player = New-Object System.Windows.Media.MediaPlayer; $player.Open('{filePath}'); $player.Play(); while($player.NaturalDuration.TimeSpan.TotalSeconds -eq 0){{Start-Sleep -Milliseconds 100}}; Start-Sleep -Seconds $player.NaturalDuration.TimeSpan.TotalSeconds\"";
-                    Console.WriteLine($"[AudioService] Using PowerShell MediaPlayer for Windows");
+                    // Escape single quotes in file path for PowerShell
+                    string escapedPath = filePath.Replace("'", "''");
+                    arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"Add-Type -AssemblyName PresentationCore; $player = New-Object System.Windows.Media.MediaPlayer; $player.Open('{escapedPath}'); $player.Play(); $player.MediaEnded.Add({{ $player.Stop(); $player.Close(); [System.Windows.Threading.Dispatcher]::CurrentDispatcher.InvokeShutdown(); }}); [System.Windows.Threading.Dispatcher]::Run()\"";
+                    LogDebug($"Using PowerShell MediaPlayer for Windows");
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
                     // Use afplay for macOS (built-in)
                     command = "afplay";
                     arguments = $"\"{filePath}\"";
-                    Console.WriteLine($"[AudioService] Using afplay for macOS");
+                    LogDebug($"Using afplay for macOS");
                 }
                 else
                 {
@@ -240,9 +272,9 @@ namespace QuranSearchApp.Services
                     return;
                 }
 
-                Console.WriteLine($"[AudioService] Starting playback: {command} {arguments}");
-                Console.WriteLine($"[AudioService] File path: {filePath}");
-                Console.WriteLine($"[AudioService] File exists: {File.Exists(filePath)}");
+                LogDebug($"Starting playback: {command} {arguments}");
+                LogDebug($"File path: {filePath}");
+                LogDebug($"File exists: {File.Exists(filePath)}");
 
                 _audioProcess = new Process
                 {
@@ -266,7 +298,7 @@ namespace QuranSearchApp.Services
                 var errorOutput = await _audioProcess.StandardError.ReadToEndAsync();
                 if (!string.IsNullOrEmpty(errorOutput))
                 {
-                    Console.WriteLine($"[AudioService] Player error output: {errorOutput}");
+                    LogDebug($"Player error output: {errorOutput}");
                 }
                 
                 // Only update state if it's not already set
@@ -280,8 +312,8 @@ namespace QuranSearchApp.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[AudioService] Exception in StartAudioPlaybackAsync: {ex.Message}");
-                Console.WriteLine($"[AudioService] Stack trace: {ex.StackTrace}");
+                LogDebug($"Exception in StartAudioPlaybackAsync: {ex.Message}");
+                LogDebug($"Stack trace: {ex.StackTrace}");
                 PlaybackError?.Invoke(this, $"Error starting audio playback: {ex.Message}");
             }
         }
@@ -422,7 +454,7 @@ namespace QuranSearchApp.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[AudioService] Error in OnAudioProcessExited: {ex}");
+                LogDebug($"Error in OnAudioProcessExited: {ex}");
                 // Ensure we still update the state even if there's an error
                 _isPlaying = false;
                 PlaybackStateChanged?.Invoke(this, false);
