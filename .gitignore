@@ -388,6 +388,7 @@ FodyWeavers.xsd
 
 # Build artifacts
 *.tar.gz
+*.zip
 
 # Backup files
 *.backup
