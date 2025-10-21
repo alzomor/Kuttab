@@ -8,7 +8,7 @@
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
         x:Class="QuranSearchApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="القرآن الكريم - Quran Pattern Search"
+        Title="القرآن الكريم - Quran Pattern Search 🔬 v0.3 TEST VERSION"
         Width="1280" Height="720"
         Background="{DynamicResource ThemeBackgroundBrush}"
         RequestedThemeVariant="Light">
@@ -119,63 +119,18 @@
         
         <ScrollViewer HorizontalScrollBarVisibility="Auto" 
                       VerticalScrollBarVisibility="Auto">
-            <Grid Margin="10" MinWidth="1260">
+            <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="2*"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="200"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="150"/>
+                <RowDefinition Height="1*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
-            <!-- Header with Islamic Design -->
-            <Border Grid.Row="0" Classes="islamic-card" Margin="0,0,0,8">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <StackPanel Grid.Column="0" Orientation="Vertical">
-                        <TextBlock Text="بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ" 
-                                   FontSize="20" 
-                                   FontWeight="Bold"
-                                   Foreground="#2C5F2D"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,0,0,5"/>
-                        <TextBlock Text="Quran Tajweed Pattern Search" 
-                                   FontSize="15" 
-                                   FontWeight="SemiBold"
-                                   Foreground="#8B7355"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,0,0,3"/>
-                        <Border Background="#FFE69C" 
-                                BorderBrush="#FFC107"
-                                BorderThickness="2"
-                                CornerRadius="6"
-                                Padding="10,4"
-                                HorizontalAlignment="Center">
-                            <TextBlock Text="🔬 نسخة تجريبية v0.3 - TEST VERSION" 
-                                       FontSize="13" 
-                                       FontWeight="Bold"
-                                       Foreground="#856404"/>
-                        </Border>
-                    </StackPanel>
-                    
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <CheckBox Content="🌐 Online Images" 
-                                  IsChecked="{Binding UseRemoteImages}"
-                                  Margin="0,0,15,0"/>
-                        <CheckBox Content="🔊 Online Audio" 
-                                  IsChecked="{Binding UseRemoteAudio}"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
-            
             <!-- Search Controls -->
-            <Border Grid.Row="1" Classes="islamic-card" Margin="0,0,0,6">
+            <Border Grid.Row="0" Classes="islamic-card" Margin="0,0,0,6">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="📖 Select Tajweed Rule:" 
                                VerticalAlignment="Center" 
@@ -187,16 +142,27 @@
                               Classes="islamic"
                               ItemsSource="{Binding Rules}"
                               SelectedItem="{Binding SelectedRule}"
-                              Width="280" 
+                              MinWidth="280"
+                              MaxWidth="400"
                               Margin="0,0,15,0"/>
                     <Button Content="🔍 Search" 
                             Classes="primary"
-                            Command="{Binding SearchCommand}"/>
+                            Command="{Binding SearchCommand}"
+                            Margin="0,0,15,0"/>
+                    
+                    <!-- Online Resources Options -->
+                    <CheckBox Content="🌐 Online Images" 
+                              IsChecked="{Binding UseRemoteImages}"
+                              VerticalAlignment="Center"
+                              Margin="0,0,15,0"/>
+                    <CheckBox Content="🔊 Online Audio" 
+                              IsChecked="{Binding UseRemoteAudio}"
+                              VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
             <!-- Status Message -->
-            <Border Grid.Row="2" 
+            <Border Grid.Row="1" 
                     Background="#2C5F2D" 
                     CornerRadius="8"
                     Padding="6,4" 
@@ -208,7 +174,7 @@
             </Border>
 
             <!-- Search Results List -->
-            <Border Grid.Row="3" Classes="islamic-card" Margin="0,0,0,6">
+            <Border Grid.Row="2" Classes="islamic-card" Margin="0,0,0,6" MaxHeight="400">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -285,7 +251,7 @@
             </Border>
 
             <!-- Audio Controls -->
-            <Border Grid.Row="4" Classes="islamic-card" Margin="0,0,0,6">
+            <Border Grid.Row="3" Classes="islamic-card" Margin="0,0,0,6">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -380,7 +346,7 @@
             </Border>
 
             <!-- Picture Display Area -->
-            <Border Grid.Row="5" Classes="islamic-card">
+            <Border Grid.Row="4" Classes="islamic-card">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -410,8 +376,6 @@
                                        IsVisible="{Binding CurrentPicturePath, Converter={x:Static ObjectConverters.IsNull}}"/>
                             <Image Source="{Binding CurrentPictureBitmap}" 
                                    Stretch="Uniform"
-                                   MaxHeight="100"
-                                   MaxWidth="1240"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    IsVisible="{Binding CurrentPicturePath, Converter={x:Static ObjectConverters.IsNotNull}}"/>
