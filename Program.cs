@@ -119,10 +119,6 @@ class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .With(new FontManagerOptions
-            {
-                DefaultFamilyName = "Arial,Segoe UI Emoji,Segoe UI Symbol"
-            })
             .LogToTrace()
             .AfterSetup(builder =>
             {

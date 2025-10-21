@@ -7,7 +7,7 @@
     <Application.Styles>
         <FluentTheme />
         <Style Selector="TextBlock">
-            <Setter Property="FontFamily" Value="Scheherazade, Noto Sans Arabic, DejaVu Sans, sans-serif"/>
+            <Setter Property="FontFamily" Value="avares://QuranSearchApp/Fonts#Scheherazade New, avares://QuranSearchApp/Fonts#Noto Sans Arabic"/>
         </Style>
     </Application.Styles>
 </Application>
