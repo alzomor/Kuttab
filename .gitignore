@@ -398,3 +398,9 @@ FodyWeavers.xsd
 !quran-uthmani.txt
 !rules.json
 !README.md
+
+# Font files
+ScheherazadeNew-*/
+*.ttf
+*.otf
+install_fonts.sh
