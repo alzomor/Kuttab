@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
@@ -16,6 +17,7 @@ public class MainWindowViewModel : ViewModelBase
     private readonly QuranSearchService _searchService;
     private readonly AudioService _audioService;
     private readonly PictureService _pictureService;
+    private readonly LocalizationService _localizationService;
     private ObservableCollection<string> _rules = new();
     private ObservableCollection<QuranAya> _searchResults = new();
     private string? _selectedRule;
@@ -42,6 +44,8 @@ public class MainWindowViewModel : ViewModelBase
         _searchService = new QuranSearchService();
         _audioService = new AudioService();
         _pictureService = new PictureService();
+        _localizationService = LocalizationService.Instance;
+        
         // Initialize audio remote source setting
         _audioService.UseRemoteSource = _useRemoteAudio;
         
@@ -49,6 +53,9 @@ public class MainWindowViewModel : ViewModelBase
         _audioService.PlaybackStateChanged += OnPlaybackStateChanged;
         _audioService.PlaybackError += OnPlaybackError;
         _audioService.SequencePlaybackEnded += OnSequencePlaybackEnded;
+        
+        // Subscribe to language change events
+        _localizationService.LanguageChanged += OnLanguageChanged;
         
         SearchCommand = new AsyncCommand(SearchAsync);
         PlaySingleCommand = new SimpleCommand(PlaySingle);
@@ -221,6 +228,24 @@ public class MainWindowViewModel : ViewModelBase
 
     public bool HasRuleDescription => !string.IsNullOrWhiteSpace(RuleDescription);
 
+    public LocalizationService Localization => _localizationService;
+
+    public List<LanguageOption> AvailableLanguages => _localizationService.AvailableLanguages;
+
+    public LanguageOption SelectedLanguage
+    {
+        get => _localizationService.AvailableLanguages.Find(l => l.Code == _localizationService.CurrentLanguage) 
+               ?? _localizationService.AvailableLanguages[0];
+        set
+        {
+            if (value != null && _localizationService.CurrentLanguage != value.Code)
+            {
+                _localizationService.CurrentLanguage = value.Code;
+                this.RaisePropertyChanged(nameof(SelectedLanguage));
+            }
+        }
+    }
+
     public ICommand SearchCommand { get; }
     public ICommand PlaySingleCommand { get; }
     public ICommand PlayRepeatCommand { get; }
@@ -233,15 +258,15 @@ public class MainWindowViewModel : ViewModelBase
     {
         try
         {
-            StatusMessage = "Loading Quran text...";
+            StatusMessage = _localizationService.GetString("LoadingQuranText");
             await _searchService.LoadQuranTextAsync();
             
-            StatusMessage = "Loading rules...";
+            StatusMessage = _localizationService.GetString("LoadingRules");
             await _searchService.LoadRulesAsync();
             
             var ruleNames = _searchService.GetRuleNames();
             Rules = new ObservableCollection<string>(ruleNames);
-            StatusMessage = $"Ready - Loaded {ruleNames.Count} rules";
+            StatusMessage = _localizationService.GetString("ReadyLoadedRules", ruleNames.Count);
         }
         catch (Exception ex)
         {
@@ -250,23 +275,44 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        // Update status message when language changes
+        this.RaisePropertyChanged(nameof(Localization));
+        this.RaisePropertyChanged(nameof(SelectedLanguage));
+        
+        // If we have results, update the status message
+        if (SearchResults.Count > 0)
+        {
+            StatusMessage = _localizationService.GetString("FoundMatches", SearchResults.Count);
+        }
+        else if (Rules.Count > 0)
+        {
+            StatusMessage = _localizationService.GetString("ReadyLoadedRules", Rules.Count);
+        }
+        else
+        {
+            StatusMessage = _localizationService.GetString("Ready");
+        }
+    }
+
     private async Task SearchAsync()
     {
         if (string.IsNullOrWhiteSpace(SelectedRule))
         {
-            StatusMessage = "Please select a rule to search";
+            StatusMessage = _localizationService.GetString("PleaseSelectRule");
             return;
         }
 
         try
         {
-            StatusMessage = "Searching...";
+            StatusMessage = _localizationService.GetString("Searching");
             // Run search on background thread
             var results = await Task.Run(() => _searchService.SearchPattern(SelectedRule));
             
             // Update UI on main thread
             SearchResults = new ObservableCollection<QuranAya>(results);
-            StatusMessage = $"Found {results.Count} matches";
+            StatusMessage = _localizationService.GetString("FoundMatches", results.Count);
             
             // Update rule description
             var selectedRuleInfo = _searchService.GetRuleInfo(SelectedRule);
@@ -275,7 +321,7 @@ public class MainWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Search error: {ex.Message}";
+            StatusMessage = _localizationService.GetString("SearchError", ex.Message);
         }
     }
 
@@ -283,13 +329,13 @@ public class MainWindowViewModel : ViewModelBase
     {
         if (SelectedAya == null)
         {
-            StatusMessage = "Please select an Aya to play";
+            StatusMessage = _localizationService.GetString("PleaseSelectAya");
             return;
         }
 
         if (!_audioService.AudioFileExists(SelectedAya.SurahNumber, SelectedAya.AyaNumber))
         {
-            StatusMessage = $"Audio file not found for Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
+            StatusMessage = _localizationService.GetString("AudioFileNotFound", SelectedAya.SurahNumber, SelectedAya.AyaNumber);
             return;
         }
         
@@ -301,7 +347,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             if (_audioService.AudioFileExists(1, 1))
             {
-                StatusMessage = $"Playing Basmala before Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
+                StatusMessage = _localizationService.GetString("PlayingBasmala", SelectedAya.SurahNumber, SelectedAya.AyaNumber);
                 await _audioService.PlayAyaAsync(1, 1);
                 
                 // Wait for Basmala to finish
@@ -312,7 +358,7 @@ public class MainWindowViewModel : ViewModelBase
             }
         }
         
-        StatusMessage = $"Playing Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
+        StatusMessage = _localizationService.GetString("PlayingAya", SelectedAya.SurahNumber, SelectedAya.AyaNumber);
         await _audioService.PlayAyaAsync(SelectedAya.SurahNumber, SelectedAya.AyaNumber);
     }
 
@@ -320,13 +366,13 @@ public class MainWindowViewModel : ViewModelBase
     {
         if (SelectedAya == null)
         {
-            StatusMessage = "Please select an Aya to repeat";
+            StatusMessage = _localizationService.GetString("PleaseSelectAya");
             return;
         }
 
         if (!_audioService.AudioFileExists(SelectedAya.SurahNumber, SelectedAya.AyaNumber))
         {
-            StatusMessage = $"Audio file not found for Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
+            StatusMessage = _localizationService.GetString("AudioFileNotFound", SelectedAya.SurahNumber, SelectedAya.AyaNumber);
             return;
         }
         
@@ -336,7 +382,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             if (_audioService.AudioFileExists(1, 1))
             {
-                StatusMessage = $"Playing Basmala before Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
+                StatusMessage = _localizationService.GetString("PlayingBasmala", SelectedAya.SurahNumber, SelectedAya.AyaNumber);
                 _audioService.SetRepeatMode(false);
                 await _audioService.PlayAyaAsync(1, 1);
                 
@@ -348,7 +394,7 @@ public class MainWindowViewModel : ViewModelBase
             }
         }
         
-        StatusMessage = $"Playing Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber} on repeat";
+        StatusMessage = _localizationService.GetString("PlayingAyaOnRepeat", SelectedAya.SurahNumber, SelectedAya.AyaNumber);
         _audioService.SetRepeatMode(true);
         await _audioService.PlayAyaAsync(SelectedAya.SurahNumber, SelectedAya.AyaNumber);
     }
@@ -357,7 +403,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         if (SearchResults == null || SearchResults.Count == 0)
         {
-            StatusMessage = "No search results to play";
+            StatusMessage = _localizationService.GetString("NoSearchResults");
             return;
         }
         
@@ -370,7 +416,7 @@ public class MainWindowViewModel : ViewModelBase
         IsPlayingSequence = true;
         IsSequencePaused = false;
         
-        StatusMessage = $"Playing all {SearchResults.Count} found ayas in sequence";
+        StatusMessage = _localizationService.GetString("PlayingAllAyas", SearchResults.Count);
         _audioService.SetRepeatMode(false);
         
         await PlaySingleAyaInSequence(0);
@@ -388,7 +434,7 @@ public class MainWindowViewModel : ViewModelBase
             IsSequencePaused = false;
             _lastPlayedAyaIndex = -1;
             _currentPlayingAyaIndex = -1;
-            StatusMessage = "Finished playing all ayas";
+            StatusMessage = _localizationService.GetString("FinishedPlayingAll");
             
             // Clear highlighting
             if (CurrentPlayingAya != null)
@@ -402,7 +448,7 @@ public class MainWindowViewModel : ViewModelBase
         // Check if stop was requested
         if (!_isPlayingSequence)
         {
-            StatusMessage = "Sequence playback stopped";
+            StatusMessage = _localizationService.GetString("SequenceStopped");
             IsPlayingSequence = false;
             return;
         }
@@ -411,7 +457,7 @@ public class MainWindowViewModel : ViewModelBase
         if (_isSequencePaused)
         {
             _lastPlayedAyaIndex = index - 1;
-            StatusMessage = "Sequence playback paused";
+            StatusMessage = _localizationService.GetString("SequencePausedMessage");
             return;
         }
         
@@ -441,7 +487,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             if (_audioService.AudioFileExists(1, 1))
             {
-                StatusMessage = $"Playing Basmala before Aya {aya.SurahNumber}:{aya.AyaNumber}";
+                StatusMessage = _localizationService.GetString("PlayingBasmala", aya.SurahNumber, aya.AyaNumber);
                 
                 // Set flag to prevent sequence from advancing after Basmala
                 _isPlayingBasmala = true;
@@ -464,13 +510,13 @@ public class MainWindowViewModel : ViewModelBase
                 {
                     if (!_isPlayingSequence)
                     {
-                        StatusMessage = "Sequence playback stopped";
+                        StatusMessage = _localizationService.GetString("SequenceStopped");
                         IsPlayingSequence = false;
                     }
                     else
                     {
                         _lastPlayedAyaIndex = index - 1;
-                        StatusMessage = "Sequence playback paused";
+                        StatusMessage = _localizationService.GetString("SequencePausedMessage");
                     }
                     return;
                 }
@@ -478,7 +524,7 @@ public class MainWindowViewModel : ViewModelBase
         }
         
         // Play the actual Aya
-        StatusMessage = $"Playing Aya {aya.SurahNumber}:{aya.AyaNumber} ({index + 1}/{SearchResults.Count})";
+        StatusMessage = $"{_localizationService.GetString("PlayingAya", aya.SurahNumber, aya.AyaNumber)} ({index + 1}/{SearchResults.Count})";
         _audioService.SetRepeatMode(false);
         await _audioService.PlayAyaAsync(aya.SurahNumber, aya.AyaNumber);
         
@@ -517,7 +563,7 @@ public class MainWindowViewModel : ViewModelBase
             this.RaisePropertyChanged(nameof(IsPlaying));
             this.RaisePropertyChanged(nameof(IsRepeating));
             
-            StatusMessage = "Playback stopped";
+            StatusMessage = _localizationService.GetString("PlaybackStopped");
         });
         _ignoreNextPlaybackCompleted = false;
     }
@@ -526,7 +572,6 @@ public class MainWindowViewModel : ViewModelBase
     {
         if (!_isPlayingSequence || _isSequencePaused)
         {
-            StatusMessage = "No sequence playback to pause";
             return;
         }
         
@@ -539,14 +584,14 @@ public class MainWindowViewModel : ViewModelBase
         _isSequencePaused = true;
         IsSequencePaused = true;
         await _audioService.StopAsync(); // Stop current audio
-        StatusMessage = "Sequence playback paused";
+        StatusMessage = _localizationService.GetString("SequencePausedMessage");
     }
     
     private async void ResumeSequence()
     {
         if (!_isSequencePaused || !_isPlayingSequence)
         {
-            StatusMessage = "No paused sequence to resume";
+            StatusMessage = _localizationService.GetString("NoPausedSequence");
             return;
         }
         
@@ -558,7 +603,7 @@ public class MainWindowViewModel : ViewModelBase
         
         if (resumeIndex < SearchResults.Count)
         {
-            StatusMessage = $"Resuming sequence from Aya {resumeIndex + 1}/{SearchResults.Count}";
+            StatusMessage = _localizationService.GetString("ResumingSequence", resumeIndex + 1, SearchResults.Count);
             await PlaySingleAyaInSequence(resumeIndex);
         }
         else
@@ -567,7 +612,7 @@ public class MainWindowViewModel : ViewModelBase
             _isPlayingSequence = false;
             IsPlayingSequence = false;
             _lastPlayedAyaIndex = -1;
-            StatusMessage = "Sequence already completed";
+            StatusMessage = _localizationService.GetString("SequenceCompleted");
         }
     }
 
@@ -622,7 +667,7 @@ public class MainWindowViewModel : ViewModelBase
         // Update the UI on the UI thread
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
-            StatusMessage = $"Audio error: {error}";
+            StatusMessage = _localizationService.GetString("AudioError", error);
             IsPlaying = false;
             
             // Ensure the UI is updated immediately
@@ -659,7 +704,7 @@ public class MainWindowViewModel : ViewModelBase
                 else
                 {
                     CurrentPictureBitmap = null;
-                    StatusMessage = "Error: Could not load image";
+                    StatusMessage = _localizationService.GetString("ErrorCouldNotLoadImage");
                     Console.WriteLine($"[ViewModel] Failed to load bitmap for: {picturePath}");
                 }
             }
@@ -667,7 +712,7 @@ public class MainWindowViewModel : ViewModelBase
             {
                 CurrentPicturePath = null;
                 CurrentPictureBitmap = null;
-                StatusMessage = $"Picture not found for Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}";
+                StatusMessage = _localizationService.GetString("PictureNotFound", SelectedAya.SurahNumber, SelectedAya.AyaNumber);
                 Console.WriteLine($"[ViewModel] Picture not found for Aya {SelectedAya.SurahNumber}:{SelectedAya.AyaNumber}");
             }
         }
@@ -675,7 +720,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             CurrentPicturePath = null;
             CurrentPictureBitmap = null;
-            StatusMessage = $"Error loading picture: {ex.Message}";
+            StatusMessage = _localizationService.GetString("ErrorLoadingPicture", ex.Message);
             Console.WriteLine($"[ViewModel] Error in UpdatePictureForSelectedAyaAsync: {ex.Message}");
         }
     }

@@ -3,12 +3,13 @@
         xmlns:vm="using:QuranSearchApp.ViewModels"
         xmlns:views="using:QuranSearchApp.Views"
         xmlns:models="using:QuranSearchApp.Models"
+        xmlns:services="using:QuranSearchApp.Services"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
         x:Class="QuranSearchApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="القرآن الكريم - Quran Pattern Search 🔬 v0.3 TEST VERSION"
+        Title="{Binding Localization.WindowTitle}"
         Width="1280" Height="720"
         Background="{DynamicResource ThemeBackgroundBrush}"
         RequestedThemeVariant="Light">
@@ -132,7 +133,27 @@
             <!-- Search Controls -->
             <Border Grid.Row="0" Classes="islamic-card" Margin="0,0,0,6">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="📖 Select Tajweed Rule:" 
+                    <!-- Language Selector -->
+                    <TextBlock Text="{Binding Localization.Language}" 
+                               VerticalAlignment="Center" 
+                               Margin="0,0,8,0"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="#2C5F2D"/>
+                    <ComboBox Name="LanguageComboBox"
+                              Classes="islamic"
+                              ItemsSource="{Binding AvailableLanguages}"
+                              SelectedItem="{Binding SelectedLanguage}"
+                              MinWidth="140"
+                              Margin="0,0,20,0">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="services:LanguageOption">
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    
+                    <TextBlock Text="{Binding Localization.SelectTajweedRule}" 
                                VerticalAlignment="Center" 
                                Margin="0,0,12,0"
                                FontSize="14"
@@ -145,17 +166,17 @@
                               MinWidth="280"
                               MaxWidth="400"
                               Margin="0,0,15,0"/>
-                    <Button Content="🔍 Search" 
+                    <Button Content="{Binding Localization.Search}" 
                             Classes="primary"
                             Command="{Binding SearchCommand}"
                             Margin="0,0,15,0"/>
                     
                     <!-- Online Resources Options -->
-                    <CheckBox Content="🌐 Online Images" 
+                    <CheckBox Content="{Binding Localization.OnlineImages}" 
                               IsChecked="{Binding UseRemoteImages}"
                               VerticalAlignment="Center"
                               Margin="0,0,15,0"/>
-                    <CheckBox Content="🔊 Online Audio" 
+                    <CheckBox Content="{Binding Localization.OnlineAudio}" 
                               IsChecked="{Binding UseRemoteAudio}"
                               VerticalAlignment="Center"/>
                 </StackPanel>
@@ -227,14 +248,19 @@
                                                     CornerRadius="4" 
                                                     Padding="8,4"
                                                     Margin="0,0,0,8">
-                                                <TextBlock FontSize="13" 
-                                                           Foreground="#8B7355" 
-                                                           FontWeight="SemiBold">
-                                                    <Run Text="📜 سورة "/>
-                                                    <Run Text="{Binding SurahNumber}"/>
-                                                    <Run Text=" - آية "/>
-                                                    <Run Text="{Binding AyaNumber}"/>
-                                                </TextBlock>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="📜 "
+                                                               FontSize="13" 
+                                                               Foreground="#8B7355" 
+                                                               FontWeight="SemiBold"/>
+                                                    <TextBlock FontSize="13" 
+                                                               Foreground="#8B7355" 
+                                                               FontWeight="SemiBold">
+                                                        <Run Text="{Binding SurahNumber}"/>
+                                                        <Run Text=":"/>
+                                                        <Run Text="{Binding AyaNumber}"/>
+                                                    </TextBlock>
+                                                </StackPanel>
                                             </Border>
                                             
                                             <!-- Arabic text with highlighted matches -->
@@ -259,26 +285,26 @@
                     </Grid.RowDefinitions>
                     
                     <TextBlock Grid.Row="0" 
-                               Text="Audio Controls" 
+                               Text="{Binding Localization.AudioControls}" 
                                FontSize="14" 
                                FontWeight="SemiBold"
                                Foreground="#2C5F2D"
                                Margin="0,0,0,8"/>
                     
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <Button Content="▶️ Play Single" 
+                        <Button Content="{Binding Localization.PlaySingle}" 
                                 Classes="secondary"
                                 Command="{Binding PlaySingleCommand}"
                                 IsEnabled="{Binding !IsPlaying}"
                                 Margin="0,0,10,0"/>
                         
-                        <Button Content="🔁 Play Repeat" 
+                        <Button Content="{Binding Localization.PlayRepeat}" 
                                 Classes="secondary"
                                 Command="{Binding PlayRepeatCommand}"
                                 IsEnabled="{Binding !IsPlaying}"
                                 Margin="0,0,10,0"/>
                         
-                        <Button Content="📋 Play All Sequence" 
+                        <Button Content="{Binding Localization.PlayAllSequence}" 
                                 Classes="secondary"
                                 Command="{Binding PlayAllCommand}"
                                 IsEnabled="{Binding CanStartSequence}"
@@ -295,7 +321,7 @@
                                 FontWeight="SemiBold"
                                 Margin="0,0,10,0"/>
                         
-                        <Button Content="⏹️ Stop" 
+                        <Button Content="{Binding Localization.Stop}" 
                                 Classes="danger"
                                 Command="{Binding StopCommand}"
                                 IsEnabled="{Binding IsPlaying}"
@@ -313,10 +339,10 @@
                                 <TextBlock Text="🔴" 
                                            FontSize="14"
                                            Margin="0,0,6,0"/>
-                                <TextBlock Text="Playing" 
+                                <TextBlock Text="{Binding Localization.Playing}" 
                                            FontWeight="SemiBold"
                                            Foreground="#856404"/>
-                                <TextBlock Text="(Repeat)" 
+                                <TextBlock Text="{Binding Localization.Repeat}" 
                                            FontStyle="Italic"
                                            Foreground="#856404"
                                            Margin="6,0,0,0"
@@ -336,7 +362,7 @@
                                 <TextBlock Text="⏸️" 
                                            FontSize="14"
                                            Margin="0,0,6,0"/>
-                                <TextBlock Text="Sequence Paused" 
+                                <TextBlock Text="{Binding Localization.SequencePaused}" 
                                            FontWeight="SemiBold"
                                            Foreground="#856404"/>
                             </StackPanel>
@@ -354,7 +380,7 @@
                     </Grid.RowDefinitions>
                     
                     <TextBlock Grid.Row="0" 
-                               Text="📷 Quranic Page View" 
+                               Text="{Binding Localization.QuranicPageView}" 
                                FontSize="14" 
                                FontWeight="SemiBold"
                                Foreground="#2C5F2D"
@@ -367,7 +393,7 @@
                             CornerRadius="8"
                             Height="100">
                         <Grid>
-                            <TextBlock Text="اختر آية لعرض صورتها 📖" 
+                            <TextBlock Text="{Binding Localization.SelectAyaToViewImage}" 
                                        HorizontalAlignment="Center" 
                                        VerticalAlignment="Center"
                                        Foreground="#8B7355"
