@@ -9,6 +9,7 @@ using ReactiveUI;
 using QuranSearchApp.Models;
 using QuranSearchApp.Services;
 using Avalonia.Media.Imaging;
+using FlowDirection = Avalonia.Media.FlowDirection;
 
 namespace QuranSearchApp.ViewModels;
 
@@ -246,6 +247,10 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
+    public FlowDirection CurrentFlowDirection => _localizationService.IsRightToLeft 
+        ? FlowDirection.RightToLeft 
+        : FlowDirection.LeftToRight;
+
     public ICommand SearchCommand { get; }
     public ICommand PlaySingleCommand { get; }
     public ICommand PlayRepeatCommand { get; }
@@ -280,6 +285,7 @@ public class MainWindowViewModel : ViewModelBase
         // Update status message when language changes
         this.RaisePropertyChanged(nameof(Localization));
         this.RaisePropertyChanged(nameof(SelectedLanguage));
+        this.RaisePropertyChanged(nameof(CurrentFlowDirection));
         
         // If we have results, update the status message
         if (SearchResults.Count > 0)

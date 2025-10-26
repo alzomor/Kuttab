@@ -44,7 +44,7 @@
   "PictureNotFound": "الصورة غير موجودة للآية {0}:{1}",
   "ErrorLoadingPicture": "خطأ في تحميل الصورة: {0}",
   "ErrorCouldNotLoadImage": "خطأ: تعذر تحميل الصورة",
-  "Language": "🌐 اللغة:",
+  "Language": "🗣️ اللغة:",
   "Arabic": "العربية",
   "English": "English",
   "German": "Deutsch"

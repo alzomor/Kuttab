@@ -12,7 +12,8 @@
         Title="{Binding Localization.WindowTitle}"
         Width="1280" Height="720"
         Background="{DynamicResource ThemeBackgroundBrush}"
-        RequestedThemeVariant="Light">
+        RequestedThemeVariant="Light"
+        FlowDirection="{Binding CurrentFlowDirection}">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>

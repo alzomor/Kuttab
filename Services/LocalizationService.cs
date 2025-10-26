@@ -46,6 +46,9 @@ public class LocalizationService : ReactiveObject
         {
             this.RaisePropertyChanged(key);
         }
+        
+        // Notify that RTL status may have changed
+        this.RaisePropertyChanged(nameof(IsRightToLeft));
     }
 
     private void LoadLanguage(string languageCode)
@@ -129,11 +132,13 @@ public class LocalizationService : ReactiveObject
     public string English => this["English"];
     public string German => this["German"];
 
+    public bool IsRightToLeft => _currentLanguage == "ar";
+
     public List<LanguageOption> AvailableLanguages => new()
     {
-        new LanguageOption { Code = "ar", Name = "العربية" },
-        new LanguageOption { Code = "en", Name = "English" },
-        new LanguageOption { Code = "de", Name = "Deutsch" }
+        new LanguageOption { Code = "ar", Name = "العربية", IsRightToLeft = true },
+        new LanguageOption { Code = "en", Name = "English", IsRightToLeft = false },
+        new LanguageOption { Code = "de", Name = "Deutsch", IsRightToLeft = false }
     };
 }
 
@@ -141,4 +146,5 @@ public class LanguageOption
 {
     public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
+    public bool IsRightToLeft { get; set; }
 }

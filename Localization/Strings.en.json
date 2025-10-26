@@ -44,7 +44,7 @@
   "PictureNotFound": "Picture not found for Aya {0}:{1}",
   "ErrorLoadingPicture": "Error loading picture: {0}",
   "ErrorCouldNotLoadImage": "Error: Could not load image",
-  "Language": "🌐 Language:",
+  "Language": "🗣️ Language:",
   "Arabic": "العربية",
   "English": "English",
   "German": "Deutsch"
