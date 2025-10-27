@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 
-namespace QuranSearchApp.Models;
+namespace QuranSearch.Core.Models;
 
 public class QuranAya : INotifyPropertyChanged
 {

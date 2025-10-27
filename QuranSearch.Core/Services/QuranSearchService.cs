@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using QuranSearchApp.Models;
+using QuranSearch.Core.Models;
+using QuranSearch.Core.Interfaces;
 
-namespace QuranSearchApp.Services;
+namespace QuranSearch.Core.Services;
 
 public class QuranSearchService
 {
+    private readonly IFileService _fileService;
+    
     // List of exceptions for Idgham Bighunnah (words that should not be considered for Idgham)
     private static readonly List<string> IdghamBighunnahExceptions = new()
     {
@@ -26,11 +27,17 @@ public class QuranSearchService
     private List<QuranAya> _quranText = new();
     private List<TajweedRule> _rules = new();
 
+    public QuranSearchService(IFileService fileService)
+    {
+        _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+    }
+
     public async Task LoadQuranTextAsync()
     {
         try
         {
-            var lines = await File.ReadAllLinesAsync("quran-uthmani.txt");
+            var content = await _fileService.ReadAllTextAsync("quran-uthmani.txt");
+            var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             _quranText.Clear();
 
             foreach (var line in lines)
@@ -63,12 +70,12 @@ public class QuranSearchService
     {
         try
         {
-            if (!File.Exists("rules.json"))
+            if (!_fileService.FileExists("rules.json"))
             {
                 throw new Exception("rules.json file not found");
             }
 
-            var jsonContent = await File.ReadAllTextAsync("rules.json");
+            var jsonContent = await _fileService.ReadAllTextAsync("rules.json");
             if (string.IsNullOrWhiteSpace(jsonContent))
             {
                 throw new Exception("rules.json file is empty");

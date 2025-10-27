@@ -1,22 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 using System.Text.Json;
 using ReactiveUI;
+using QuranSearch.Core.Interfaces;
 
-namespace QuranSearchApp.Services;
+namespace QuranSearch.Core.Services;
 
 public class LocalizationService : ReactiveObject
 {
-    private static LocalizationService? _instance;
+    private readonly IFileService _fileService;
     private Dictionary<string, string> _currentStrings = new();
     private string _currentLanguage = "ar"; // Default to Arabic
 
-    public static LocalizationService Instance => _instance ??= new LocalizationService();
-
-    private LocalizationService()
+    public LocalizationService(IFileService fileService)
     {
+        _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         LoadLanguage(_currentLanguage);
     }
 
@@ -55,15 +53,15 @@ public class LocalizationService : ReactiveObject
     {
         try
         {
-            var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Localization", $"Strings.{languageCode}.json");
+            var filePath = System.IO.Path.Combine("Localization", $"Strings.{languageCode}.json");
             
-            if (!File.Exists(filePath))
+            if (!_fileService.FileExists(filePath))
             {
                 Console.WriteLine($"Language file not found: {filePath}");
                 return;
             }
 
-            var jsonContent = File.ReadAllText(filePath);
+            var jsonContent = _fileService.ReadAllText(filePath); // Use synchronous version to avoid deadlock
             _currentStrings = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent) ?? new Dictionary<string, string>();
             
             Console.WriteLine($"Loaded language: {languageCode} with {_currentStrings.Count} strings");
@@ -147,4 +145,6 @@ public class LanguageOption
     public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public bool IsRightToLeft { get; set; }
+    
+    public override string ToString() => Name;
 }

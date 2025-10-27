@@ -1,6 +1,6 @@
 using ReactiveUI;
 
-namespace QuranSearchApp.ViewModels;
+namespace QuranSearch.Core.ViewModels;
 
 public class ViewModelBase : ReactiveObject
 {

@@ -4,10 +4,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using System.Net;
+using QuranSearch.Core.Interfaces;
 
 namespace QuranSearchApp.Services
 {
-    public class PictureService
+    public class PictureService : IPictureService
     {
         private readonly string _pictureBasePath;
         private readonly string _remoteBaseUrl = "https://everyayah.com/data/QuranText_jpg/";
@@ -57,7 +58,22 @@ namespace QuranSearchApp.Services
         }
 
         /// <summary>
-        /// Checks if a picture file exists for the given Sura and Aya
+        /// Checks if a picture file exists for the given Sura and Aya (synchronous)
+        /// </summary>
+        public bool PictureExists(int suraNumber, int ayaNumber)
+        {
+            if (_useRemoteSource)
+            {
+                // For remote source, assume exists (will fail gracefully on load)
+                return true;
+            }
+            
+            string filePath = GetPicturePath(suraNumber, ayaNumber);
+            return File.Exists(filePath);
+        }
+
+        /// <summary>
+        /// Checks if a picture file exists for the given Sura and Aya (async version)
         /// </summary>
         public async Task<bool> PictureExistsAsync(int suraNumber, int ayaNumber)
         {
@@ -88,6 +104,15 @@ namespace QuranSearchApp.Services
                 
                 return exists;
             }
+        }
+
+        /// <summary>
+        /// Loads a bitmap image from the specified path or URL
+        /// Returns as object to match interface (will be Avalonia.Media.Imaging.Bitmap)
+        /// </summary>
+        async Task<object?> IPictureService.LoadBitmapAsync(string pathOrUrl)
+        {
+            return await LoadBitmapAsync(pathOrUrl);
         }
 
         /// <summary>

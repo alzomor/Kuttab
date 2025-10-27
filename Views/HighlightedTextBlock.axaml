@@ -3,7 +3,7 @@
              x:Class="QuranSearchApp.Views.HighlightedTextBlock">
     <TextBlock Name="MainTextBlock" 
                FontSize="20" 
-               FontFamily="avares://QuranSearchApp/Fonts#Scheherazade New, avares://QuranSearchApp/Fonts#Noto Sans Arabic"
+               FontFamily="Scheherazade New"
                TextWrapping="Wrap"
                FlowDirection="RightToLeft"/>
 </UserControl>

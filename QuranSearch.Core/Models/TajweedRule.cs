@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace QuranSearchApp.Models;
+namespace QuranSearch.Core.Models;
 
 public class TajweedRule
 {

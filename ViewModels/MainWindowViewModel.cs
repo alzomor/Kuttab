@@ -6,7 +6,10 @@ using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
-using QuranSearchApp.Models;
+using QuranSearch.Core.Models;
+using QuranSearch.Core.Services;
+using QuranSearch.Core.ViewModels;
+using QuranSearch.Core.Interfaces;
 using QuranSearchApp.Services;
 using Avalonia.Media.Imaging;
 using FlowDirection = Avalonia.Media.FlowDirection;
@@ -16,8 +19,8 @@ namespace QuranSearchApp.ViewModels;
 public class MainWindowViewModel : ViewModelBase
 {
     private readonly QuranSearchService _searchService;
-    private readonly AudioService _audioService;
-    private readonly PictureService _pictureService;
+    private readonly IAudioService _audioService;
+    private readonly IPictureService _pictureService;
     private readonly LocalizationService _localizationService;
     private ObservableCollection<string> _rules = new();
     private ObservableCollection<QuranAya> _searchResults = new();
@@ -42,10 +45,11 @@ public class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
-        _searchService = new QuranSearchService();
+        var fileService = new DesktopFileService();
+        _searchService = new QuranSearchService(fileService);
         _audioService = new AudioService();
         _pictureService = new PictureService();
-        _localizationService = LocalizationService.Instance;
+        _localizationService = new LocalizationService(fileService);
         
         // Initialize audio remote source setting
         _audioService.UseRemoteSource = _useRemoteAudio;
@@ -284,7 +288,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         // Update status message when language changes
         this.RaisePropertyChanged(nameof(Localization));
-        this.RaisePropertyChanged(nameof(SelectedLanguage));
+        // Don't raise SelectedLanguage here - it's already raised in the setter
         this.RaisePropertyChanged(nameof(CurrentFlowDirection));
         
         // If we have results, update the status message
@@ -696,13 +700,13 @@ public class MainWindowViewModel : ViewModelBase
         
         try
         {
-            if (await _pictureService.PictureExistsAsync(SelectedAya.SurahNumber, SelectedAya.AyaNumber))
+            if (_pictureService.PictureExists(SelectedAya.SurahNumber, SelectedAya.AyaNumber))
             {
                 var picturePath = _pictureService.GetPicturePath(SelectedAya.SurahNumber, SelectedAya.AyaNumber);
                 CurrentPicturePath = picturePath;
                 
-                var bitmap = await _pictureService.LoadBitmapAsync(picturePath);
-                if (bitmap != null)
+                var bitmapObject = await _pictureService.LoadBitmapAsync(picturePath);
+                if (bitmapObject != null && bitmapObject is Bitmap bitmap)
                 {
                     CurrentPictureBitmap = bitmap;
                     Console.WriteLine($"[ViewModel] Picture loaded successfully: {picturePath}");

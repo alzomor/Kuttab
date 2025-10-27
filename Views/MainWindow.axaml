@@ -2,8 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:QuranSearchApp.ViewModels"
         xmlns:views="using:QuranSearchApp.Views"
-        xmlns:models="using:QuranSearchApp.Models"
-        xmlns:services="using:QuranSearchApp.Services"
+        xmlns:models="using:QuranSearch.Core.Models"
+        xmlns:services="using:QuranSearch.Core.Services"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
@@ -227,7 +227,7 @@
                                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListBox.ItemTemplate>
-                                <DataTemplate DataType="models:QuranAya">
+                                <DataTemplate DataType="models:QuranAya" x:CompileBindings="False">
                                     <Border Margin="6" Padding="12" CornerRadius="8"
                                             Background="White"
                                             BorderBrush="#E8DCC4"

@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace QuranSearchApp.ViewModels;
+namespace QuranSearch.Core.ViewModels;
 
 public class SimpleCommand : ICommand
 {

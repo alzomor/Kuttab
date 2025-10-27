@@ -2,50 +2,90 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using QuranSearchApp.Models;
+using QuranSearch.Core.Models;
 
 namespace QuranSearchApp.Views;
 
 public partial class HighlightedTextBlock : UserControl
 {
-    public static readonly StyledProperty<string> TextProperty =
-        AvaloniaProperty.Register<HighlightedTextBlock, string>(nameof(Text), string.Empty);
+    private TextBlock? _mainTextBlock;
+    
+    public static readonly StyledProperty<string?> TextProperty =
+        AvaloniaProperty.Register<HighlightedTextBlock, string?>(
+            nameof(Text), 
+            string.Empty,
+            coerce: (obj, value) =>
+            {
+                if (obj is HighlightedTextBlock control)
+                {
+                    Console.WriteLine($"[HighlightedTextBlock] Text property changed via coerce");
+                    // Schedule update on next UI thread cycle
+                    Avalonia.Threading.Dispatcher.UIThread.Post(() => control.UpdateHighlightedText(), Avalonia.Threading.DispatcherPriority.Normal);
+                }
+                return value;
+            });
 
-    public static readonly StyledProperty<List<MatchPosition>> MatchPositionsProperty =
-        AvaloniaProperty.Register<HighlightedTextBlock, List<MatchPosition>>(nameof(MatchPositions), new List<MatchPosition>());
+    public static readonly StyledProperty<List<MatchPosition>?> MatchPositionsProperty =
+        AvaloniaProperty.Register<HighlightedTextBlock, List<MatchPosition>?>(
+            nameof(MatchPositions), 
+            defaultValue: null,
+            coerce: (obj, value) =>
+            {
+                if (obj is HighlightedTextBlock control)
+                {
+                    Console.WriteLine($"[HighlightedTextBlock] MatchPositions property changed via coerce with {value?.Count ?? 0} items");
+                    // Schedule update on next UI thread cycle
+                    Avalonia.Threading.Dispatcher.UIThread.Post(() => control.UpdateHighlightedText(), Avalonia.Threading.DispatcherPriority.Normal);
+                }
+                return value;
+            });
 
-    public string Text
+    public string? Text
     {
         get => GetValue(TextProperty);
-        set => SetValue(TextProperty, value);
+        set
+        {
+            Console.WriteLine($"[HighlightedTextBlock] Text property setter called with: {value?.Substring(0, Math.Min(30, value?.Length ?? 0))}...");
+            SetValue(TextProperty, value);
+        }
     }
 
-    public List<MatchPosition> MatchPositions
+    public List<MatchPosition>? MatchPositions
     {
         get => GetValue(MatchPositionsProperty);
-        set => SetValue(MatchPositionsProperty, value);
+        set
+        {
+            Console.WriteLine($"[HighlightedTextBlock] MatchPositions property setter called with {value?.Count ?? 0} positions");
+            SetValue(MatchPositionsProperty, value);
+        }
     }
 
     public HighlightedTextBlock()
     {
+        Console.WriteLine("[HighlightedTextBlock] *** CONSTRUCTOR CALLED ***");
         InitializeComponent();
-        PropertyChanged += OnPropertyChanged;
-    }
-
-    private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-    {
-        if (e.Property == TextProperty || e.Property == MatchPositionsProperty)
+        
+        // Cache the TextBlock reference after initialization
+        this.AttachedToVisualTree += (s, e) =>
         {
-            UpdateHighlightedText();
-        }
+            Console.WriteLine("[HighlightedTextBlock] *** ATTACHED TO VISUAL TREE ***");
+            _mainTextBlock = this.FindControl<TextBlock>("MainTextBlock");
+            Console.WriteLine($"[HighlightedTextBlock] MainTextBlock found: {_mainTextBlock != null}");
+            UpdateHighlightedText(); // Update after control is ready
+        };
     }
 
     private void UpdateHighlightedText()
     {
-        var textBlock = this.FindControl<TextBlock>("MainTextBlock");  // find MainTextBlock  in the XAML
-        if (textBlock == null) return;                                                  //return if not found
+        var textBlock = _mainTextBlock ?? this.FindControl<TextBlock>("MainTextBlock");
+        if (textBlock == null)
+        {
+            Console.WriteLine("[HighlightedTextBlock] ERROR: MainTextBlock not found!");
+            return;
+        }
 
         textBlock.Inlines?.Clear();                                                    // Clear existing text and formatting
 
@@ -54,9 +94,12 @@ public partial class HighlightedTextBlock : UserControl
 
         if (MatchPositions == null || !MatchPositions.Any())                     //if no matches, just display the text as is   
         {
+            Console.WriteLine($"[HighlightedTextBlock] No match positions for text: {Text?.Substring(0, Math.Min(50, Text?.Length ?? 0))}...");
             textBlock.Inlines?.Add(new Run { Text = Text });
             return;
         }
+        
+        Console.WriteLine($"[HighlightedTextBlock] Highlighting {MatchPositions.Count} matches in text: {Text?.Substring(0, Math.Min(50, Text?.Length ?? 0))}...");
 
         // Zero-Width Joiner to maintain Arabic contextual forms when splitting text
         const string ZWJ = "\u200D";

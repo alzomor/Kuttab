@@ -6,10 +6,11 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Text;
+using QuranSearch.Core.Interfaces;
 
 namespace QuranSearchApp.Services
 {
-    public class AudioService
+    public class AudioService : IAudioService
     {
         private readonly string _audioBasePath;
         private readonly string _remoteAudioBaseUrl = "https://everyayah.com/data/Husary_128kbps";
