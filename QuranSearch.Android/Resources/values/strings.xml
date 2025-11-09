@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">بحث القرآن الكريم - Quran Search</string>
+    
+    <!-- UI Labels -->
+    <string name="select_language">Select Language</string>
+    <string name="select_rule">Select Tajweed Rule</string>
+    <string name="search">Search</string>
+    <string name="play">Play</string>
+    <string name="play_repeat">Play Repeat</string>
+    <string name="play_all">Play All</string>
+    <string name="stop">Stop</string>
+    <string name="use_remote_audio">Use Remote Audio</string>
+    <string name="ready">Ready</string>
+    
+    <!-- Status Messages -->
+    <string name="loading">Loading Quran data...</string>
+    <string name="searching">Searching...</string>
+    <string name="found_matches">Found %d matches</string>
+    <string name="no_matches">No matches found</string>
+    <string name="playing">Playing...</string>
+    <string name="stopped">Stopped</string>
+    <string name="error_loading">Error loading data</string>
+    
+    <!-- Languages -->
+    <string name="arabic">العربية</string>
+    <string name="english">English</string>
+    <string name="german">Deutsch</string>
+    
+    <!-- Matched Text -->
+    <string name="matched_text">Matched: %s</string>
+</resources>
