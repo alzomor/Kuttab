@@ -149,10 +149,16 @@ public class AyaViewHolder : RecyclerView.ViewHolder
             }
             
             _arabicText.TextFormatted = spannableString;
+            // Ensure RTL and right alignment are preserved after setting formatted text
+            _arabicText.TextDirection = global::Android.Views.TextDirection.Rtl;
+            _arabicText.Gravity = global::Android.Views.GravityFlags.End;
         }
         else
         {
             _arabicText.Text = aya.Text;
+            // Ensure RTL and right alignment
+            _arabicText.TextDirection = global::Android.Views.TextDirection.Rtl;
+            _arabicText.Gravity = global::Android.Views.GravityFlags.End;
         }
         
         // Set selection background
