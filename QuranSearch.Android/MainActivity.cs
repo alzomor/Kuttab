@@ -270,25 +270,22 @@ public class MainActivity : AppCompatActivity
         
         try
         {
-            // Update button texts
+            // Update button texts using LocalizationService
             if (_searchButton != null)
-                _searchButton.Text = GetString(Resource.String.search);
+                _searchButton.Text = _localizationService.GetString("Search");
             if (_playButton != null)
-                _playButton.Text = GetString(Resource.String.play);
+                _playButton.Text = _localizationService.GetString("Play");
             if (_playRepeatButton != null)
-                _playRepeatButton.Text = GetString(Resource.String.play_repeat);
+                _playRepeatButton.Text = _localizationService.GetString("PlayRepeat");
             if (_playAllButton != null)
-                _playAllButton.Text = GetString(Resource.String.play_all);
+                _playAllButton.Text = _localizationService.GetString("PlayAll");
             if (_stopButton != null)
-                _stopButton.Text = GetString(Resource.String.stop);
+                _stopButton.Text = _localizationService.GetString("Stop");
             if (_useRemoteAudioCheckBox != null)
-                _useRemoteAudioCheckBox.Text = GetString(Resource.String.use_remote_audio);
+                _useRemoteAudioCheckBox.Text = _localizationService.GetString("UseRemoteAudio");
             
-            // Update status if at ready state
-            if (_statusText?.Text == GetString(Resource.String.ready) || string.IsNullOrEmpty(_statusText?.Text))
-            {
-                UpdateStatus(GetString(Resource.String.ready));
-            }
+            // Update status
+            UpdateStatus(_localizationService.GetString("Ready"));
             
             // Reload rules spinner with localized names if available
             if (_searchService != null && _ruleSpinner != null)
