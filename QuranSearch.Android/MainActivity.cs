@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace QuranSearch.Android;
 
-[Activity(Label = "@string/app_name", MainLauncher = true, Theme = "@style/Theme.AppCompat.Light")]
+[Activity(Label = "@string/app_name", MainLauncher = true, Theme = "@style/SplashTheme")]
 public class MainActivity : AppCompatActivity
 {
     private QuranSearchService? _searchService;
@@ -43,6 +43,9 @@ public class MainActivity : AppCompatActivity
     
     protected override void OnCreate(Bundle? savedInstanceState)
     {
+        // Switch from splash theme to app theme
+        SetTheme(Resource.Style.AppTheme);
+        
         base.OnCreate(savedInstanceState);
         SetContentView(Resource.Layout.activity_main);
         
