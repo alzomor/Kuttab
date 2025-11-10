@@ -27,7 +27,8 @@
         android:textSize="20sp"
         android:textDirection="rtl"
         android:layoutDirection="rtl"
-        android:gravity="end"
+        android:gravity="right|end"
+        android:textAlignment="viewEnd"
         android:layout_marginBottom="8dp" />
 
     <!-- Matched Part Info -->

@@ -93,7 +93,6 @@ public class AndroidPictureService : IPictureService
 
     private string GetRemotePictureUrl(int surahNumber, int ayaNumber)
     {
-        // Adjust base if you have a CDN. Placeholder path:
-        return $"https://example.com/QuranText_jpg/{surahNumber}_{ayaNumber}.jpg";
+        return $"https://everyayah.com/data/QuranText_jpg/{surahNumber}_{ayaNumber}.jpg";
     }
 }

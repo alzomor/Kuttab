@@ -98,25 +98,54 @@ public class AyaViewHolder : RecyclerView.ViewHolder
         // Set Arabic text with highlighting
         if (aya.MatchPositions != null && aya.MatchPositions.Count > 0)
         {
-            var spannableString = new SpannableString(aya.Text);
+            // Add Zero-Width Joiner (ZWJ) before and after highlighted parts
+            // to preserve Arabic contextual letter forms
+            const char ZWJ = '\u200D';
+            var textBuilder = new System.Text.StringBuilder(aya.Text);
+            var offsetAdjustment = 0;
             
-            foreach (var match in aya.MatchPositions)
+            // Sort matches by start position
+            var sortedMatches = aya.MatchPositions.OrderBy(m => m.Start).ToList();
+            
+            foreach (var match in sortedMatches)
             {
+                var adjustedStart = match.Start + offsetAdjustment;
+                
+                // Insert ZWJ before the match
+                textBuilder.Insert(adjustedStart, ZWJ);
+                offsetAdjustment++;
+                
+                // Insert ZWJ after the match
+                textBuilder.Insert(adjustedStart + match.Length + 1, ZWJ);
+                offsetAdjustment++;
+            }
+            
+            var adjustedText = textBuilder.ToString();
+            var spannableString = new SpannableString(adjustedText);
+            offsetAdjustment = 0;
+            
+            foreach (var match in sortedMatches)
+            {
+                var adjustedStart = match.Start + offsetAdjustment;
+                var adjustedLength = match.Length + 2; // Include both ZWJs
+                
                 // Orange background for matched text
                 var backgroundSpan = new BackgroundColorSpan(Color.Orange);
                 spannableString.SetSpan(
                     backgroundSpan, 
-                    match.Start, 
-                    match.Start + match.Length, 
+                    adjustedStart, 
+                    adjustedStart + adjustedLength, 
                     SpanTypes.ExclusiveExclusive);
                 
                 // Bold text for matched parts
                 var boldSpan = new StyleSpan(TypefaceStyle.Bold);
                 spannableString.SetSpan(
                     boldSpan, 
-                    match.Start, 
-                    match.Start + match.Length, 
+                    adjustedStart, 
+                    adjustedStart + adjustedLength, 
                     SpanTypes.ExclusiveExclusive);
+                
+                offsetAdjustment += 2; // Account for the two ZWJs added
             }
             
             _arabicText.TextFormatted = spannableString;

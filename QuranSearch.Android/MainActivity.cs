@@ -260,7 +260,52 @@ public class MainActivity : AppCompatActivity
         if (e.Position >= 0 && e.Position < languages.Length && _localizationService != null)
         {
             _localizationService.CurrentLanguage = languages[e.Position];
-            // Reload UI strings if needed
+            UpdateUIStringsForCurrentLanguage();
+        }
+    }
+    
+    private void UpdateUIStringsForCurrentLanguage()
+    {
+        if (_localizationService == null) return;
+        
+        try
+        {
+            // Update button texts
+            if (_searchButton != null)
+                _searchButton.Text = GetString(Resource.String.search);
+            if (_playButton != null)
+                _playButton.Text = GetString(Resource.String.play);
+            if (_playRepeatButton != null)
+                _playRepeatButton.Text = GetString(Resource.String.play_repeat);
+            if (_playAllButton != null)
+                _playAllButton.Text = GetString(Resource.String.play_all);
+            if (_stopButton != null)
+                _stopButton.Text = GetString(Resource.String.stop);
+            if (_useRemoteAudioCheckBox != null)
+                _useRemoteAudioCheckBox.Text = GetString(Resource.String.use_remote_audio);
+            
+            // Update status if at ready state
+            if (_statusText?.Text == GetString(Resource.String.ready) || string.IsNullOrEmpty(_statusText?.Text))
+            {
+                UpdateStatus(GetString(Resource.String.ready));
+            }
+            
+            // Reload rules spinner with localized names if available
+            if (_searchService != null && _ruleSpinner != null)
+            {
+                var rules = _searchService.GetRuleNames();
+                if (rules.Count > 0)
+                {
+                    var ruleAdapter = new ArrayAdapter<string>(this,
+                        global::Android.Resource.Layout.SimpleSpinnerItem, rules);
+                    ruleAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
+                    _ruleSpinner.Adapter = ruleAdapter;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Error updating UI strings: {ex.Message}");
         }
     }
     
