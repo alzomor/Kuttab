@@ -1,6 +1,8 @@
 using Android.App;
 using Android.OS;
 using Android.Widget;
+using Android.Graphics;
+using Android.Views;
 using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using QuranSearch.Android.Adapters;
@@ -31,6 +33,7 @@ public class MainActivity : AppCompatActivity
     private Button? _stopButton;
     private CheckBox? _useRemoteAudioCheckBox;
     private TextView? _statusText;
+    private ImageView? _ayaImage;
     private RecyclerView? _recyclerView;
     private AyaAdapter? _adapter;
     
@@ -64,6 +67,7 @@ public class MainActivity : AppCompatActivity
             {
                 _audioService.PlaybackStateChanged += OnPlaybackStateChanged;
                 _audioService.SequencePlaybackEnded += OnSequencePlaybackEnded;
+                _audioService.PlaybackError += (s, msg) => ShowError(msg);
             }
         }
         catch (Exception ex)
@@ -83,6 +87,7 @@ public class MainActivity : AppCompatActivity
         _stopButton = FindViewById<Button>(Resource.Id.stopButton);
         _useRemoteAudioCheckBox = FindViewById<CheckBox>(Resource.Id.useRemoteAudioCheckBox);
         _statusText = FindViewById<TextView>(Resource.Id.statusText);
+        _ayaImage = FindViewById<ImageView>(Resource.Id.ayaImage);
         _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerView);
         
         // Setup button click handlers
@@ -168,7 +173,8 @@ public class MainActivity : AppCompatActivity
             _adapter?.UpdateData(_searchResults);
             
             var matchCount = _searchResults.Count;
-            UpdateStatus(string.Format(GetString(Resource.String.found_matches), matchCount));
+            // Use Android formatting (resource uses %d)
+            UpdateStatus(GetString(Resource.String.found_matches, matchCount));
             
             // Enable audio buttons if there are results
             UpdateAudioButtonsState(matchCount > 0);
@@ -185,6 +191,10 @@ public class MainActivity : AppCompatActivity
         {
             UpdateStatus($"Clicked on item at position: {position}");
             _currentPlayingIndex = position;
+            if (position >= 0 && position < _searchResults.Count)
+            {
+                ShowAyaImage(_searchResults[position]);
+            }
             PlayCurrentAya(false);
         }
         catch (Exception ex)
@@ -269,12 +279,8 @@ public class MainActivity : AppCompatActivity
             var aya = _searchResults[_currentPlayingIndex];
             _audioService.SetRepeatMode(repeat);
             
-            var audioPath = _audioService.UseRemoteSource 
-                ? GetRemoteAudioUrl(aya.SurahNumber, aya.AyaNumber)
-                : GetLocalAudioPath(aya.SurahNumber, aya.AyaNumber);
-            
-            UpdateStatus($"Playing: {aya.SurahNumber}:{aya.AyaNumber}, path={audioPath}");
-            await _audioService.PlayAudioAsync(audioPath);
+            UpdateStatus($"Playing: {aya.SurahNumber}:{aya.AyaNumber}");
+            await _audioService.PlayAyaAsync(aya.SurahNumber, aya.AyaNumber);
             UpdateStatus($"{GetString(Resource.String.playing)} {aya.SurahNumber}:{aya.AyaNumber}");
         }
         catch (Exception ex)
@@ -304,6 +310,37 @@ public class MainActivity : AppCompatActivity
             
             UpdateAudioButtonsState(true);
         });
+    }
+    
+    private async void ShowAyaImage(QuranAya aya)
+    {
+        try
+        {
+            if (_pictureService == null || _ayaImage == null)
+                return;
+            // Ensure image exists locally (download if allowed and online)
+            var ok = await _pictureService.EnsurePictureAvailableAsync(aya.SurahNumber, aya.AyaNumber);
+            var path = _pictureService.GetPicturePath(aya.SurahNumber, aya.AyaNumber);
+            var bmp = await _pictureService.LoadBitmapAsync(path) as Bitmap;
+            RunOnUiThread(() =>
+            {
+                if (bmp != null)
+                {
+                    _ayaImage.SetImageBitmap(bmp);
+                    _ayaImage.Visibility = ViewStates.Visible;
+                }
+                else
+                {
+                    _ayaImage.Visibility = ViewStates.Gone;
+                    if (!ok)
+                        UpdateStatus("Image not available (offline or cannot download).");
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Image load failed: {ex.Message}");
+        }
     }
     
     private void OnSequencePlaybackEnded(object? sender, EventArgs e)
