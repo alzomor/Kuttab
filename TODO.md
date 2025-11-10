@@ -470,7 +470,7 @@ adb install bin/Release/net8.0-android/QuranSearch.Android-Signed.apk
 - [x] Configure AndroidManifest.xml
 - [x] Set permissions (INTERNET, ACCESS_NETWORK_STATE)
 - [x] Test debug builds on device
-- [ ] Create app icon (using default)
+- [x] Create app theme and splash screen (Islamic green/gold theme)
 - [ ] Generate signed APK for production
 - [ ] Publish to Play Store (future)
 
@@ -578,12 +578,19 @@ adb install bin/Release/net8.0-android/QuranSearch.Android-Signed.apk
    - On-demand file downloads
    - Offline error handling
 
+6. **Professional UI Theme**
+   - Islamic/Quran theme with green and gold colors
+   - Custom splash screen on app launch
+   - Smooth theme transition to main app
+   - Consistent branding throughout
+
 ### Commits Created:
 - Audio playback fixes and local-first file management
 - Language switching, contextual forms, and image improvements
 - Arabic text right-alignment fixes
 - Multilingual button translations with consistent icons
 - Final Arabic text alignment in adapter
+- App theme and splash screen with Islamic colors
 
 ### Files Modified/Created:
 - `QuranSearch.Android/MainActivity.cs`
@@ -593,6 +600,9 @@ adb install bin/Release/net8.0-android/QuranSearch.Android-Signed.apk
 - `QuranSearch.Android/Adapters/AyaAdapter.cs`
 - `QuranSearch.Android/Resources/layout/activity_main.xml`
 - `QuranSearch.Android/Resources/layout/item_aya.xml`
+- `QuranSearch.Android/Resources/values/colors.xml`
+- `QuranSearch.Android/Resources/values/styles.xml`
+- `QuranSearch.Android/Resources/drawable/splash_screen.xml`
 - `QuranSearch.Android/Assets/Localization/*.json`
 - `QuranSearch.Android/AndroidManifest.xml`
 
