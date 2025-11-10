@@ -27,9 +27,9 @@
         android:text="بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِيمِ"
         android:textSize="20sp"
         android:textDirection="rtl"
-        android:layoutDirection="rtl"
-        android:gravity="right|end"
+        android:gravity="end"
         android:textAlignment="viewEnd"
+        android:layout_gravity="end"
         android:layout_marginBottom="8dp" />
 
     <!-- Matched Part Info -->
