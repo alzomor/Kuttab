@@ -8,6 +8,9 @@
     <ApplicationId>com.quransearch.android</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <RuntimeIdentifiers>android-x86;android-x64;android-arm64</RuntimeIdentifiers>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <AndroidEnableAssemblyCompression>false</AndroidEnableAssemblyCompression>
   </PropertyGroup>
 
   <ItemGroup>
