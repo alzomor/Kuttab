@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Background color -->
-    <item android:drawable="@color/splash_background"/>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#1B5E20"/>
+        </shape>
+    </item>
     
-    <!-- Centered app icon -->
+    <!-- Centered Kuttab logo using mipmap -->
     <item>
         <bitmap
-            android:gravity="center"
-            android:src="@mipmap/appicon"/>
+            android:src="@mipmap/appicon"
+            android:gravity="center" />
     </item>
 </layer-list>
