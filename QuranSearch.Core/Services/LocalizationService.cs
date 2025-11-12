@@ -10,7 +10,7 @@ public class LocalizationService : ReactiveObject
 {
     private readonly IFileService _fileService;
     private Dictionary<string, string> _currentStrings = new();
-    private string _currentLanguage = "ar"; // Default to Arabic
+    private string _currentLanguage = "en"; // Default to English
 
     public LocalizationService(IFileService fileService)
     {

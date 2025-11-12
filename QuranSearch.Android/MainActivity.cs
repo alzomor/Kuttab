@@ -116,6 +116,8 @@ public class MainActivity : AppCompatActivity
             languageAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
             _languageSpinner.Adapter = languageAdapter;
             _languageSpinner.ItemSelected += OnLanguageSelected;
+            // Set default to English (index 1)
+            _languageSpinner.SetSelection(1);
         }
     }
     
@@ -338,22 +340,8 @@ public class MainActivity : AppCompatActivity
     {
         RunOnUiThread(() =>
         {
-            if (_audioService != null && !_audioService.IsPlaying && _isPlayingSequence)
-            {
-                // Play next in sequence
-                _currentPlayingIndex++;
-                if (_currentPlayingIndex < _searchResults.Count)
-                {
-                    PlayCurrentAya(false);
-                }
-                else
-                {
-                    _isPlayingSequence = false;
-                    UpdateStatus(GetString(Resource.String.ready));
-                }
-            }
-            
-            UpdateAudioButtonsState(true);
+            // Only update UI state - sequence playback is handled by OnSequencePlaybackEnded
+            UpdateAudioButtonsState(_searchResults.Count > 0);
         });
     }
     

@@ -35,7 +35,20 @@ public class AndroidAudioService : IAudioService
     {
         try
         {
-            StopPlayback();
+            // Stop any existing playback first, but preserve repeat mode
+            if (_mediaPlayer != null)
+            {
+                try
+                {
+                    if (_mediaPlayer.IsPlaying)
+                    {
+                        _mediaPlayer.Stop();
+                    }
+                    _mediaPlayer.Release();
+                }
+                catch { }
+                _mediaPlayer = null;
+            }
             
             _mediaPlayer = new MediaPlayer();
             
@@ -134,10 +147,17 @@ public class AndroidAudioService : IAudioService
             {
                 _mediaPlayer = null;
                 _isPlaying = false;
-                _isRepeating = false;
+                // Don't clear _isRepeating here - it should persist until explicitly stopped
                 PlaybackStateChanged?.Invoke(this, false);
             }
         }
+    }
+    
+    public Task StopAsync()
+    {
+        _isRepeating = false; // Clear repeat mode when explicitly stopping
+        StopPlayback();
+        return Task.CompletedTask;
     }
     
     public void SetRepeatMode(bool repeat)
@@ -210,12 +230,6 @@ public class AndroidAudioService : IAudioService
         {
             PlaybackError?.Invoke(this, $"Playback error: {ex.Message}");
         }
-    }
-    
-    public Task StopAsync()
-    {
-        StopPlayback();
-        return Task.CompletedTask;
     }
     
     private string GetRemoteAudioUrl(int surah, int aya)
