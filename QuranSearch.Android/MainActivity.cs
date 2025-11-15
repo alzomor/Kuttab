@@ -24,6 +24,10 @@ public class MainActivity : AppCompatActivity
     private AndroidPictureService? _pictureService;
     private LocalizationService? _localizationService;
     
+    private LinearLayout? _languageContainer;
+    private LinearLayout? _ruleContainer;
+    private TextView? _languageIcon;
+    private TextView? _ruleIcon;
     private Spinner? _languageSpinner;
     private Spinner? _ruleSpinner;
     private Button? _searchButton;
@@ -81,6 +85,10 @@ public class MainActivity : AppCompatActivity
     
     private void InitializeViews()
     {
+        _languageContainer = FindViewById<LinearLayout>(Resource.Id.languageContainer);
+        _ruleContainer = FindViewById<LinearLayout>(Resource.Id.ruleContainer);
+        _languageIcon = FindViewById<TextView>(Resource.Id.languageIcon);
+        _ruleIcon = FindViewById<TextView>(Resource.Id.ruleIcon);
         _languageSpinner = FindViewById<Spinner>(Resource.Id.languageSpinner);
         _ruleSpinner = FindViewById<Spinner>(Resource.Id.ruleSpinner);
         _searchButton = FindViewById<Button>(Resource.Id.searchButton);
@@ -265,7 +273,30 @@ public class MainActivity : AppCompatActivity
         if (e.Position >= 0 && e.Position < languages.Length && _localizationService != null)
         {
             _localizationService.CurrentLanguage = languages[e.Position];
+            UpdateLayoutDirection(languages[e.Position]);
             UpdateUIStringsForCurrentLanguage();
+        }
+    }
+    
+    private void UpdateLayoutDirection(string language)
+    {
+        // Set layout direction based on language
+        var layoutDirection = language == "ar" ? LayoutDirection.Rtl : LayoutDirection.Ltr;
+        
+        // Update main containers
+        if (_languageContainer != null)
+        {
+            _languageContainer.LayoutDirection = layoutDirection;
+        }
+        if (_ruleContainer != null)
+        {
+            _ruleContainer.LayoutDirection = layoutDirection;
+        }
+        
+        // Update the RecyclerView for RTL support
+        if (_recyclerView != null)
+        {
+            _recyclerView.LayoutDirection = layoutDirection;
         }
     }
     
