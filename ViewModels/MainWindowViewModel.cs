@@ -43,6 +43,9 @@ public class MainWindowViewModel : ViewModelBase
     private bool _useRemoteAudio = true; // Default to online audio for portability
     private bool _ignoreNextPlaybackCompleted = false;
 
+    // Map from display name (may be localized) to Arabic rule name used in rules.json
+    private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
+
     public MainWindowViewModel()
     {
         var fileService = new DesktopFileService();
@@ -273,8 +276,8 @@ public class MainWindowViewModel : ViewModelBase
             StatusMessage = _localizationService.GetString("LoadingRules");
             await _searchService.LoadRulesAsync();
             
+            UpdateRuleDisplayNames();
             var ruleNames = _searchService.GetRuleNames();
-            Rules = new ObservableCollection<string>(ruleNames);
             StatusMessage = _localizationService.GetString("ReadyLoadedRules", ruleNames.Count);
         }
         catch (Exception ex)
@@ -284,12 +287,32 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
+    private void UpdateRuleDisplayNames()
+    {
+        var ruleNames = _searchService.GetRuleNames();
+        var displayNames = new List<string>();
+        _ruleDisplayToArabic.Clear();
+        var languageCode = _localizationService.CurrentLanguage;
+        
+        foreach (var arabicName in ruleNames)
+        {
+            var displayName = RuleNameTranslator.GetLocalizedName(arabicName, languageCode);
+            displayNames.Add(displayName);
+            _ruleDisplayToArabic[displayName] = arabicName;
+        }
+        
+        Rules = new ObservableCollection<string>(displayNames);
+    }
+
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
         // Update status message when language changes
         this.RaisePropertyChanged(nameof(Localization));
         // Don't raise SelectedLanguage here - it's already raised in the setter
         this.RaisePropertyChanged(nameof(CurrentFlowDirection));
+
+        // Update rule display names when language changes
+        UpdateRuleDisplayNames();
         
         // If we have results, update the status message
         if (SearchResults.Count > 0)
@@ -317,8 +340,15 @@ public class MainWindowViewModel : ViewModelBase
         try
         {
             StatusMessage = _localizationService.GetString("Searching");
-            // Run search on background thread
-            var results = await Task.Run(() => _searchService.SearchPattern(SelectedRule));
+            // Determine Arabic rule name from selected display name
+            var selectedDisplayName = SelectedRule ?? string.Empty;
+            if (!_ruleDisplayToArabic.TryGetValue(selectedDisplayName, out var arabicRuleName))
+            {
+                arabicRuleName = selectedDisplayName; // Fallback: assume it's already Arabic
+            }
+
+            // Run search on background thread using Arabic rule name
+            var results = await Task.Run(() => _searchService.SearchPattern(arabicRuleName));
             
             // Update UI on main thread
             SearchResults = new ObservableCollection<QuranAya>(results);
@@ -328,9 +358,21 @@ public class MainWindowViewModel : ViewModelBase
             
             StatusMessage = _localizationService.GetString("FoundMatches", results.Count);
             
-            // Update rule description
-            var selectedRuleInfo = _searchService.GetRuleInfo(SelectedRule);
-            RuleDescription = selectedRuleInfo != null ? $"Rule: {selectedRuleInfo.Name}" : $"Rule: {SelectedRule}";
+            // Update rule description with localized rule name based on current language
+            var selectedRuleInfo = _searchService.GetRuleInfo(arabicRuleName);
+            var arabicRuleNameForDescription = selectedRuleInfo?.Name ?? arabicRuleName;
+            var languageCode = _localizationService.CurrentLanguage;
+            var localizedRuleName = RuleNameTranslator.GetLocalizedName(arabicRuleNameForDescription, languageCode);
+
+            // For Arabic, keep the original name; for other languages, show the translated name
+            if (languageCode == "ar")
+            {
+                RuleDescription = $"Rule: {arabicRuleNameForDescription}";
+            }
+            else
+            {
+                RuleDescription = $"Rule: {localizedRuleName}";
+            }
             this.RaisePropertyChanged(nameof(HasRuleDescription));
         }
         catch (Exception ex)

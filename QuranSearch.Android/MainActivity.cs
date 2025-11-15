@@ -44,6 +44,8 @@ public class MainActivity : AppCompatActivity
     private List<QuranAya> _searchResults = new();
     private int _currentPlayingIndex = -1;
     private bool _isPlayingSequence = false;
+    // Map from display name (localized) to Arabic rule name used in rules.json
+    private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
     
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -153,15 +155,8 @@ public class MainActivity : AppCompatActivity
                 await _searchService.LoadQuranTextAsync();
                 await _searchService.LoadRulesAsync();
                 
-                // Populate rules spinner
-                var rules = _searchService.GetRuleNames();
-                if (_ruleSpinner != null && rules.Count > 0)
-                {
-                    var ruleAdapter = new ArrayAdapter<string>(this, 
-                        global::Android.Resource.Layout.SimpleSpinnerItem, rules);
-                    ruleAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
-                    _ruleSpinner.Adapter = ruleAdapter;
-                }
+                // Populate rules spinner with localized display names
+                UpdateRuleDisplayNames();
                 
                 UpdateStatus(GetString(Resource.String.ready));
             }
@@ -178,12 +173,17 @@ public class MainActivity : AppCompatActivity
         {
             if (_searchService == null || _ruleSpinner == null) return;
             
-            var selectedRule = _ruleSpinner.SelectedItem?.ToString();
-            if (string.IsNullOrEmpty(selectedRule)) return;
+            var selectedDisplayName = _ruleSpinner.SelectedItem?.ToString();
+            if (string.IsNullOrEmpty(selectedDisplayName)) return;
+            // Map display name back to Arabic rule name for searching
+            if (!_ruleDisplayToArabic.TryGetValue(selectedDisplayName, out var arabicRuleName))
+            {
+                arabicRuleName = selectedDisplayName; // Fallback
+            }
             
             UpdateStatus(GetString(Resource.String.searching));
             
-            _searchResults = await Task.Run(() => _searchService.SearchByRuleName(selectedRule));
+            _searchResults = await Task.Run(() => _searchService.SearchByRuleName(arabicRuleName));
 
             // Reset highlighted/selected index for new results
             _currentPlayingIndex = -1;
@@ -328,18 +328,8 @@ public class MainActivity : AppCompatActivity
             // Update status
             UpdateStatus(_localizationService.GetString("Ready"));
             
-            // Reload rules spinner with localized names if available
-            if (_searchService != null && _ruleSpinner != null)
-            {
-                var rules = _searchService.GetRuleNames();
-                if (rules.Count > 0)
-                {
-                    var ruleAdapter = new ArrayAdapter<string>(this,
-                        global::Android.Resource.Layout.SimpleSpinnerItem, rules);
-                    ruleAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
-                    _ruleSpinner.Adapter = ruleAdapter;
-                }
-            }
+            // Reload rules spinner with localized names
+            UpdateRuleDisplayNames();
 
             // Ensure adapter reflects current language and direction
             UpdateAdapterLocalization();
@@ -361,6 +351,29 @@ public class MainActivity : AppCompatActivity
             _adapter.SetLocalization(_localizationService, isRtl);
         }
         catch { /* no-op */ }
+    }
+
+    private void UpdateRuleDisplayNames()
+    {
+        if (_searchService == null || _ruleSpinner == null || _localizationService == null)
+            return;
+
+        var arabicRuleNames = _searchService.GetRuleNames();
+        var displayNames = new List<string>();
+        _ruleDisplayToArabic.Clear();
+        var languageCode = _localizationService.CurrentLanguage;
+
+        foreach (var arabicName in arabicRuleNames)
+        {
+            var displayName = RuleNameTranslator.GetLocalizedName(arabicName, languageCode);
+            displayNames.Add(displayName);
+            _ruleDisplayToArabic[displayName] = arabicName;
+        }
+
+        var ruleAdapter = new ArrayAdapter<string>(this,
+            global::Android.Resource.Layout.SimpleSpinnerItem, displayNames);
+        ruleAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
+        _ruleSpinner.Adapter = ruleAdapter;
     }
     
     private async Task PlayCurrentAya(bool repeat)
