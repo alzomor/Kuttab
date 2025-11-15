@@ -112,8 +112,16 @@ public class AyaViewHolder : RecyclerView.ViewHolder
     
     public void Bind(QuranAya aya)
     {
-        // Set reference
-        _ayaReference.Text = $"{aya.SurahNumber}:{aya.AyaNumber}";
+        // Set reference with Surah name
+        var surahName = SurahInfo.GetSurahName(aya.SurahNumber);
+        if (!string.IsNullOrEmpty(surahName))
+        {
+            _ayaReference.Text = $"{aya.SurahNumber} ({surahName}): {aya.AyaNumber}";
+        }
+        else
+        {
+            _ayaReference.Text = $"{aya.SurahNumber}:{aya.AyaNumber}";
+        }
         
         // Set Arabic text with highlighting
         if (aya.MatchPositions != null && aya.MatchPositions.Count > 0)

@@ -15,6 +15,8 @@ public class QuranAya : INotifyPropertyChanged
     public string MatchedCase { get; set; } = string.Empty;
     public string MatchedText { get; set; } = string.Empty;
     public List<MatchPosition> MatchPositions { get; set; } = new();
+
+    public string SurahName => SurahInfo.GetSurahName(SurahNumber);
     
     public bool IsCurrentlyPlaying
     {

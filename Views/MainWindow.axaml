@@ -258,7 +258,11 @@
                                                                Foreground="#8B7355" 
                                                                FontWeight="SemiBold">
                                                         <Run Text="{Binding SurahNumber}"/>
-                                                        <Run Text=":"/>
+                                                        <Run Text=" "/>
+                                                        <Run Text="("/>
+                                                        <Run Text="{Binding SurahName}"/>
+                                                        <Run Text=")"/>
+                                                        <Run Text=": "/>
                                                         <Run Text="{Binding AyaNumber}"/>
                                                     </TextBlock>
                                                 </StackPanel>
