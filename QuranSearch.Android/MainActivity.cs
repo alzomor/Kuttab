@@ -371,8 +371,8 @@ public class MainActivity : AppCompatActivity
         }
 
         var ruleAdapter = new ArrayAdapter<string>(this,
-            global::Android.Resource.Layout.SimpleSpinnerItem, displayNames);
-        ruleAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
+            Resource.Layout.item_rule, displayNames);
+        ruleAdapter.SetDropDownViewResource(Resource.Layout.item_rule);
         _ruleSpinner.Adapter = ruleAdapter;
     }
     
