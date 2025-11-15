@@ -25,5 +25,9 @@
 
   <ItemGroup>
     <AndroidAsset Include="Assets\**" />
+    <!-- Include localization JSON files as Android assets -->
+    <AndroidAsset Include="..\Localization\*.json">
+      <Link>Localization/%(FileName)%(Extension)</Link>
+    </AndroidAsset>
   </ItemGroup>
 </Project>

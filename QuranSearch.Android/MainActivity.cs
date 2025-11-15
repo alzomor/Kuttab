@@ -137,6 +137,8 @@ public class MainActivity : AppCompatActivity
             _adapter = new AyaAdapter();
             _adapter.ItemClick += OnAyaItemClick;
             _recyclerView.SetAdapter(_adapter);
+            // Initialize adapter localization if services are ready
+            UpdateAdapterLocalization();
         }
     }
     
@@ -182,14 +184,16 @@ public class MainActivity : AppCompatActivity
             UpdateStatus(GetString(Resource.String.searching));
             
             _searchResults = await Task.Run(() => _searchService.SearchByRuleName(selectedRule));
-            
+
+            // Reset highlighted/selected index for new results
+            _currentPlayingIndex = -1;
             _adapter?.UpdateData(_searchResults);
             
             var matchCount = _searchResults.Count;
             // Use Android formatting (resource uses %d)
             UpdateStatus(GetString(Resource.String.found_matches, matchCount));
             
-            // Enable audio buttons if there are results
+            // Enable audio buttons if there are results (none selected yet)
             UpdateAudioButtonsState(matchCount > 0);
         }
         catch (Exception ex)
@@ -275,6 +279,7 @@ public class MainActivity : AppCompatActivity
             _localizationService.CurrentLanguage = languages[e.Position];
             UpdateLayoutDirection(languages[e.Position]);
             UpdateUIStringsForCurrentLanguage();
+            UpdateAdapterLocalization();
         }
     }
     
@@ -335,11 +340,27 @@ public class MainActivity : AppCompatActivity
                     _ruleSpinner.Adapter = ruleAdapter;
                 }
             }
+
+            // Ensure adapter reflects current language and direction
+            UpdateAdapterLocalization();
         }
         catch (Exception ex)
         {
             ShowError($"Error updating UI strings: {ex.Message}");
         }
+    }
+
+    private void UpdateAdapterLocalization()
+    {
+        try
+        {
+            if (_adapter == null || _localizationService == null)
+                return;
+            // Determine RTL by current language code
+            var isRtl = _localizationService.CurrentLanguage == "ar";
+            _adapter.SetLocalization(_localizationService, isRtl);
+        }
+        catch { /* no-op */ }
     }
     
     private async Task PlayCurrentAya(bool repeat)

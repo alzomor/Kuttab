@@ -267,7 +267,23 @@
                                             <!-- Arabic text with highlighted matches -->
                                             <views:HighlightedTextBlock Text="{Binding Text}"
                                                                         MatchPositions="{Binding MatchPositions}"
-                                                                        Margin="0,0,0,0"/>
+                                                                        Margin="0,0,0,8"/>
+                                            
+                                            <!-- Matched characters display -->
+                                            <Border Background="#FFF9F0" 
+                                                    CornerRadius="4" 
+                                                    Padding="8,4"
+                                                    Margin="0,0,0,0"
+                                                    FlowDirection="{Binding $parent[Window].DataContext.CurrentFlowDirection}">
+                                                <TextBlock FontSize="12" 
+                                                           Foreground="#B8860B"
+                                                           FontWeight="Medium"
+                                                           TextWrapping="Wrap">
+                                                    <Run Text="{Binding $parent[Window].DataContext.Localization.Matched}"/>
+                                                    <Run Text=" "/>
+                                                    <Run Text="{Binding MatchedText}" FontFamily="Traditional Arabic"/>
+                                                </TextBlock>
+                                            </Border>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>

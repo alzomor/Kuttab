@@ -322,6 +322,10 @@ public class MainWindowViewModel : ViewModelBase
             
             // Update UI on main thread
             SearchResults = new ObservableCollection<QuranAya>(results);
+            
+            // Reset selected Aya when new search results are loaded
+            SelectedAya = null;
+            
             StatusMessage = _localizationService.GetString("FoundMatches", results.Count);
             
             // Update rule description

@@ -5,6 +5,7 @@ using Android.Views;
 using Android.Widget;
 using AndroidX.RecyclerView.Widget;
 using QuranSearch.Core.Models;
+using QuranSearch.Core.Services;
 using System;
 using System.Collections.Generic;
 
@@ -15,12 +16,31 @@ public class AyaAdapter : RecyclerView.Adapter
     private List<QuranAya> _items = new();
     private int _selectedPosition = -1;
     public event EventHandler<int>? ItemClick;
+    private LocalizationService? _localization;
+    private bool _isRtl = false;
     
     public void UpdateData(List<QuranAya> items)
     {
         _items = items;
+        // Reset previous selection/highlight on new dataset
+        _selectedPosition = -1;
         NotifyDataSetChanged();
     }
+    
+    public void SetLocalization(LocalizationService localization, bool isRtl)
+    {
+        _localization = localization;
+        _isRtl = isRtl;
+        NotifyDataSetChanged();
+    }
+    
+    public string GetMatchedLabel()
+    {
+        // Fallback to English if localization not available
+        return _localization?.GetString("Matched") ?? "Matched:";
+    }
+    
+    public bool IsRtl => _isRtl;
     
     public QuranAya? GetItem(int position)
     {
@@ -150,15 +170,26 @@ public class AyaViewHolder : RecyclerView.ViewHolder
             
             _arabicText.TextFormatted = spannableString;
             // Ensure RTL and right alignment are preserved after setting formatted text
-            _arabicText.TextDirection = global::Android.Views.TextDirection.Rtl;
-            _arabicText.Gravity = global::Android.Views.GravityFlags.End;
+            _arabicText.TextDirection = _adapter.IsRtl 
+                ? global::Android.Views.TextDirection.Rtl 
+                : global::Android.Views.TextDirection.Ltr;
+            _arabicText.Gravity = _adapter.IsRtl 
+                ? global::Android.Views.GravityFlags.End 
+                : global::Android.Views.GravityFlags.Start;
+            _arabicText.TextAlignment = _adapter.IsRtl 
+                ? global::Android.Views.TextAlignment.ViewEnd 
+                : global::Android.Views.TextAlignment.ViewStart;
         }
         else
         {
             _arabicText.Text = aya.Text;
             // Ensure RTL and right alignment
-            _arabicText.TextDirection = global::Android.Views.TextDirection.Rtl;
-            _arabicText.Gravity = global::Android.Views.GravityFlags.End;
+            _arabicText.TextDirection = _adapter.IsRtl 
+                ? global::Android.Views.TextDirection.Rtl 
+                : global::Android.Views.TextDirection.Ltr;
+            _arabicText.Gravity = _adapter.IsRtl 
+                ? global::Android.Views.GravityFlags.End 
+                : global::Android.Views.GravityFlags.Start;
         }
         
         // Set selection background
@@ -171,15 +202,21 @@ public class AyaViewHolder : RecyclerView.ViewHolder
             _itemView.SetBackgroundColor(Color.Transparent);
         }
         
-        // Set matched part info
-        if (aya.MatchPositions != null && aya.MatchPositions.Count > 0)
+        // Set matched part info (all matches, localized label, and alignment by language)
+        if (!string.IsNullOrWhiteSpace(aya.MatchedText))
         {
-            var firstMatch = aya.MatchPositions[0];
-            var matchedText = aya.Text.Substring(firstMatch.Start, Math.Min(firstMatch.Length, 30));
-            if (firstMatch.Length > 30)
-                matchedText += "...";
-            _matchedPart.Text = $"Matched: {matchedText}";
+            var label = _adapter.GetMatchedLabel();
+            _matchedPart.Text = $"{label} {aya.MatchedText}";
             _matchedPart.Visibility = ViewStates.Visible;
+            _matchedPart.TextDirection = _adapter.IsRtl 
+                ? global::Android.Views.TextDirection.Rtl 
+                : global::Android.Views.TextDirection.Ltr;
+            _matchedPart.Gravity = _adapter.IsRtl 
+                ? global::Android.Views.GravityFlags.End 
+                : global::Android.Views.GravityFlags.Start;
+            _matchedPart.TextAlignment = _adapter.IsRtl 
+                ? global::Android.Views.TextAlignment.ViewEnd 
+                : global::Android.Views.TextAlignment.ViewStart;
         }
         else
         {

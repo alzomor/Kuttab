@@ -181,7 +181,7 @@ public class QuranSearchService
                             Text = aya.Text,
                             FullLine = aya.FullLine,
                             MatchedCase = ruleCase.Description,
-                            MatchedText = string.Join(" | ", matches.Select(m => m.MatchedText)),
+                            MatchedText = string.Join(", ", matches.Select(m => m.MatchedText)),
                             MatchPositions = matches
                         });
                     }
