@@ -126,56 +126,177 @@ public class AyaViewHolder : RecyclerView.ViewHolder
         // Set Arabic text with highlighting
         if (aya.MatchPositions != null && aya.MatchPositions.Count > 0)
         {
-            // Add Zero-Width Joiner (ZWJ) before and after highlighted parts
-            // to preserve Arabic contextual letter forms
             const char ZWJ = '\u200D';
             var textBuilder = new System.Text.StringBuilder(aya.Text);
             var offsetAdjustment = 0;
-            
-            // Sort matches by start position
+
+            bool IsDiacritic(char c)
+            {
+                return (c >= '\u064B' && c <= '\u065F') || (c >= '\u0670' && c <= '\u06DC') || c == '\u0640';
+            }
+
+            bool IsArabicLetter(char c)
+            {
+                return (c >= '\u0621' && c <= '\u064A') || c == '\u0671';
+            }
+
+            bool IsConnector(char c)
+            {
+                if (!IsArabicLetter(c)) return false;
+                return c != '\u0627' && c != '\u0622' && c != '\u0623' && c != '\u0625' && c != '\u0671' &&
+                       c != '\u062F' && c != '\u0630' && c != '\u0631' && c != '\u0632' && c != '\u0648' && c != '\u0621';
+            }
+
+            int FindPrevBaseIndex(string s, int start)
+            {
+                int i = start;
+                while (i >= 0 && (IsDiacritic(s[i]) || s[i] == ZWJ)) i--;
+                return i;
+            }
+
+            int FindNextBaseIndex(string s, int start)
+            {
+                int i = start;
+                while (i < s.Length && (IsDiacritic(s[i]) || s[i] == ZWJ)) i++;
+                return i < s.Length ? i : -1;
+            }
+
             var sortedMatches = aya.MatchPositions.OrderBy(m => m.Start).ToList();
-            
+
             foreach (var match in sortedMatches)
             {
                 var adjustedStart = match.Start + offsetAdjustment;
-                
-                // Insert ZWJ before the match
-                textBuilder.Insert(adjustedStart, ZWJ);
-                offsetAdjustment++;
-                
-                // Insert ZWJ after the match
-                textBuilder.Insert(adjustedStart + match.Length + 1, ZWJ);
-                offsetAdjustment++;
+                var added = 0;
+
+                var prevIndex = FindPrevBaseIndex(textBuilder.ToString(), adjustedStart - 1);
+                var nextIndex = FindNextBaseIndex(textBuilder.ToString(), adjustedStart + match.Length);
+
+                char firstChar = adjustedStart < textBuilder.Length ? textBuilder[adjustedStart] : '\0';
+                char lastChar = (adjustedStart + match.Length - 1) < textBuilder.Length && match.Length > 0
+                    ? textBuilder[adjustedStart + match.Length - 1]
+                    : '\0';
+
+                bool connectPrevToFirst = prevIndex >= 0 && IsConnector(textBuilder[prevIndex]) && IsConnector(firstChar);
+                bool connectLastToNext = nextIndex >= 0 && IsConnector(lastChar) && IsConnector(textBuilder[nextIndex]);
+
+                // Helper: end of previous cluster (after its diacritics)
+                int PrevClusterEnd()
+                {
+                    if (prevIndex < 0) return -1;
+                    int pos = prevIndex + 1;
+                    while (pos < textBuilder.Length && IsDiacritic(textBuilder[pos])) pos++;
+                    return pos;
+                }
+
+                // Helper: position immediately after last base of match (before its diacritics)
+                int MatchBaseEnd()
+                {
+                    return adjustedStart + match.Length;
+                }
+
+                // Helper: position after last base + its diacritics (between clusters)
+                int MatchClusterEnd()
+                {
+                    int pos = adjustedStart + match.Length + added;
+                    while (pos < textBuilder.Length && IsDiacritic(textBuilder[pos])) pos++;
+                    return pos;
+                }
+
+                // BEFORE boundary: external ZWJ after previous cluster, internal ZWJ at start of match
+                if (connectPrevToFirst)
+                {
+                    // External ZWJ after previous cluster
+                    int extPos = PrevClusterEnd();
+                    if (extPos >= 0 && !(extPos < textBuilder.Length && textBuilder[extPos] == ZWJ))
+                    {
+                        textBuilder.Insert(extPos, ZWJ);
+                        // If the insert position is before adjustedStart, it shifts adjustedStart by +1
+                        if (extPos <= adjustedStart) adjustedStart++;
+                        added++;
+                    }
+
+                    // Internal ZWJ at the very start of the match
+                    if (!(adjustedStart < textBuilder.Length && textBuilder[adjustedStart] == ZWJ))
+                    {
+                        textBuilder.Insert(adjustedStart, ZWJ);
+                        added++;
+                        // Match content shifted by +1 inside
+                    }
+                }
+
+                // AFTER boundary: internal ZWJ right after last base, external ZWJ after trailing diacritics
+                if (connectLastToNext)
+                {
+                    // Internal ZWJ immediately after the last base (before its diacritics)
+                    int intAfterPos = MatchBaseEnd() + (connectPrevToFirst ? 1 : 0); // account for internal before ZWJ
+                    if (!(intAfterPos < textBuilder.Length && textBuilder[intAfterPos] == ZWJ))
+                    {
+                        textBuilder.Insert(intAfterPos, ZWJ);
+                        added++;
+                    }
+
+                    // External ZWJ after last base + its diacritics (between clusters)
+                    int extAfterPos = MatchClusterEnd();
+                    if (!(extAfterPos < textBuilder.Length && textBuilder[extAfterPos] == ZWJ))
+                    {
+                        textBuilder.Insert(extAfterPos, ZWJ);
+                        added++;
+                    }
+                }
+
+                offsetAdjustment += added;
             }
-            
+
             var adjustedText = textBuilder.ToString();
             var spannableString = new SpannableString(adjustedText);
             offsetAdjustment = 0;
-            
+
             foreach (var match in sortedMatches)
             {
                 var adjustedStart = match.Start + offsetAdjustment;
-                var adjustedLength = match.Length + 2; // Include both ZWJs
-                
-                // Orange background for matched text
+                var beforeIndex = adjustedStart - 1;
+                var afterIndex = adjustedStart + match.Length;
+                // Include internal ZWJs (if any) but exclude external ZWJs
+                int leftHasZWJ = (beforeIndex >= 0 && beforeIndex < adjustedText.Length && adjustedText[beforeIndex] == ZWJ) ? 1 : 0; // external before
+                int rightHasZWJ = (afterIndex >= 0 && afterIndex < adjustedText.Length && adjustedText[afterIndex] == ZWJ) ? 1 : 0;   // could be internal or external
+
+                // Span starts at adjustedStart (may begin with internal ZWJ)
+                var spanStart = adjustedStart;
+                // Compute end: base match end
+                var spanEnd = afterIndex;
+                // If an internal ZWJ was inserted right after last base, it will be at 'afterIndex'
+                if (spanEnd < adjustedText.Length && adjustedText[spanEnd] == ZWJ)
+                    spanEnd++;
+                // Include trailing diacritics after last base
+                while (spanEnd < adjustedText.Length && IsDiacritic(adjustedText[spanEnd]))
+                    spanEnd++;
+                // Exclude external ZWJ after cluster if present
+                if (spanEnd < adjustedText.Length && adjustedText[spanEnd] == ZWJ)
+                {
+                    // Do not extend span to cover this external ZWJ
+                }
+
                 var backgroundSpan = new BackgroundColorSpan(Color.Orange);
                 spannableString.SetSpan(
-                    backgroundSpan, 
-                    adjustedStart, 
-                    adjustedStart + adjustedLength, 
+                    backgroundSpan,
+                    spanStart,
+                    spanEnd,
                     SpanTypes.ExclusiveExclusive);
-                
-                // Bold text for matched parts
-                var boldSpan = new StyleSpan(TypefaceStyle.Bold);
-                spannableString.SetSpan(
-                    boldSpan, 
-                    adjustedStart, 
-                    adjustedStart + adjustedLength, 
-                    SpanTypes.ExclusiveExclusive);
-                
-                offsetAdjustment += 2; // Account for the two ZWJs added
+
+                // Bold styling can break Arabic joining across span boundaries; avoid bold for RTL Arabic
+                if (!_adapter.IsRtl)
+                {
+                    var boldSpan = new StyleSpan(TypefaceStyle.Bold);
+                    spannableString.SetSpan(
+                        boldSpan,
+                        spanStart,
+                        spanEnd,
+                        SpanTypes.ExclusiveExclusive);
+                }
+
+                // Note: offsetAdjustment was fully accounted for during insertion phase.
             }
-            
+
             _arabicText.TextFormatted = spannableString;
             // Ensure RTL and right alignment are preserved after setting formatted text
             _arabicText.TextDirection = _adapter.IsRtl 
