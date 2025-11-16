@@ -32,6 +32,7 @@ public class MainActivity : AppCompatActivity
     private Spinner? _ruleSpinner;
     private string? _selectedRuleName;
     private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
+    private readonly HashSet<string> _groupHeaders = new();
     private Button? _searchButton;
     private Button? _playButton;
     private Button? _playRepeatButton;
@@ -179,6 +180,13 @@ public class MainActivity : AppCompatActivity
             
             if (!string.IsNullOrEmpty(selectedDisplayName) && _ruleDisplayToArabic.TryGetValue(selectedDisplayName, out var mappedName))
             {
+                // Check if it's a group header
+                if (string.IsNullOrEmpty(mappedName))
+                {
+                    var errorMsg = _localizationService?.GetString("SelectSpecificRule") ?? "Please select a specific rule, not a group";
+                    ShowError(errorMsg);
+                    return;
+                }
                 arabicRuleName = mappedName;
             }
             else if (!string.IsNullOrEmpty(_selectedRuleName))
@@ -187,14 +195,15 @@ public class MainActivity : AppCompatActivity
             }
             else
             {
-                ShowError("Please select a Tajweed rule first");
+                var errorMsg = _localizationService?.GetString("SelectRuleFirst") ?? "Please select a Tajweed rule first";
+                ShowError(errorMsg);
                 return;
             }
             
             UpdateStatus(GetString(Resource.String.searching));
             
-            _searchResults = await Task.Run(() => _searchService.SearchByRuleName(arabicRuleName));
-
+            _searchResults = _searchService.SearchByRuleName(arabicRuleName);
+            
             // Reset highlighted/selected index for new results
             _currentPlayingIndex = -1;
             _adapter?.UpdateData(_searchResults);
@@ -400,12 +409,14 @@ public class MainActivity : AppCompatActivity
         }
 
         // Build hierarchical display list
+        _groupHeaders.Clear();
         foreach (var kvp in groupMap)
         {
-            // Add group header (non-selectable visual separator)
-            var groupHeader = $"──── {kvp.Key} ────";
+            // Add group header (non-selectable, will be displayed in bold)
+            var groupHeader = kvp.Key; // Just the group name, no decorators
             displayNames.Add(groupHeader);
             _ruleDisplayToArabic[groupHeader] = ""; // Empty mapping for headers
+            _groupHeaders.Add(groupHeader); // Track as group header
 
             // Add rules in this group with indentation
             foreach (var rule in kvp.Value)
@@ -417,9 +428,8 @@ public class MainActivity : AppCompatActivity
             }
         }
 
-        var ruleAdapter = new ArrayAdapter<string>(this,
-            Resource.Layout.item_rule, displayNames);
-        ruleAdapter.SetDropDownViewResource(Resource.Layout.item_rule);
+        var ruleAdapter = new RuleSpinnerAdapter(this,
+            Resource.Layout.item_rule, displayNames, _groupHeaders);
         _ruleSpinner.Adapter = ruleAdapter;
     }
 

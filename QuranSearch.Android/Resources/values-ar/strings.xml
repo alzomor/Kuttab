@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">كُتّاب</string>
+    
+    <!-- UI Labels -->
+    <string name="select_language">اختر اللغة</string>
+    <string name="select_rule">اختر قاعدة التجويد</string>
+    <string name="search">بحث</string>
+    <string name="play">تشغيل</string>
+    <string name="play_repeat">إعادة التشغيل</string>
+    <string name="play_all">تشغيل الكل</string>
+    <string name="stop">إيقاف</string>
+    <string name="use_remote_audio">استخدام الصوت عن بُعد</string>
+    <string name="ready">جاهز</string>
+    
+    <!-- Status Messages -->
+    <string name="loading">جاري تحميل بيانات القرآن...</string>
+    <string name="searching">جاري البحث...</string>
+    <string name="found_matches">تم العثور على %d نتيجة</string>
+    <string name="no_matches">لا توجد نتائج</string>
+    <string name="playing">جاري التشغيل...</string>
+    <string name="stopped">تم الإيقاف</string>
+    <string name="error_loading">خطأ في تحميل البيانات</string>
+    
+    <!-- Error Messages -->
+    <string name="SelectSpecificRule">الرجاء اختيار قاعدة محددة، وليس مجموعة</string>
+    <string name="SelectRuleFirst">الرجاء اختيار قاعدة تجويد أولاً</string>
+    
+    <!-- Languages -->
+    <string name="arabic">العربية</string>
+    <string name="english">English</string>
+    <string name="german">Deutsch</string>
+    
+    <!-- Matched Text -->
+    <string name="matched_text">المطابقة: %s</string>
+</resources>

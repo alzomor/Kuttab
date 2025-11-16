@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Kuttab</string>
+    
+    <!-- UI Labels -->
+    <string name="select_language">Sprache wählen</string>
+    <string name="select_rule">Wählen Sie die Tajweed-Regel</string>
+    <string name="search">Suchen</string>
+    <string name="play">Abspielen</string>
+    <string name="play_repeat">Wiederholen</string>
+    <string name="play_all">Alle abspielen</string>
+    <string name="stop">Stoppen</string>
+    <string name="use_remote_audio">Remote-Audio verwenden</string>
+    <string name="ready">Bereit</string>
+    
+    <!-- Status Messages -->
+    <string name="loading">Korandaten werden geladen...</string>
+    <string name="searching">Suche läuft...</string>
+    <string name="found_matches">%d Übereinstimmungen gefunden</string>
+    <string name="no_matches">Keine Übereinstimmungen gefunden</string>
+    <string name="playing">Wird abgespielt...</string>
+    <string name="stopped">Gestoppt</string>
+    <string name="error_loading">Fehler beim Laden der Daten</string>
+    
+    <!-- Error Messages -->
+    <string name="SelectSpecificRule">Bitte wählen Sie eine bestimmte Regel, keine Gruppe</string>
+    <string name="SelectRuleFirst">Bitte wählen Sie zuerst eine Tajweed-Regel</string>
+    
+    <!-- Languages -->
+    <string name="arabic">العربية</string>
+    <string name="english">English</string>
+    <string name="german">Deutsch</string>
+    
+    <!-- Matched Text -->
+    <string name="matched_text">Übereinstimmung: %s</string>
+</resources>
