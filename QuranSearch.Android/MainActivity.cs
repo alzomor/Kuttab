@@ -33,7 +33,6 @@ public class MainActivity : AppCompatActivity
     private string? _selectedRuleName;
     private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
     private Button? _searchButton;
-    private Button? _chooseRuleButton;
     private Button? _playButton;
     private Button? _playRepeatButton;
     private Button? _playAllButton;
@@ -95,7 +94,6 @@ public class MainActivity : AppCompatActivity
         _languageSpinner = FindViewById<Spinner>(Resource.Id.languageSpinner);
         _ruleSpinner = FindViewById<Spinner>(Resource.Id.ruleSpinner);
         _searchButton = FindViewById<Button>(Resource.Id.searchButton);
-        _chooseRuleButton = FindViewById<Button>(Resource.Id.chooseRuleButton);
         _playButton = FindViewById<Button>(Resource.Id.playButton);
         _playRepeatButton = FindViewById<Button>(Resource.Id.playRepeatButton);
         _playAllButton = FindViewById<Button>(Resource.Id.playAllButton);
@@ -108,8 +106,6 @@ public class MainActivity : AppCompatActivity
         // Setup button click handlers
         if (_searchButton != null)
             _searchButton.Click += OnSearchClick;
-        if (_chooseRuleButton != null)
-            _chooseRuleButton.Click += OnChooseRuleClick;
         if (_playButton != null)
             _playButton.Click += OnPlayClick;
         if (_playRepeatButton != null)
@@ -351,18 +347,6 @@ public class MainActivity : AppCompatActivity
         catch (Exception ex)
         {
             ShowError($"Error updating UI strings: {ex.Message}");
-        }
-    }
-
-    private void OnChooseRuleClick(object? sender, EventArgs e)
-    {
-        try
-        {
-            ShowRuleSelectionDialog();
-        }
-        catch (Exception ex)
-        {
-            ShowError($"Error showing rule selection: {ex.Message}");
         }
     }
 
