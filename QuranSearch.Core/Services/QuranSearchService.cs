@@ -133,7 +133,7 @@ public class QuranSearchService
                 try
                 {
                     var matches = new List<MatchPosition>();
-                    var regex = new Regex(ruleCase.Regex);
+                    var regex = new Regex(ruleCase.Regex, RegexOptions.CultureInvariant);
                     var regexMatches = regex.Matches(aya.Text);
                     
                     foreach (Match match in regexMatches)
@@ -170,6 +170,30 @@ public class QuranSearchService
                             Length = match.Length,
                             MatchedText = match.Value
                         });
+                    }
+
+                    // Fallback: if no regex matches and the pattern appears to be a single literal symbol,
+                    // do a direct scan for that Unicode character (useful for small Quranic stop signs)
+                    if (matches.Count == 0)
+                    {
+                        var pattern = ruleCase.Regex;
+                        // Heuristic: treat as literal if it has length 1 and no regex metacharacters
+                        if (!string.IsNullOrEmpty(pattern) && pattern.Length == 1)
+                        {
+                            var ch = pattern[0];
+                            for (int i = 0; i < aya.Text.Length; i++)
+                            {
+                                if (aya.Text[i] == ch)
+                                {
+                                    matches.Add(new MatchPosition
+                                    {
+                                        Start = i,
+                                        Length = 1,
+                                        MatchedText = aya.Text.Substring(i, 1)
+                                    });
+                                }
+                            }
+                        }
                     }
 
                     if (matches.Count > 0)
