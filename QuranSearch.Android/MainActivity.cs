@@ -183,8 +183,7 @@ public class MainActivity : AppCompatActivity
                 // Check if it's a group header
                 if (string.IsNullOrEmpty(mappedName))
                 {
-                    var errorMsg = _localizationService?.GetString("SelectSpecificRule") ?? "Please select a specific rule, not a group";
-                    ShowError(errorMsg);
+                    ShowError(GetString(Resource.String.SelectSpecificRule));
                     return;
                 }
                 arabicRuleName = mappedName;
@@ -195,8 +194,7 @@ public class MainActivity : AppCompatActivity
             }
             else
             {
-                var errorMsg = _localizationService?.GetString("SelectRuleFirst") ?? "Please select a Tajweed rule first";
-                ShowError(errorMsg);
+                ShowError(GetString(Resource.String.SelectRuleFirst));
                 return;
             }
             
@@ -299,6 +297,7 @@ public class MainActivity : AppCompatActivity
             UpdateLayoutDirection(languages[e.Position]);
             UpdateUIStringsForCurrentLanguage();
             UpdateAdapterLocalization();
+            UpdateRuleDisplayNames(); // Refresh rule spinner with translated group titles
         }
     }
     
