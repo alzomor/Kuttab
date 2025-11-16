@@ -30,7 +30,10 @@ public class MainActivity : AppCompatActivity
     private TextView? _ruleIcon;
     private Spinner? _languageSpinner;
     private Spinner? _ruleSpinner;
+    private string? _selectedRuleName;
+    private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
     private Button? _searchButton;
+    private Button? _chooseRuleButton;
     private Button? _playButton;
     private Button? _playRepeatButton;
     private Button? _playAllButton;
@@ -44,8 +47,6 @@ public class MainActivity : AppCompatActivity
     private List<QuranAya> _searchResults = new();
     private int _currentPlayingIndex = -1;
     private bool _isPlayingSequence = false;
-    // Map from display name (localized) to Arabic rule name used in rules.json
-    private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
     
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -94,6 +95,7 @@ public class MainActivity : AppCompatActivity
         _languageSpinner = FindViewById<Spinner>(Resource.Id.languageSpinner);
         _ruleSpinner = FindViewById<Spinner>(Resource.Id.ruleSpinner);
         _searchButton = FindViewById<Button>(Resource.Id.searchButton);
+        _chooseRuleButton = FindViewById<Button>(Resource.Id.chooseRuleButton);
         _playButton = FindViewById<Button>(Resource.Id.playButton);
         _playRepeatButton = FindViewById<Button>(Resource.Id.playRepeatButton);
         _playAllButton = FindViewById<Button>(Resource.Id.playAllButton);
@@ -106,6 +108,8 @@ public class MainActivity : AppCompatActivity
         // Setup button click handlers
         if (_searchButton != null)
             _searchButton.Click += OnSearchClick;
+        if (_chooseRuleButton != null)
+            _chooseRuleButton.Click += OnChooseRuleClick;
         if (_playButton != null)
             _playButton.Click += OnPlayClick;
         if (_playRepeatButton != null)
@@ -155,7 +159,7 @@ public class MainActivity : AppCompatActivity
                 await _searchService.LoadQuranTextAsync();
                 await _searchService.LoadRulesAsync();
                 
-                // Populate rules spinner with localized display names
+                // Populate rules spinner
                 UpdateRuleDisplayNames();
                 
                 UpdateStatus(GetString(Resource.String.ready));
@@ -173,12 +177,22 @@ public class MainActivity : AppCompatActivity
         {
             if (_searchService == null || _ruleSpinner == null) return;
             
+            // Try spinner first, then fall back to button selection
             var selectedDisplayName = _ruleSpinner.SelectedItem?.ToString();
-            if (string.IsNullOrEmpty(selectedDisplayName)) return;
-            // Map display name back to Arabic rule name for searching
-            if (!_ruleDisplayToArabic.TryGetValue(selectedDisplayName, out var arabicRuleName))
+            string arabicRuleName;
+            
+            if (!string.IsNullOrEmpty(selectedDisplayName) && _ruleDisplayToArabic.TryGetValue(selectedDisplayName, out var mappedName))
             {
-                arabicRuleName = selectedDisplayName; // Fallback
+                arabicRuleName = mappedName;
+            }
+            else if (!string.IsNullOrEmpty(_selectedRuleName))
+            {
+                arabicRuleName = _selectedRuleName;
+            }
+            else
+            {
+                ShowError("Please select a Tajweed rule first");
+                return;
             }
             
             UpdateStatus(GetString(Resource.String.searching));
@@ -340,6 +354,18 @@ public class MainActivity : AppCompatActivity
         }
     }
 
+    private void OnChooseRuleClick(object? sender, EventArgs e)
+    {
+        try
+        {
+            ShowRuleSelectionDialog();
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Error showing rule selection: {ex.Message}");
+        }
+    }
+
     private void UpdateAdapterLocalization()
     {
         try
@@ -358,22 +384,179 @@ public class MainActivity : AppCompatActivity
         if (_searchService == null || _ruleSpinner == null || _localizationService == null)
             return;
 
-        var arabicRuleNames = _searchService.GetRuleNames();
+        var rules = _searchService.GetRules();
         var displayNames = new List<string>();
         _ruleDisplayToArabic.Clear();
         var languageCode = _localizationService.CurrentLanguage;
 
-        foreach (var arabicName in arabicRuleNames)
+        // Group rules by category
+        var groupMap = new Dictionary<string, List<TajweedRule>>();
+        foreach (var rule in rules)
         {
-            var displayName = RuleNameTranslator.GetLocalizedName(arabicName, languageCode);
-            displayNames.Add(displayName);
-            _ruleDisplayToArabic[displayName] = arabicName;
+            if (rule == null) continue;
+
+            var groupTitle = string.Empty;
+            if (!string.IsNullOrWhiteSpace(rule.Group))
+            {
+                groupTitle = RuleGroupTranslator.GetGroupTitle(rule.Group, languageCode);
+            }
+            
+            if (string.IsNullOrWhiteSpace(groupTitle))
+            {
+                groupTitle = languageCode == "ar" ? "قواعد أخرى" : 
+                             languageCode == "de" ? "Andere Regeln" : "Other Rules";
+            }
+
+            if (!groupMap.ContainsKey(groupTitle))
+            {
+                groupMap[groupTitle] = new List<TajweedRule>();
+            }
+            
+            groupMap[groupTitle].Add(rule);
+        }
+
+        // Build hierarchical display list
+        foreach (var kvp in groupMap)
+        {
+            // Add group header (non-selectable visual separator)
+            var groupHeader = $"──── {kvp.Key} ────";
+            displayNames.Add(groupHeader);
+            _ruleDisplayToArabic[groupHeader] = ""; // Empty mapping for headers
+
+            // Add rules in this group with indentation
+            foreach (var rule in kvp.Value)
+            {
+                var localizedName = RuleNameTranslator.GetLocalizedName(rule.Name, languageCode);
+                var indentedName = $"    {localizedName}";
+                displayNames.Add(indentedName);
+                _ruleDisplayToArabic[indentedName] = rule.Name;
+            }
         }
 
         var ruleAdapter = new ArrayAdapter<string>(this,
             Resource.Layout.item_rule, displayNames);
         ruleAdapter.SetDropDownViewResource(Resource.Layout.item_rule);
         _ruleSpinner.Adapter = ruleAdapter;
+    }
+
+    private void ShowRuleSelectionDialog()
+    {
+        try
+        {
+            if (_searchService == null || _localizationService == null)
+            {
+                ShowError("Services not initialized");
+                return;
+            }
+
+            var rules = _searchService.GetRules();
+            if (rules == null || rules.Count == 0)
+            {
+                ShowError("No rules available");
+                return;
+            }
+
+            var languageCode = _localizationService.CurrentLanguage;
+
+            // Build grouped display list with separators
+            var displayItems = new List<string>();
+            var ruleMapping = new List<TajweedRule?>(); // null for group headers
+            var groupMap = new Dictionary<string, List<TajweedRule>>();
+
+            // Group rules
+            foreach (var rule in rules)
+            {
+                if (rule == null) continue;
+
+                var groupTitle = string.Empty;
+                
+                if (!string.IsNullOrWhiteSpace(rule.Group))
+                {
+                    groupTitle = RuleGroupTranslator.GetGroupTitle(rule.Group, languageCode);
+                }
+                
+                if (string.IsNullOrWhiteSpace(groupTitle))
+                {
+                    groupTitle = languageCode == "ar" ? "قواعد أخرى" : 
+                                 languageCode == "de" ? "Andere Regeln" : "Other Rules";
+                }
+
+                if (!groupMap.ContainsKey(groupTitle))
+                {
+                    groupMap[groupTitle] = new List<TajweedRule>();
+                }
+                
+                groupMap[groupTitle].Add(rule);
+            }
+
+            // Build flat list with group headers
+            foreach (var kvp in groupMap)
+            {
+                // Add group header
+                displayItems.Add($"──── {kvp.Key} ────");
+                ruleMapping.Add(null);
+
+                // Add rules in this group
+                foreach (var rule in kvp.Value)
+                {
+                    var localizedName = RuleNameTranslator.GetLocalizedName(rule.Name, languageCode);
+                    displayItems.Add($"    {localizedName}");
+                    ruleMapping.Add(rule);
+                }
+            }
+
+            if (displayItems.Count == 0)
+            {
+                ShowError("No rules available");
+                return;
+            }
+
+            // Create simple list dialog
+            var builder = new global::Android.App.AlertDialog.Builder(this);
+            var title = _localizationService.GetString("SelectTajweedRule");
+            builder.SetTitle(title);
+            
+            builder.SetItems(displayItems.ToArray(), (sender, args) =>
+            {
+                try
+                {
+                    var selectedIndex = args.Which;
+                    if (selectedIndex >= 0 && selectedIndex < ruleMapping.Count)
+                    {
+                        var selectedRule = ruleMapping[selectedIndex];
+                        if (selectedRule != null) // Not a group header
+                        {
+                            _selectedRuleName = selectedRule.Name;
+                            var localizedName = RuleNameTranslator.GetLocalizedName(selectedRule.Name, languageCode);
+                            
+                            // Sync with spinner if available (match indented format)
+                            if (_ruleSpinner?.Adapter is ArrayAdapter<string> spinnerAdapter)
+                            {
+                                var spinnerDisplayName = $"    {localizedName}";
+                                var pos = spinnerAdapter.GetPosition(spinnerDisplayName);
+                                if (pos >= 0)
+                                {
+                                    _ruleSpinner.SetSelection(pos);
+                                }
+                            }
+                            
+                            UpdateStatus($"Selected: {localizedName}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ShowError($"Error selecting rule: {ex.Message}");
+                }
+            });
+            
+            builder.SetNegativeButton("Cancel", (sender, args) => { });
+            builder.Show();
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Error showing rule selection: {ex.Message}\nStack: {ex.StackTrace}");
+        }
     }
     
     private async Task PlayCurrentAya(bool repeat)

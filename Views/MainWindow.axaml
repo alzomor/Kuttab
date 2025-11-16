@@ -133,53 +133,76 @@
             
             <!-- Search Controls -->
             <Border Grid.Row="0" Classes="islamic-card" Margin="0,0,0,6">
-                <StackPanel Orientation="Horizontal">
-                    <!-- Language Selector -->
-                    <TextBlock Text="{Binding Localization.Language}" 
-                               VerticalAlignment="Center" 
-                               Margin="0,0,8,0"
-                               FontSize="14"
-                               FontWeight="SemiBold"
-                               Foreground="#2C5F2D"/>
-                    <ComboBox Name="LanguageComboBox"
-                              Classes="islamic"
-                              ItemsSource="{Binding AvailableLanguages}"
-                              SelectedItem="{Binding SelectedLanguage}"
-                              MinWidth="140"
-                              Margin="0,0,20,0">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate DataType="services:LanguageOption">
-                                <TextBlock Text="{Binding Name}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                    
-                    <TextBlock Text="{Binding Localization.SelectTajweedRule}" 
-                               VerticalAlignment="Center" 
-                               Margin="0,0,12,0"
-                               FontSize="14"
-                               FontWeight="SemiBold"
-                               Foreground="#2C5F2D"/>
-                    <ComboBox Name="RulesComboBox" 
-                              Classes="islamic"
-                              ItemsSource="{Binding Rules}"
-                              SelectedItem="{Binding SelectedRule}"
-                              MinWidth="280"
-                              MaxWidth="400"
-                              Margin="0,0,15,0"/>
-                    <Button Content="{Binding Localization.Search}" 
-                            Classes="primary"
-                            Command="{Binding SearchCommand}"
-                            Margin="0,0,15,0"/>
-                    
-                    <!-- Online Resources Options -->
-                    <CheckBox Content="{Binding Localization.OnlineImages}" 
-                              IsChecked="{Binding UseRemoteImages}"
-                              VerticalAlignment="Center"
-                              Margin="0,0,15,0"/>
-                    <CheckBox Content="{Binding Localization.OnlineAudio}" 
-                              IsChecked="{Binding UseRemoteAudio}"
-                              VerticalAlignment="Center"/>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <!-- Language Selector -->
+                        <TextBlock Text="{Binding Localization.Language}" 
+                                   VerticalAlignment="Center" 
+                                   Margin="0,0,8,0"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="#2C5F2D"/>
+                        <ComboBox Name="LanguageComboBox"
+                                  Classes="islamic"
+                                  ItemsSource="{Binding AvailableLanguages}"
+                                  SelectedItem="{Binding SelectedLanguage}"
+                                  MinWidth="140"
+                                  Margin="0,0,20,0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="services:LanguageOption">
+                                    <TextBlock Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        
+                        <TextBlock Text="{Binding Localization.SelectTajweedRule}" 
+                                   VerticalAlignment="Center" 
+                                   Margin="0,0,12,0"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="#2C5F2D"/>
+                        <ComboBox Name="RulesComboBox" 
+                                  Classes="islamic"
+                                  ItemsSource="{Binding Rules}"
+                                  SelectedItem="{Binding SelectedRule}"
+                                  MinWidth="280"
+                                  MaxWidth="400"
+                                  Margin="0,0,15,0"/>
+                        <Button Content="{Binding Localization.Search}" 
+                                Classes="primary"
+                                Command="{Binding SearchCommand}"
+                                Margin="0,0,15,0"/>
+                        
+                        <!-- Online Resources Options -->
+                        <CheckBox Content="{Binding Localization.OnlineImages}" 
+                                  IsChecked="{Binding UseRemoteImages}"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,15,0"/>
+                        <CheckBox Content="{Binding Localization.OnlineAudio}" 
+                                  IsChecked="{Binding UseRemoteAudio}"
+                                  VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Grouped, expandable Tajweed rules -->
+                    <Border Margin="0,8,0,0"
+                            Background="#FAFAF8"
+                            BorderBrush="#D4C5B0"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <TreeView Items="{Binding RuleGroups}"
+                                  SelectedItem="{Binding SelectedRuleItem}">
+                            <TreeView.ItemTemplate>
+                                <HierarchicalDataTemplate DataType="vm:RuleGroupNode"
+                                                          Items="{Binding Rules}">
+                                    <TextBlock Text="{Binding GroupTitle}" 
+                                               FontWeight="SemiBold"/>
+                                </HierarchicalDataTemplate>
+                                <DataTemplate DataType="vm:RuleItemNode">
+                                    <TextBlock Text="{Binding RuleTitle}"/>
+                                </DataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </Border>
                 </StackPanel>
             </Border>
 

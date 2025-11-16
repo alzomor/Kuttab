@@ -11,6 +11,7 @@
     <RuntimeIdentifiers>android-x86;android-x64;android-arm64</RuntimeIdentifiers>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <AndroidEnableAssemblyCompression>false</AndroidEnableAssemblyCompression>
+    <AndroidUseFastDeployment>false</AndroidUseFastDeployment>
   </PropertyGroup>
 
   <ItemGroup>

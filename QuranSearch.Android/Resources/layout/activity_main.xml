@@ -55,6 +55,14 @@
             android:layout_weight="1" />
     </LinearLayout>
 
+    <!-- Open grouped Tajweed rule selection dialog -->
+    <Button
+        android:id="@+id/chooseRuleButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose rule..."
+        android:layout_marginBottom="8dp" />
+
     <!-- Search Button -->
     <Button
         android:id="@+id/searchButton"

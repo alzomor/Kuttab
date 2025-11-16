@@ -23,8 +23,10 @@ public class MainWindowViewModel : ViewModelBase
     private readonly IPictureService _pictureService;
     private readonly LocalizationService _localizationService;
     private ObservableCollection<string> _rules = new();
+    private ObservableCollection<RuleGroupNode> _ruleGroups = new();
     private ObservableCollection<QuranAya> _searchResults = new();
     private string? _selectedRule;
+    private object? _selectedRuleItem;
     private QuranAya? _selectedAya;
     private int _repeatCount = 1;
     private string _statusMessage = "Ready";
@@ -82,6 +84,12 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _rules, value);
     }
 
+    public ObservableCollection<RuleGroupNode> RuleGroups
+    {
+        get => _ruleGroups;
+        set => this.RaiseAndSetIfChanged(ref _ruleGroups, value);
+    }
+
     public ObservableCollection<QuranAya> SearchResults
     {
         get => _searchResults;
@@ -92,6 +100,22 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _selectedRule;
         set => this.RaiseAndSetIfChanged(ref _selectedRule, value);
+    }
+
+    // Selected item in the grouped TreeView. When a leaf rule item is selected,
+    // map it back to the display key used by the ComboBox/lookup dictionary.
+    public object? SelectedRuleItem
+    {
+        get => _selectedRuleItem;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _selectedRuleItem, value);
+
+            if (value is RuleItemNode ruleItem && !string.IsNullOrWhiteSpace(ruleItem.DisplayKey))
+            {
+                SelectedRule = ruleItem.DisplayKey;
+            }
+        }
     }
 
     public QuranAya? SelectedAya
@@ -289,19 +313,55 @@ public class MainWindowViewModel : ViewModelBase
 
     private void UpdateRuleDisplayNames()
     {
-        var ruleNames = _searchService.GetRuleNames();
+        var rules = _searchService.GetRules();
         var displayNames = new List<string>();
         _ruleDisplayToArabic.Clear();
         var languageCode = _localizationService.CurrentLanguage;
-        
-        foreach (var arabicName in ruleNames)
+
+        // Build flat list for ComboBox and grouped structure for TreeView
+        var groupMap = new Dictionary<string, RuleGroupNode>();
+        var groupList = new List<RuleGroupNode>();
+
+        foreach (var rule in rules)
         {
-            var displayName = RuleNameTranslator.GetLocalizedName(arabicName, languageCode);
+            var arabicName = rule.Name;
+            var localizedRuleName = RuleNameTranslator.GetLocalizedName(arabicName, languageCode);
+            var groupTitle = RuleGroupTranslator.GetGroupTitle(rule.Group, languageCode);
+
+            string displayName;
+            if (!string.IsNullOrWhiteSpace(groupTitle))
+            {
+                displayName = $"{groupTitle} – {localizedRuleName}";
+            }
+            else
+            {
+                displayName = localizedRuleName;
+            }
+
             displayNames.Add(displayName);
             _ruleDisplayToArabic[displayName] = arabicName;
+
+            // Populate grouped structure for TreeView
+            var effectiveGroupTitle = string.IsNullOrWhiteSpace(groupTitle)
+                ? localizedRuleName
+                : groupTitle;
+
+            if (!groupMap.TryGetValue(effectiveGroupTitle, out var groupNode))
+            {
+                groupNode = new RuleGroupNode { GroupTitle = effectiveGroupTitle };
+                groupMap[effectiveGroupTitle] = groupNode;
+                groupList.Add(groupNode);
+            }
+
+            groupNode.Rules.Add(new RuleItemNode
+            {
+                DisplayKey = displayName,
+                RuleTitle = localizedRuleName
+            });
         }
-        
+
         Rules = new ObservableCollection<string>(displayNames);
+        RuleGroups = new ObservableCollection<RuleGroupNode>(groupList);
     }
 
     private void OnLanguageChanged(object? sender, EventArgs e)
@@ -797,4 +857,18 @@ public class MainWindowViewModel : ViewModelBase
         IsPlayingSequence = false;
         IsSequencePaused = false;
     }
+}
+
+public class RuleGroupNode
+{
+    public string GroupTitle { get; set; } = string.Empty;
+    public ObservableCollection<RuleItemNode> Rules { get; } = new();
+}
+
+public class RuleItemNode
+{
+    // Key used for mapping back to Arabic rule name (matches ComboBox display string)
+    public string DisplayKey { get; set; } = string.Empty;
+    // Text shown under each group in the TreeView
+    public string RuleTitle { get; set; } = string.Empty;
 }

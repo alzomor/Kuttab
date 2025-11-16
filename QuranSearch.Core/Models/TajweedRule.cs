@@ -8,6 +8,9 @@ public class TajweedRule
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
     
+    [JsonPropertyName("group")]
+    public string? Group { get; set; }
+    
     [JsonPropertyName("cases")]
     public List<TajweedCase> Cases { get; set; } = new();
 }
