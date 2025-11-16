@@ -118,6 +118,10 @@ public class MainActivity : AppCompatActivity
         if (_useRemoteAudioCheckBox != null)
             _useRemoteAudioCheckBox.CheckedChange += OnUseRemoteAudioChanged;
         
+        // Hide currently displayed Aya when user picks a new rule (actual rule, not a group header)
+        if (_ruleSpinner != null)
+            _ruleSpinner.ItemSelected += OnRuleSpinnerItemSelected;
+        
         // Setup language spinner
         if (_languageSpinner != null)
         {
@@ -198,6 +202,14 @@ public class MainActivity : AppCompatActivity
                 return;
             }
             
+            // Reset UI from any previously displayed Aya before running a new search
+            HideAyaImage();
+            _currentPlayingIndex = -1;
+            _isPlayingSequence = false;
+            _audioService?.StopPlayback();
+            _adapter?.UpdateData(new List<QuranAya>());
+            UpdateAudioButtonsState(false);
+
             UpdateStatus(GetString(Resource.String.searching));
             
             _searchResults = _searchService.SearchByRuleName(arabicRuleName);
@@ -217,6 +229,41 @@ public class MainActivity : AppCompatActivity
         {
             ShowError($"Search failed: {ex.Message}");
         }
+    }
+    
+    private void HideAyaImage()
+    {
+        try
+        {
+            if (_ayaImage == null) return;
+            RunOnUiThread(() =>
+            {
+                _ayaImage.SetImageDrawable(null);
+                _ayaImage.Visibility = ViewStates.Gone;
+            });
+        }
+        catch { /* no-op */ }
+    }
+
+    private void OnRuleSpinnerItemSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
+    {
+        try
+        {
+            if (_ruleSpinner == null) return;
+            var selected = _ruleSpinner.GetItemAtPosition(e.Position)?.ToString();
+            if (string.IsNullOrEmpty(selected)) return;
+            
+            // Only react for real rules (mapping exists and not empty). Group headers map to empty string.
+            if (_ruleDisplayToArabic.TryGetValue(selected, out var mapped) && !string.IsNullOrEmpty(mapped))
+            {
+                // Hide any currently shown Aya and stop playback
+                HideAyaImage();
+                _audioService?.StopPlayback();
+                _currentPlayingIndex = -1;
+                UpdateAudioButtonsState(_searchResults.Count > 0);
+            }
+        }
+        catch { /* no-op */ }
     }
     
     private void OnAyaItemClick(object? sender, int position)
