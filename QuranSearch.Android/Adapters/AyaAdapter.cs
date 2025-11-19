@@ -404,17 +404,17 @@ public class AyaViewHolder : RecyclerView.ViewHolder
             }
 
             _arabicText.TextFormatted = spannableString;
-            // Always use RTL and right alignment for Arabic Quranic text
+            // Always use RTL and right alignment for Arabic Quranic text (use absolute Right, not relative End)
             _arabicText.TextDirection = global::Android.Views.TextDirection.Rtl;
-            _arabicText.Gravity = global::Android.Views.GravityFlags.End;
+            _arabicText.Gravity = global::Android.Views.GravityFlags.Right;
             _arabicText.TextAlignment = global::Android.Views.TextAlignment.ViewEnd;
         }
         else
         {
             _arabicText.Text = aya.Text;
-            // Always use RTL and right alignment for Arabic Quranic text
+            // Always use RTL and right alignment for Arabic Quranic text (use absolute Right, not relative End)
             _arabicText.TextDirection = global::Android.Views.TextDirection.Rtl;
-            _arabicText.Gravity = global::Android.Views.GravityFlags.End;
+            _arabicText.Gravity = global::Android.Views.GravityFlags.Right;
             _arabicText.TextAlignment = global::Android.Views.TextAlignment.ViewEnd;
         }
         

@@ -6,7 +6,8 @@
     android:padding="12dp"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:layoutDirection="locale">
 
     <!-- Aya Reference (Surah:Aya) -->
     <TextView
@@ -27,7 +28,7 @@
         android:textSize="20sp"
         android:layout_marginBottom="8dp"
         android:textDirection="rtl"
-        android:gravity="end"
+        android:gravity="right"
         android:textAlignment="viewEnd" />
 
     <!-- Matched Part Info -->
