@@ -314,72 +314,32 @@ public class AyaViewHolder : RecyclerView.ViewHolder
 
             var adjustedText = textBuilder.ToString();
             var spannableString = new SpannableString(adjustedText);
-            offsetAdjustment = 0;
 
             foreach (var match in sortedMatches)
             {
-                // Recalculate adjusted length for this match
-                int adjustedLength = match.Length;
-                int matchStart = match.Start;
-                int matchEnd = match.Start + match.Length;
-                bool spanHasBaseChar = false;
-                
-                for (int i = match.Start; i < matchEnd && i < aya.Text.Length; i++)
+                // Count ALL ZWJs that appear BEFORE this match's original position
+                // This gives us the correct offset in the adjusted text
+                int zwjsBefore = 0;
+                int originalPos = 0;
+                for (int i = 0; i < adjustedText.Length && originalPos < match.Start; i++)
                 {
-                    if (!IsDiacritic(aya.Text[i]))
+                    if (adjustedText[i] == ZWJ)
                     {
-                        spanHasBaseChar = true;
-                        break;
+                        zwjsBefore++;
+                    }
+                    else
+                    {
+                        originalPos++;
                     }
                 }
 
-                // For stop signs, use extended span
-                if (!spanHasBaseChar)
-                {
-                    bool extendedBefore = false;
-                    bool extendedAfter = false;
-                    
-                    if (matchEnd < aya.Text.Length && char.IsWhiteSpace(aya.Text[matchEnd]))
-                    {
-                        adjustedLength += 1;
-                        extendedAfter = true;
-                    }
-                    
-                    if (match.Start > 0 && char.IsWhiteSpace(aya.Text[match.Start - 1]))
-                    {
-                        matchStart -= 1;
-                        adjustedLength += 1;
-                        extendedBefore = true;
-                    }
-
-                    if (!extendedBefore)
-                    {
-                        int prev = match.Start - 1;
-                        while (prev >= 0 && IsDiacritic(aya.Text[prev])) prev--;
-                        if (prev >= 0)
-                        {
-                            adjustedLength += (match.Start - prev);
-                            matchStart = prev;
-                        }
-                    }
-                    
-                    if (!extendedAfter)
-                    {
-                        int next = matchEnd;
-                        while (next < aya.Text.Length && IsDiacritic(aya.Text[next])) next++;
-                        if (next < aya.Text.Length)
-                        {
-                            adjustedLength = (next - matchStart) + 1;
-                        }
-                    }
-                }
-
-                var adjustedStart = matchStart + offsetAdjustment;
+                var adjustedStart = match.Start + zwjsBefore;
                 var beforeIndex = adjustedStart - 1;
-                var afterIndex = adjustedStart + adjustedLength;
+                var afterIndex = adjustedStart + match.Length;
+                
                 // Include internal ZWJs (if any) but exclude external ZWJs
-                int leftHasZWJ = (beforeIndex >= 0 && beforeIndex < adjustedText.Length && adjustedText[beforeIndex] == ZWJ) ? 1 : 0; // external before
-                int rightHasZWJ = (afterIndex >= 0 && afterIndex < adjustedText.Length && adjustedText[afterIndex] == ZWJ) ? 1 : 0;   // could be internal or external
+                int leftHasZWJ = (beforeIndex >= 0 && beforeIndex < adjustedText.Length && adjustedText[beforeIndex] == ZWJ) ? 1 : 0;
+                int rightHasZWJ = (afterIndex >= 0 && afterIndex < adjustedText.Length && adjustedText[afterIndex] == ZWJ) ? 1 : 0;
 
                 // Span starts at adjustedStart (may begin with internal ZWJ)
                 var spanStart = adjustedStart;
@@ -414,15 +374,6 @@ public class AyaViewHolder : RecyclerView.ViewHolder
                         spanEnd,
                         SpanTypes.ExclusiveExclusive);
                 }
-
-                // Track offset for next match (ZWJs were inserted in first loop)
-                // Count ZWJs between current position and next match start
-                int zwjCount = 0;
-                for (int i = adjustedStart; i < spanEnd && i < adjustedText.Length; i++)
-                {
-                    if (adjustedText[i] == ZWJ) zwjCount++;
-                }
-                offsetAdjustment += zwjCount;
             }
 
             _arabicText.TextFormatted = spannableString;
