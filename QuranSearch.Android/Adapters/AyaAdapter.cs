@@ -152,6 +152,14 @@ public class AyaViewHolder : RecyclerView.ViewHolder
                        c != '\u062F' && c != '\u0630' && c != '\u0631' && c != '\u0632' && c != '\u0648' && c != '\u0621';
             }
 
+            // Check if character can receive connection from the right
+            // All Arabic letters except hamza (ء) can receive connections
+            bool CanReceiveFromRight(char c)
+            {
+                if (!IsArabicLetter(c)) return false;
+                return c != '\u0621'; // Hamza is the only letter that cannot receive connection
+            }
+
             int FindPrevBaseIndex(string s, int start)
             {
                 int i = start;
@@ -242,7 +250,7 @@ public class AyaViewHolder : RecyclerView.ViewHolder
                     : '\0';
 
                 bool connectPrevToFirst = prevIndex >= 0 && IsConnector(textBuilder[prevIndex]) && IsConnector(firstChar);
-                bool connectLastToNext = nextIndex >= 0 && IsConnector(lastChar) && IsConnector(textBuilder[nextIndex]);
+                bool connectLastToNext = nextIndex >= 0 && IsConnector(lastChar) && CanReceiveFromRight(textBuilder[nextIndex]);
 
                 // Helper: end of previous cluster (after its diacritics)
                 int PrevClusterEnd()
