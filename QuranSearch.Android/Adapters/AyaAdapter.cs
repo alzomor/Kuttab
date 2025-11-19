@@ -404,27 +404,18 @@ public class AyaViewHolder : RecyclerView.ViewHolder
             }
 
             _arabicText.TextFormatted = spannableString;
-            // Ensure RTL and right alignment are preserved after setting formatted text
-            _arabicText.TextDirection = _adapter.IsRtl 
-                ? global::Android.Views.TextDirection.Rtl 
-                : global::Android.Views.TextDirection.Ltr;
-            _arabicText.Gravity = _adapter.IsRtl 
-                ? global::Android.Views.GravityFlags.End 
-                : global::Android.Views.GravityFlags.Start;
-            _arabicText.TextAlignment = _adapter.IsRtl 
-                ? global::Android.Views.TextAlignment.ViewEnd 
-                : global::Android.Views.TextAlignment.ViewStart;
+            // Always use RTL and right alignment for Arabic Quranic text
+            _arabicText.TextDirection = global::Android.Views.TextDirection.Rtl;
+            _arabicText.Gravity = global::Android.Views.GravityFlags.End;
+            _arabicText.TextAlignment = global::Android.Views.TextAlignment.ViewEnd;
         }
         else
         {
             _arabicText.Text = aya.Text;
-            // Ensure RTL and right alignment
-            _arabicText.TextDirection = _adapter.IsRtl 
-                ? global::Android.Views.TextDirection.Rtl 
-                : global::Android.Views.TextDirection.Ltr;
-            _arabicText.Gravity = _adapter.IsRtl 
-                ? global::Android.Views.GravityFlags.End 
-                : global::Android.Views.GravityFlags.Start;
+            // Always use RTL and right alignment for Arabic Quranic text
+            _arabicText.TextDirection = global::Android.Views.TextDirection.Rtl;
+            _arabicText.Gravity = global::Android.Views.GravityFlags.End;
+            _arabicText.TextAlignment = global::Android.Views.TextAlignment.ViewEnd;
         }
         
         // Set selection background
