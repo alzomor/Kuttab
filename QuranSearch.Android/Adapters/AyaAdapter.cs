@@ -129,6 +129,9 @@ public class AyaViewHolder : RecyclerView.ViewHolder
             const char ZWJ = '\u200D';
             var textBuilder = new System.Text.StringBuilder(aya.Text);
             var offsetAdjustment = 0;
+            
+            // Store extended positions for stop signs (maps match index to adjusted start/length)
+            var extendedPositions = new Dictionary<int, (int start, int length)>();
 
             bool IsDiacritic(char c)
             {
@@ -176,8 +179,10 @@ public class AyaViewHolder : RecyclerView.ViewHolder
 
             var sortedMatches = aya.MatchPositions.OrderBy(m => m.Start).ToList();
 
-            foreach (var match in sortedMatches)
+            for (int matchIndex = 0; matchIndex < sortedMatches.Count; matchIndex++)
             {
+                var match = sortedMatches[matchIndex];
+                
                 // Check if match contains only diacritics/stop signs (no base characters)
                 int adjustedLength = match.Length;
                 int adjustedStart = match.Start;
@@ -236,6 +241,9 @@ public class AyaViewHolder : RecyclerView.ViewHolder
                             adjustedLength = (next - adjustedStart) + 1;
                         }
                     }
+                    
+                    // Store the extended position for use in highlighting loop
+                    extendedPositions[matchIndex] = (adjustedStart, adjustedLength);
                 }
 
                 adjustedStart += offsetAdjustment;
@@ -323,13 +331,24 @@ public class AyaViewHolder : RecyclerView.ViewHolder
             var adjustedText = textBuilder.ToString();
             var spannableString = new SpannableString(adjustedText);
 
-            foreach (var match in sortedMatches)
+            for (int matchIndex = 0; matchIndex < sortedMatches.Count; matchIndex++)
             {
+                var match = sortedMatches[matchIndex];
+                
+                // Use extended position if this is a stop sign match
+                int matchStart = match.Start;
+                int matchLength = match.Length;
+                if (extendedPositions.TryGetValue(matchIndex, out var extended))
+                {
+                    matchStart = extended.start;
+                    matchLength = extended.length;
+                }
+                
                 // Count ALL ZWJs that appear BEFORE this match's original position
                 // This gives us the correct offset in the adjusted text
                 int zwjsBefore = 0;
                 int originalPos = 0;
-                for (int i = 0; i < adjustedText.Length && originalPos < match.Start; i++)
+                for (int i = 0; i < adjustedText.Length && originalPos < matchStart; i++)
                 {
                     if (adjustedText[i] == ZWJ)
                     {
@@ -341,9 +360,9 @@ public class AyaViewHolder : RecyclerView.ViewHolder
                     }
                 }
 
-                var adjustedStart = match.Start + zwjsBefore;
+                var adjustedStart = matchStart + zwjsBefore;
                 var beforeIndex = adjustedStart - 1;
-                var afterIndex = adjustedStart + match.Length;
+                var afterIndex = adjustedStart + matchLength;
                 
                 // Include internal ZWJs (if any) but exclude external ZWJs
                 int leftHasZWJ = (beforeIndex >= 0 && beforeIndex < adjustedText.Length && adjustedText[beforeIndex] == ZWJ) ? 1 : 0;
