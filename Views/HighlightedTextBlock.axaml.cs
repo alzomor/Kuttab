@@ -115,12 +115,15 @@ public partial class HighlightedTextBlock : UserControl
                    c == 'ٰ' || c == 'ۥ' || c == 'ۦ';  // Small Alif, small Waw, small Ya
         }
         
-        // Helper to check if character is a diacritic
+        // Helper to check if character is a diacritic or Quranic annotation mark
         bool IsDiacritic(char c)
         {
-            return (c >= '\u064B' && c <= '\u065F') ||  // Arabic diacritics
-                   (c >= '\u0670' && c <= '\u06DC') ||  // Extended Arabic marks
-                   c == '\u0640';                        // Tatweel
+            return (c >= '\u064B' && c <= '\u065F') ||  // Arabic diacritics (ً ٌ ٍ َ ُ ِ ّ ْ)
+                   (c >= '\u0670' && c <= '\u06DC') ||  // Extended Arabic marks (includes ۖ ۗ ۘ ۙ ۚ ۛ ۜ)
+                   c == '\u0640' ||                      // Tatweel (ـ)
+                   c == '\u06DD' ||                      // Arabic end of ayah
+                   c == '\u06DE' ||                      // ۞ Start of rub el hizb
+                   c == '\u06E9';                        // ۩ Place of sajdah
         }
         
         var sortedPositions = MatchPositions.OrderBy(m => m.Start).ToList();
@@ -128,12 +131,73 @@ public partial class HighlightedTextBlock : UserControl
 
         foreach (var match in sortedPositions)
         {
+            // Compute adjusted span to ensure visibility for non-spacing marks (e.g., stop signs)
+            int adjustedStart = match.Start;
+            int adjustedLength = match.Length;
+            int matchEnd = match.Start + match.Length;
+            bool spanHasBaseChar = false;
+            for (int i = match.Start; i < matchEnd && i < Text.Length; i++)
+            {
+                if (!IsDiacritic(Text[i]))
+                {
+                    spanHasBaseChar = true;
+                    break;
+                }
+            }
+
+            if (!spanHasBaseChar)
+            {
+                // For non-spacing marks (like stop signs), include BOTH preceding and following context
+                bool extendedBefore = false;
+                bool extendedAfter = false;
+                
+                // Try to include following whitespace or character
+                if (matchEnd < Text.Length && char.IsWhiteSpace(Text[matchEnd]))
+                {
+                    adjustedLength += 1; // include following space
+                    extendedAfter = true;
+                }
+                
+                // Try to include preceding whitespace or character
+                if (match.Start > 0 && char.IsWhiteSpace(Text[match.Start - 1]))
+                {
+                    adjustedStart -= 1; // include preceding space
+                    adjustedLength += 1;
+                    extendedBefore = true;
+                }
+
+                // If no whitespace before, include previous base character
+                if (!extendedBefore)
+                {
+                    int prev = match.Start - 1;
+                    while (prev >= 0 && IsDiacritic(Text[prev])) prev--;
+                    if (prev >= 0)
+                    {
+                        adjustedLength += (match.Start - prev);
+                        adjustedStart = prev;
+                        extendedBefore = true;
+                    }
+                }
+                
+                // If no whitespace after, include next base character
+                if (!extendedAfter)
+                {
+                    int next = matchEnd;
+                    while (next < Text.Length && IsDiacritic(Text[next])) next++;
+                    if (next < Text.Length)
+                    {
+                        adjustedLength = (next - adjustedStart) + 1;
+                        extendedAfter = true;
+                    }
+                }
+            }
+
             // Determine word boundaries for smart ZWJ insertion - skip diacritics first
-            bool isAtWordStart = match.Start == 0;
-            if (!isAtWordStart && match.Start > 0)
+            bool isAtWordStart = adjustedStart == 0;
+            if (!isAtWordStart && adjustedStart > 0)
             {
                 // Skip diacritics backward to check for actual word boundary
-                int checkIndex = match.Start - 1;
+                int checkIndex = adjustedStart - 1;
                 while (checkIndex >= 0 && IsDiacritic(Text[checkIndex]))
                 {
                     checkIndex--;
@@ -141,11 +205,11 @@ public partial class HighlightedTextBlock : UserControl
                 isAtWordStart = checkIndex < 0 || char.IsWhiteSpace(Text[checkIndex]);
             }
             
-            bool isAtWordEnd = match.Start + match.Length >= Text.Length;
+            bool isAtWordEnd = adjustedStart + adjustedLength >= Text.Length;
             if (!isAtWordEnd)
             {
                 // Skip diacritics forward to check for actual word boundary
-                int checkIndex = match.Start + match.Length;
+                int checkIndex = adjustedStart + adjustedLength;
                 while (checkIndex < Text.Length && IsDiacritic(Text[checkIndex]))
                 {
                     checkIndex++;
@@ -157,10 +221,10 @@ public partial class HighlightedTextBlock : UserControl
             bool prevCharConnects = false;
             bool nextCharConnects = false;
             
-            if (!isAtWordStart && match.Start > 0)
+            if (!isAtWordStart && adjustedStart > 0)
             {
                 // Skip diacritics to find the actual letter before the match
-                int prevIndex = match.Start - 1;
+                int prevIndex = adjustedStart - 1;
                 while (prevIndex >= 0 && IsDiacritic(Text[prevIndex]))
                 {
                     prevIndex--;
@@ -179,21 +243,21 @@ public partial class HighlightedTextBlock : UserControl
             {
                 nextCharConnects = false;
             }
-            else if (match.Start + match.Length < Text.Length)
+            else if (adjustedStart + adjustedLength < Text.Length)
             {
                 // Skip diacritics backwards from end of match to find last actual letter
-                int lastCharIndex = match.Start + match.Length - 1;
+                int lastCharIndex = adjustedStart + adjustedLength - 1;
                 while (lastCharIndex >= match.Start && IsDiacritic(Text[lastCharIndex]))
                 {
                     lastCharIndex--;
                 }
                 
-                if (lastCharIndex >= match.Start)
+                if (lastCharIndex >= adjustedStart)
                 {
                     char highlightLastChar = Text[lastCharIndex];
                     
                     // Skip diacritics FORWARD from end of match to find next actual character
-                    int nextCharIndex = match.Start + match.Length;
+                    int nextCharIndex = adjustedStart + adjustedLength;
                     while (nextCharIndex < Text.Length && IsDiacritic(Text[nextCharIndex]))
                     {
                         nextCharIndex++;
@@ -209,9 +273,9 @@ public partial class HighlightedTextBlock : UserControl
             }
             
             // Add text before the match
-            if (match.Start > currentIndex)
+            if (adjustedStart > currentIndex)
             {
-                var beforeText = Text.Substring(currentIndex, match.Start - currentIndex);
+                var beforeText = Text.Substring(currentIndex, adjustedStart - currentIndex);
                 // Add ZWJ at end only if previous character actually connects
                 if (prevCharConnects)
                 {
@@ -221,7 +285,7 @@ public partial class HighlightedTextBlock : UserControl
             }
 
             // Add highlighted match with orange background
-            var matchText = Text.Substring(match.Start, match.Length);
+            var matchText = Text.Substring(adjustedStart, Math.Min(adjustedLength, Math.Max(0, Text.Length - adjustedStart)));
             
             // Add ZWJ only where characters actually connect in Arabic
             string prefix = prevCharConnects ? ZWJ : "";
@@ -236,7 +300,7 @@ public partial class HighlightedTextBlock : UserControl
             };
             textBlock.Inlines?.Add(highlightedRun);
 
-            currentIndex = match.Start + match.Length;
+            currentIndex = adjustedStart + adjustedLength;
         }
 
         // Add remaining text after the last match

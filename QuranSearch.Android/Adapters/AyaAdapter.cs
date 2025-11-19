@@ -132,7 +132,12 @@ public class AyaViewHolder : RecyclerView.ViewHolder
 
             bool IsDiacritic(char c)
             {
-                return (c >= '\u064B' && c <= '\u065F') || (c >= '\u0670' && c <= '\u06DC') || c == '\u0640';
+                return (c >= '\u064B' && c <= '\u065F') ||  // Arabic diacritics (ً ٌ ٍ َ ُ ِ ّ ْ)
+                       (c >= '\u0670' && c <= '\u06DC') ||  // Extended Arabic marks (includes ۖ ۗ ۘ ۙ ۚ ۛ ۜ)
+                       c == '\u0640' ||                      // Tatweel (ـ)
+                       c == '\u06DD' ||                      // Arabic end of ayah
+                       c == '\u06DE' ||                      // ۞ Start of rub el hizb
+                       c == '\u06E9';                        // ۩ Place of sajdah
             }
 
             bool IsArabicLetter(char c)
@@ -165,15 +170,75 @@ public class AyaViewHolder : RecyclerView.ViewHolder
 
             foreach (var match in sortedMatches)
             {
-                var adjustedStart = match.Start + offsetAdjustment;
+                // Check if match contains only diacritics/stop signs (no base characters)
+                int adjustedLength = match.Length;
+                int adjustedStart = match.Start;
+                int matchEnd = match.Start + match.Length;
+                bool spanHasBaseChar = false;
+                
+                for (int i = match.Start; i < matchEnd && i < aya.Text.Length; i++)
+                {
+                    if (!IsDiacritic(aya.Text[i]))
+                    {
+                        spanHasBaseChar = true;
+                        break;
+                    }
+                }
+
+                // For stop signs and non-spacing marks, extend to include surrounding context
+                if (!spanHasBaseChar)
+                {
+                    bool extendedBefore = false;
+                    bool extendedAfter = false;
+                    
+                    // Try to include following whitespace
+                    if (matchEnd < aya.Text.Length && char.IsWhiteSpace(aya.Text[matchEnd]))
+                    {
+                        adjustedLength += 1;
+                        extendedAfter = true;
+                    }
+                    
+                    // Try to include preceding whitespace
+                    if (match.Start > 0 && char.IsWhiteSpace(aya.Text[match.Start - 1]))
+                    {
+                        adjustedStart -= 1;
+                        adjustedLength += 1;
+                        extendedBefore = true;
+                    }
+
+                    // If no whitespace before, include previous base character
+                    if (!extendedBefore)
+                    {
+                        int prev = match.Start - 1;
+                        while (prev >= 0 && IsDiacritic(aya.Text[prev])) prev--;
+                        if (prev >= 0)
+                        {
+                            adjustedLength += (match.Start - prev);
+                            adjustedStart = prev;
+                        }
+                    }
+                    
+                    // If no whitespace after, include next base character
+                    if (!extendedAfter)
+                    {
+                        int next = matchEnd;
+                        while (next < aya.Text.Length && IsDiacritic(aya.Text[next])) next++;
+                        if (next < aya.Text.Length)
+                        {
+                            adjustedLength = (next - adjustedStart) + 1;
+                        }
+                    }
+                }
+
+                adjustedStart += offsetAdjustment;
                 var added = 0;
 
                 var prevIndex = FindPrevBaseIndex(textBuilder.ToString(), adjustedStart - 1);
-                var nextIndex = FindNextBaseIndex(textBuilder.ToString(), adjustedStart + match.Length);
+                var nextIndex = FindNextBaseIndex(textBuilder.ToString(), adjustedStart + adjustedLength);
 
                 char firstChar = adjustedStart < textBuilder.Length ? textBuilder[adjustedStart] : '\0';
-                char lastChar = (adjustedStart + match.Length - 1) < textBuilder.Length && match.Length > 0
-                    ? textBuilder[adjustedStart + match.Length - 1]
+                char lastChar = (adjustedStart + adjustedLength - 1) < textBuilder.Length && adjustedLength > 0
+                    ? textBuilder[adjustedStart + adjustedLength - 1]
                     : '\0';
 
                 bool connectPrevToFirst = prevIndex >= 0 && IsConnector(textBuilder[prevIndex]) && IsConnector(firstChar);
@@ -191,13 +256,13 @@ public class AyaViewHolder : RecyclerView.ViewHolder
                 // Helper: position immediately after last base of match (before its diacritics)
                 int MatchBaseEnd()
                 {
-                    return adjustedStart + match.Length;
+                    return adjustedStart + adjustedLength;
                 }
 
                 // Helper: position after last base + its diacritics (between clusters)
                 int MatchClusterEnd()
                 {
-                    int pos = adjustedStart + match.Length + added;
+                    int pos = adjustedStart + adjustedLength + added;
                     while (pos < textBuilder.Length && IsDiacritic(textBuilder[pos])) pos++;
                     return pos;
                 }
@@ -253,9 +318,65 @@ public class AyaViewHolder : RecyclerView.ViewHolder
 
             foreach (var match in sortedMatches)
             {
-                var adjustedStart = match.Start + offsetAdjustment;
+                // Recalculate adjusted length for this match
+                int adjustedLength = match.Length;
+                int matchStart = match.Start;
+                int matchEnd = match.Start + match.Length;
+                bool spanHasBaseChar = false;
+                
+                for (int i = match.Start; i < matchEnd && i < aya.Text.Length; i++)
+                {
+                    if (!IsDiacritic(aya.Text[i]))
+                    {
+                        spanHasBaseChar = true;
+                        break;
+                    }
+                }
+
+                // For stop signs, use extended span
+                if (!spanHasBaseChar)
+                {
+                    bool extendedBefore = false;
+                    bool extendedAfter = false;
+                    
+                    if (matchEnd < aya.Text.Length && char.IsWhiteSpace(aya.Text[matchEnd]))
+                    {
+                        adjustedLength += 1;
+                        extendedAfter = true;
+                    }
+                    
+                    if (match.Start > 0 && char.IsWhiteSpace(aya.Text[match.Start - 1]))
+                    {
+                        matchStart -= 1;
+                        adjustedLength += 1;
+                        extendedBefore = true;
+                    }
+
+                    if (!extendedBefore)
+                    {
+                        int prev = match.Start - 1;
+                        while (prev >= 0 && IsDiacritic(aya.Text[prev])) prev--;
+                        if (prev >= 0)
+                        {
+                            adjustedLength += (match.Start - prev);
+                            matchStart = prev;
+                        }
+                    }
+                    
+                    if (!extendedAfter)
+                    {
+                        int next = matchEnd;
+                        while (next < aya.Text.Length && IsDiacritic(aya.Text[next])) next++;
+                        if (next < aya.Text.Length)
+                        {
+                            adjustedLength = (next - matchStart) + 1;
+                        }
+                    }
+                }
+
+                var adjustedStart = matchStart + offsetAdjustment;
                 var beforeIndex = adjustedStart - 1;
-                var afterIndex = adjustedStart + match.Length;
+                var afterIndex = adjustedStart + adjustedLength;
                 // Include internal ZWJs (if any) but exclude external ZWJs
                 int leftHasZWJ = (beforeIndex >= 0 && beforeIndex < adjustedText.Length && adjustedText[beforeIndex] == ZWJ) ? 1 : 0; // external before
                 int rightHasZWJ = (afterIndex >= 0 && afterIndex < adjustedText.Length && adjustedText[afterIndex] == ZWJ) ? 1 : 0;   // could be internal or external
@@ -294,7 +415,14 @@ public class AyaViewHolder : RecyclerView.ViewHolder
                         SpanTypes.ExclusiveExclusive);
                 }
 
-                // Note: offsetAdjustment was fully accounted for during insertion phase.
+                // Track offset for next match (ZWJs were inserted in first loop)
+                // Count ZWJs between current position and next match start
+                int zwjCount = 0;
+                for (int i = adjustedStart; i < spanEnd && i < adjustedText.Length; i++)
+                {
+                    if (adjustedText[i] == ZWJ) zwjCount++;
+                }
+                offsetAdjustment += zwjCount;
             }
 
             _arabicText.TextFormatted = spannableString;
