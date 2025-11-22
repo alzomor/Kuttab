@@ -7,7 +7,7 @@ from pathlib import Path
 
 # Configuration
 PROJECT_NAME = "Quraan"
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 TARGETS = [
     {"rid": "win-x64", "ext": "zip"},
     {"rid": "linux-x64", "ext": "tar.gz"},
@@ -28,11 +28,15 @@ def run_command(cmd, cwd=None):
         )
         if result.stdout:
             print(result.stdout)
+        if result.stderr:
+            print(result.stderr)
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ Command failed with error: {e}")
+        print(f"❌ Command failed with return code: {e.returncode}")
+        if e.stdout:
+            print(f"Standard output:\n{e.stdout}")
         if e.stderr:
-            print(f"Error details:\n{e.stderr}")
+            print(f"Error output:\n{e.stderr}")
         return False
 
 def build_for_platform(target):
@@ -52,7 +56,7 @@ def build_for_platform(target):
     # Build command
     cmd = [
         "dotnet", "publish",
-        "-c", "Debug",
+        "-c", "Release",
         "-r", rid,
         "--self-contained", "true",
         "-p:PublishSingleFile=true",
@@ -69,31 +73,61 @@ def build_for_platform(target):
         return False
     
     print(f"✅ Successfully built for {rid}")
-    # Ensure extra non-code assets are present in publish folder (Windows specific as requested)
-    ensure_extra_files(output_dir, rid)
     return True
 
-def ensure_extra_files(output_dir: str, rid: str) -> None:
-    """Copy required extra files into the publish directory.
-    Currently ensures `quran-uthmani.txt` is present for Windows builds.
-    """
-    try:
-        # Only for Windows publish as requested
-        if rid.startswith("win"):
-            src_candidates = [
-                Path("quran-uthmani.txt"),
-                Path("Quran_uthmani.txt"),
-            ]
-            src_path = next((p for p in src_candidates if p.exists()), None)
-            if src_path is None:
-                print("⚠️  quran-uthmani.txt not found at repo root; skipping copy.")
-                return
-            dest_path = Path(output_dir) / "quran-uthmani.txt"
-            os.makedirs(output_dir, exist_ok=True)
-            shutil.copy2(src_path, dest_path)
-            print(f"📄 Copied '{src_path.name}' to publish folder: {dest_path}")
-    except Exception as e:
-        print(f"⚠️  Failed to copy extra files: {e}")
+def build_android_apk():
+    """Build the Android APK."""
+    print(f"\n{'='*80}")
+    print(f"🤖 Building Android APK")
+    print(f"{'='*80}")
+    
+    android_project_dir = "./QuranSearch.Android"
+    if not os.path.exists(android_project_dir):
+        print("⚠️  Android project not found, skipping Android build")
+        return False
+    
+    # Build command for Android
+    cmd = [
+        "dotnet", "build",
+        "-c", "Release",
+        "-f", "net8.0-android",
+        "QuranSearch.Android.csproj"
+    ]
+    
+    if not run_command(cmd, cwd=android_project_dir):
+        print("❌ Failed to build Android APK")
+        return False
+    
+    # Find the generated APK
+    apk_search_dir = os.path.join(android_project_dir, "bin/Release/net8.0-android")
+    if not os.path.exists(apk_search_dir):
+        print("❌ APK output directory not found")
+        return False
+    
+    # Find APK files (usually named like com.quransearch.android-Signed.apk)
+    apk_files = [f for f in os.listdir(apk_search_dir) if f.endswith(".apk")]
+    if not apk_files:
+        print("❌ No APK file found in output directory")
+        return False
+    
+    # Copy APK to dist folder
+    os.makedirs("dist", exist_ok=True)
+    for apk_file in apk_files:
+        src_apk = os.path.join(apk_search_dir, apk_file)
+        # Rename to a cleaner name
+        dest_apk = os.path.join("dist", f"{PROJECT_NAME}-android-{VERSION}.apk")
+        shutil.copy2(src_apk, dest_apk)
+        print(f"✅ Copied APK to: {dest_apk}")
+    
+    return True
+
+def cleanup_publish_folder():
+    """Remove the publish folder after archives are created."""
+    publish_dir = "./publish"
+    if os.path.exists(publish_dir):
+        print(f"\n🧹 Cleaning up publish folder...")
+        shutil.rmtree(publish_dir)
+        print(f"✅ Removed temporary publish folder")
 
 def create_archive(rid, ext):
     """Create an archive for the built files."""
@@ -121,24 +155,45 @@ def create_archive(rid, ext):
         print(f"❌ Failed to create archive: {e}")
         return False
 
+def copy_installation_instructions():
+    """Copy installation instructions to dist folder."""
+    src_file = "INSTALLATION_INSTRUCTIONS.md"
+    dest_file = os.path.join("dist", "INSTALLATION_INSTRUCTIONS.md")
+    
+    if os.path.exists(src_file):
+        shutil.copy2(src_file, dest_file)
+        print(f"📄 Copied installation instructions to dist folder")
+    else:
+        print(f"⚠️  Installation instructions file not found: {src_file}")
+
 def main():
     # Create necessary directories
     os.makedirs("dist", exist_ok=True)
     
-    # Build for all targets
+    # Copy installation instructions
+    copy_installation_instructions()
+    
+    # Build for all desktop targets
     success_count = 0
     for target in TARGETS:
         if build_for_platform(target):
             if create_archive(target["rid"], target["ext"]):
                 success_count += 1
     
+    # Build Android APK
+    android_success = build_android_apk()
+    if android_success:
+        success_count += 1
+    
+    total_targets = len(TARGETS) + 1  # Desktop targets + Android
+    
     # Print summary
     print("\n" + "="*50)
     print(f"🚀 Build Summary")
     print("="*50)
-    print(f"Total targets: {len(TARGETS)}")
+    print(f"Total targets: {total_targets}")
     print(f"Successfully built: {success_count}")
-    print(f"Failed: {len(TARGETS) - success_count}")
+    print(f"Failed: {total_targets - success_count}")
     
     if success_count > 0:
         print("\n📦 Distribution packages created in the 'dist' directory:")
@@ -146,6 +201,9 @@ def main():
         for file in dist_files:
             size_mb = os.path.getsize(os.path.join("dist", file)) / (1024 * 1024)
             print(f"- {file} ({size_mb:.2f} MB)")
+    
+    # Clean up temporary publish folder
+    cleanup_publish_folder()
     
     print("\n✅ Build process completed!" if success_count > 0 else "\n❌ Build process completed with errors!")
 

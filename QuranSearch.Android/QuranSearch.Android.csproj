@@ -12,6 +12,9 @@
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <AndroidEnableAssemblyCompression>false</AndroidEnableAssemblyCompression>
     <AndroidUseFastDeployment>false</AndroidUseFastDeployment>
+    <!-- Disable AOT compilation to avoid SDK resolution issues -->
+    <RunAOTCompilation>false</RunAOTCompilation>
+    <EnableLLVM>false</EnableLLVM>
   </PropertyGroup>
 
   <ItemGroup>

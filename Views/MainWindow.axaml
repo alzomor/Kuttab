@@ -189,18 +189,20 @@
                             BorderBrush="#D4C5B0"
                             BorderThickness="1"
                             CornerRadius="8">
-                        <TreeView Items="{Binding RuleGroups}"
+                        <TreeView ItemsSource="{Binding RuleGroups}"
                                   SelectedItem="{Binding SelectedRuleItem}">
                             <TreeView.ItemTemplate>
-                                <HierarchicalDataTemplate DataType="vm:RuleGroupNode"
-                                                          Items="{Binding Rules}">
+                                <TreeDataTemplate DataType="vm:RuleGroupNode"
+                                                 ItemsSource="{Binding Rules}">
                                     <TextBlock Text="{Binding GroupTitle}" 
                                                FontWeight="SemiBold"/>
-                                </HierarchicalDataTemplate>
+                                </TreeDataTemplate>
+                            </TreeView.ItemTemplate>
+                            <TreeView.DataTemplates>
                                 <DataTemplate DataType="vm:RuleItemNode">
                                     <TextBlock Text="{Binding RuleTitle}"/>
                                 </DataTemplate>
-                            </TreeView.ItemTemplate>
+                            </TreeView.DataTemplates>
                         </TreeView>
                     </Border>
                 </StackPanel>

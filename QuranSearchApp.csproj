@@ -30,6 +30,33 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Exclude platform-specific project files and Core source from desktop builds -->
+    <Compile Remove="QuranSearch.Android\**" />
+    <Compile Remove="QuranSearch.MAUI\**" />
+    <Compile Remove="QuranSearch.Web\**" />
+    <Compile Remove="QuranSearchWebApi\**" />
+    <Compile Remove="QuranSearch.Core\**" />
+    <Compile Remove="Alhusary\**" />
+    <Compile Remove="QuranText_jpg\**" />
+    <EmbeddedResource Remove="QuranSearch.Android\**" />
+    <EmbeddedResource Remove="QuranSearch.MAUI\**" />
+    <EmbeddedResource Remove="QuranSearch.Web\**" />
+    <EmbeddedResource Remove="QuranSearchWebApi\**" />
+    <EmbeddedResource Remove="QuranSearch.Core\**" />
+    <EmbeddedResource Remove="Alhusary\**" />
+    <EmbeddedResource Remove="QuranText_jpg\**" />
+    <None Remove="QuranSearch.Android\**" />
+    <None Remove="QuranSearch.MAUI\**" />
+    <None Remove="QuranSearch.Web\**" />
+    <None Remove="QuranSearchWebApi\**" />
+    <None Remove="QuranSearch.Core\**" />
+    <None Remove="Alhusary\**" />
+    <None Remove="QuranText_jpg\**" />
+    <Content Remove="Alhusary\**" />
+    <Content Remove="QuranText_jpg\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.0.10" />
     <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
