@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settingsScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5DC"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:layoutDirection="locale">
 
     <LinearLayout
+        android:id="@+id/settingsRootLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:layoutDirection="locale">
 
         <!-- Language Settings Card -->
         <androidx.cardview.widget.CardView
@@ -26,9 +30,10 @@
                 android:padding="20dp">
 
                 <TextView
+                    android:id="@+id/languageSettingsTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🗣️ Language Settings"
+                    android:text="@string/language_settings_title"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#2C5F2D"
@@ -41,10 +46,11 @@
                     android:gravity="center_vertical">
 
                     <TextView
+                        android:id="@+id/selectLanguageLabel"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Select Language:"
+                        android:text="@string/select_language_label"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -73,9 +79,10 @@
                 android:padding="20dp">
 
                 <TextView
+                    android:id="@+id/searchDomainTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔍 Search Domain"
+                    android:text="@string/search_domain_title"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#2C5F2D"
@@ -89,10 +96,11 @@
                     android:layout_marginBottom="12dp">
 
                     <TextView
+                        android:id="@+id/searchInLabel"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Search In:"
+                        android:text="@string/search_in_label"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -114,23 +122,20 @@
                     android:visibility="gone">
 
                     <TextView
+                        android:id="@+id/surahNumberLabel"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Surah Number:"
+                        android:text="@string/surah_number_label"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
-                    <EditText
-                        android:id="@+id/singleSurahNumber"
+                    <Spinner
+                        android:id="@+id/singleSurahSpinner"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:inputType="number"
-                        android:hint="1-114"
-                        android:minHeight="48dp"
-                        android:padding="12dp"
-                        android:background="@android:drawable/edit_text" />
+                        android:minHeight="48dp" />
                 </LinearLayout>
 
                 <!-- Surah Range Selection -->
@@ -149,23 +154,20 @@
                         android:layout_marginBottom="8dp">
 
                         <TextView
+                            android:id="@+id/fromSurahLabel"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="From Surah:"
+                            android:text="@string/from_surah_label"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
-                        <EditText
-                            android:id="@+id/startSurahNumber"
+                        <Spinner
+                            android:id="@+id/startSurahSpinner"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:inputType="number"
-                            android:hint="1-114"
-                            android:minHeight="48dp"
-                            android:padding="12dp"
-                            android:background="@android:drawable/edit_text" />
+                            android:minHeight="48dp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -175,23 +177,20 @@
                         android:gravity="center_vertical">
 
                         <TextView
+                            android:id="@+id/toSurahLabel"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="To Surah:"
+                            android:text="@string/to_surah_label"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
-                        <EditText
-                            android:id="@+id/endSurahNumber"
+                        <Spinner
+                            android:id="@+id/endSurahSpinner"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:inputType="number"
-                            android:hint="1-114"
-                            android:minHeight="48dp"
-                            android:padding="12dp"
-                            android:background="@android:drawable/edit_text" />
+                            android:minHeight="48dp" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -212,9 +211,10 @@
                 android:padding="20dp">
 
                 <TextView
+                    android:id="@+id/onlineResourcesTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🌐 Online Resources"
+                    android:text="@string/online_resources_title"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#2C5F2D"
@@ -224,7 +224,7 @@
                     android:id="@+id/useRemoteAudioCheckBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="🔊 Get Audio Files from Internet"
+                    android:text="@string/get_audio_from_internet"
                     android:textSize="14sp"
                     android:minHeight="48dp" />
 
@@ -232,14 +232,15 @@
                     android:id="@+id/useRemoteImagesCheckBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="📷 Get Aya Images from Internet"
+                    android:text="@string/get_images_from_internet"
                     android:textSize="14sp"
                     android:minHeight="48dp" />
 
                 <TextView
+                    android:id="@+id/onlineResourcesNote"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Note: Enable these options if local files are not available"
+                    android:text="@string/online_resources_note"
                     android:textSize="12sp"
                     android:fontFamily="sans-serif-light"
                     android:textStyle="italic"
@@ -262,7 +263,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="💾 Save Settings"
+                android:text="@string/save_settings"
                 android:textColor="#FFFFFF"
                 android:background="#2C5F2D"
                 android:minHeight="48dp"
@@ -274,7 +275,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:text="❌ Cancel"
+                android:text="@string/cancel"
                 android:textColor="#FFFFFF"
                 android:background="#8B7355"
                 android:minHeight="48dp"

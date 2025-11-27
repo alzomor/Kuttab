@@ -69,5 +69,19 @@
   "GetImagesFromInternet": "الحصول على صور الآيات من الإنترنت",
   "OnlineResourcesNote": "ملاحظة: فعّل هذه الخيارات إذا لم تكن الملفات المحلية متاحة",
   "SaveSettings": "حفظ الإعدادات",
-  "Cancel": "إلغاء"
+  "Cancel": "إلغاء",
+  "SettingsTitle": "⚙️ الإعدادات",
+  "LanguageSettingsTitle": "🗣️ إعدادات اللغة",
+  "SelectLanguageLabel": "اختر اللغة:",
+  "SearchDomainTitle": "🔍 نطاق البحث",
+  "SearchInLabel": "البحث في:",
+  "SurahNumberLabel": "السورة:",
+  "FromSurahLabel": "من السورة:",
+  "ToSurahLabel": "إلى السورة:",
+  "OnlineResourcesTitle": "🌐 الموارد المتصلة",
+  "GetAudioFromInternetLabel": "🔊 الحصول على ملفات الصوت من الإنترنت",
+  "GetImagesFromInternetLabel": "📷 الحصول على صور الآيات من الإنترنت",
+  "OnlineResourcesNoteText": "ملاحظة: فعّل هذه الخيارات إذا لم تكن الملفات المحلية متاحة",
+  "SaveSettingsButton": "💾 حفظ الإعدادات",
+  "CancelButton": "❌ إلغاء"
 }

@@ -6,8 +6,8 @@ import platform
 from pathlib import Path
 
 # Configuration
-PROJECT_NAME = "Quraan"
-VERSION = "0.4.0"
+PROJECT_NAME = "Kuttab"
+VERSION = "0.5.0"
 TARGETS = [
     {"rid": "win-x64", "ext": "zip"},
     {"rid": "linux-x64", "ext": "tar.gz"},

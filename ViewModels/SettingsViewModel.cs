@@ -6,8 +6,16 @@ using System.Windows.Input;
 using ReactiveUI;
 using QuranSearch.Core.Services;
 using QuranSearch.Core.ViewModels;
+using QuranSearch.Core.Models;
 
 namespace QuranSearchApp.ViewModels;
+
+public class SurahItem
+{
+    public int Number { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string DisplayText => $"{Number}. {Name}";
+}
 
 public class SettingsViewModel : ViewModelBase
 {
@@ -18,24 +26,49 @@ public class SettingsViewModel : ViewModelBase
     private bool _useRemoteImages;
     private int _startSurah = 1;
     private int _endSurah = 114;
+    private SurahItem? _selectedStartSurah;
+    private SurahItem? _selectedEndSurah;
 
     public SettingsViewModel(LocalizationService localizationService, 
                             LanguageOption currentLanguage,
                             bool useRemoteAudio,
                             bool useRemoteImages,
-                            SearchDomainOption? currentSearchDomain = null)
+                            SearchDomainOption? currentSearchDomain = null,
+                            int startSurah = 1,
+                            int endSurah = 114)
     {
         _localizationService = localizationService;
         _selectedLanguage = currentLanguage;
         _useRemoteAudio = useRemoteAudio;
         _useRemoteImages = useRemoteImages;
         _selectedSearchDomain = currentSearchDomain ?? SearchDomainOptions[0];
+        _startSurah = startSurah;
+        _endSurah = endSurah;
+        
+        // Initialize surah list
+        InitializeSurahList();
+        
+        // Set selected surahs based on initial values
+        _selectedStartSurah = SurahList.FirstOrDefault(s => s.Number == startSurah);
+        _selectedEndSurah = SurahList.FirstOrDefault(s => s.Number == endSurah);
         
         SaveCommand = new SimpleCommand(OnSave);
         CancelCommand = new SimpleCommand(OnCancel);
         
         // Subscribe to language changes
         _localizationService.LanguageChanged += OnLanguageChanged;
+    }
+    
+    private void InitializeSurahList()
+    {
+        for (int i = 1; i <= 114; i++)
+        {
+            SurahList.Add(new SurahItem
+            {
+                Number = i,
+                Name = SurahInfo.GetSurahName(i)
+            });
+        }
     }
 
     public LocalizationService Localization => _localizationService;
@@ -68,6 +101,44 @@ public class SettingsViewModel : ViewModelBase
 
     public bool IsSingleSurahSelected => _selectedSearchDomain?.Type == SearchDomainType.SingleSurah;
     public bool IsSurahRangeSelected => _selectedSearchDomain?.Type == SearchDomainType.SurahRange;
+
+    public ObservableCollection<SurahItem> SurahList { get; } = new();
+
+    public SurahItem? SelectedStartSurah
+    {
+        get => _selectedStartSurah;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _selectedStartSurah, value);
+            if (value != null)
+            {
+                _startSurah = value.Number;
+                // Ensure end is not less than start
+                if (_selectedEndSurah != null && _selectedEndSurah.Number < value.Number)
+                {
+                    SelectedEndSurah = value;
+                }
+            }
+        }
+    }
+
+    public SurahItem? SelectedEndSurah
+    {
+        get => _selectedEndSurah;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _selectedEndSurah, value);
+            if (value != null)
+            {
+                _endSurah = value.Number;
+                // Ensure start is not greater than end
+                if (_selectedStartSurah != null && _selectedStartSurah.Number > value.Number)
+                {
+                    SelectedStartSurah = value;
+                }
+            }
+        }
+    }
 
     public int StartSurah
     {

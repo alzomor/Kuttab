@@ -129,6 +129,23 @@ public class LocalizationService : ReactiveObject
     public string Arabic => this["Arabic"];
     public string English => this["English"];
     public string German => this["German"];
+    public string Matched => this["Matched"];
+    
+    // Settings window properties
+    public string SettingsTitle => this["SettingsTitle"];
+    public string LanguageSettingsTitle => this["LanguageSettingsTitle"];
+    public string SelectLanguageLabel => this["SelectLanguageLabel"];
+    public string SearchDomainTitle => this["SearchDomainTitle"];
+    public string SearchInLabel => this["SearchInLabel"];
+    public string SurahNumberLabel => this["SurahNumberLabel"];
+    public string FromSurahLabel => this["FromSurahLabel"];
+    public string ToSurahLabel => this["ToSurahLabel"];
+    public string OnlineResourcesTitle => this["OnlineResourcesTitle"];
+    public string GetAudioFromInternetLabel => this["GetAudioFromInternetLabel"];
+    public string GetImagesFromInternetLabel => this["GetImagesFromInternetLabel"];
+    public string OnlineResourcesNoteText => this["OnlineResourcesNoteText"];
+    public string SaveSettingsButton => this["SaveSettingsButton"];
+    public string CancelButton => this["CancelButton"];
 
     public bool IsRightToLeft => _currentLanguage == "ar";
 

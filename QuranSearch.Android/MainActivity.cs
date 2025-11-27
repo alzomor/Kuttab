@@ -25,11 +25,8 @@ public class MainActivity : AppCompatActivity
     private AndroidPictureService? _pictureService;
     private LocalizationService? _localizationService;
     
-    private LinearLayout? _languageContainer;
     private LinearLayout? _ruleContainer;
-    private TextView? _languageIcon;
     private TextView? _ruleIcon;
-    private Spinner? _languageSpinner;
     private Spinner? _ruleSpinner;
     private string? _selectedRuleName;
     private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
@@ -40,7 +37,6 @@ public class MainActivity : AppCompatActivity
     private Button? _playRepeatButton;
     private Button? _playAllButton;
     private Button? _stopButton;
-    private CheckBox? _useRemoteAudioCheckBox;
     private TextView? _statusText;
     private ImageView? _ayaImage;
     private RecyclerView? _recyclerView;
@@ -96,11 +92,8 @@ public class MainActivity : AppCompatActivity
     
     private void InitializeViews()
     {
-        _languageContainer = FindViewById<LinearLayout>(Resource.Id.languageContainer);
         _ruleContainer = FindViewById<LinearLayout>(Resource.Id.ruleContainer);
-        _languageIcon = FindViewById<TextView>(Resource.Id.languageIcon);
         _ruleIcon = FindViewById<TextView>(Resource.Id.ruleIcon);
-        _languageSpinner = FindViewById<Spinner>(Resource.Id.languageSpinner);
         _ruleSpinner = FindViewById<Spinner>(Resource.Id.ruleSpinner);
         _settingsButton = FindViewById<Button>(Resource.Id.settingsButton);
         _searchButton = FindViewById<Button>(Resource.Id.searchButton);
@@ -108,7 +101,6 @@ public class MainActivity : AppCompatActivity
         _playRepeatButton = FindViewById<Button>(Resource.Id.playRepeatButton);
         _playAllButton = FindViewById<Button>(Resource.Id.playAllButton);
         _stopButton = FindViewById<Button>(Resource.Id.stopButton);
-        _useRemoteAudioCheckBox = FindViewById<CheckBox>(Resource.Id.useRemoteAudioCheckBox);
         _statusText = FindViewById<TextView>(Resource.Id.statusText);
         _ayaImage = FindViewById<ImageView>(Resource.Id.ayaImage);
         _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerView);
@@ -126,25 +118,10 @@ public class MainActivity : AppCompatActivity
             _playAllButton.Click += OnPlayAllClick;
         if (_stopButton != null)
             _stopButton.Click += OnStopClick;
-        if (_useRemoteAudioCheckBox != null)
-            _useRemoteAudioCheckBox.CheckedChange += OnUseRemoteAudioChanged;
         
         // Hide currently displayed Aya when user picks a new rule (actual rule, not a group header)
         if (_ruleSpinner != null)
             _ruleSpinner.ItemSelected += OnRuleSpinnerItemSelected;
-        
-        // Setup language spinner
-        if (_languageSpinner != null)
-        {
-            var languages = new[] { "العربية", "English", "Deutsch" };
-            var languageAdapter = new ArrayAdapter<string>(this, 
-                global::Android.Resource.Layout.SimpleSpinnerItem, languages);
-            languageAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
-            _languageSpinner.Adapter = languageAdapter;
-            _languageSpinner.ItemSelected += OnLanguageSelected;
-            // Set default to English (index 1)
-            _languageSpinner.SetSelection(1);
-        }
     }
     
     private void SetupRecyclerView()
@@ -350,37 +327,12 @@ public class MainActivity : AppCompatActivity
         UpdateStatus(GetString(Resource.String.stopped));
     }
     
-    private void OnUseRemoteAudioChanged(object? sender, CompoundButton.CheckedChangeEventArgs e)
-    {
-        if (_audioService != null)
-        {
-            _audioService.UseRemoteSource = e.IsChecked;
-        }
-    }
-    
-    private void OnLanguageSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
-    {
-        var languages = new[] { "ar", "en", "de" };
-        if (e.Position >= 0 && e.Position < languages.Length && _localizationService != null)
-        {
-            _localizationService.CurrentLanguage = languages[e.Position];
-            UpdateLayoutDirection(languages[e.Position]);
-            UpdateUIStringsForCurrentLanguage();
-            UpdateAdapterLocalization();
-            UpdateRuleDisplayNames(); // Refresh rule spinner with translated group titles
-        }
-    }
-    
     private void UpdateLayoutDirection(string language)
     {
         // Set layout direction based on language
         var layoutDirection = language == "ar" ? LayoutDirection.Rtl : LayoutDirection.Ltr;
         
         // Update main containers
-        if (_languageContainer != null)
-        {
-            _languageContainer.LayoutDirection = layoutDirection;
-        }
         if (_ruleContainer != null)
         {
             _ruleContainer.LayoutDirection = layoutDirection;
@@ -410,8 +362,6 @@ public class MainActivity : AppCompatActivity
                 _playAllButton.Text = _localizationService.GetString("PlayAll");
             if (_stopButton != null)
                 _stopButton.Text = _localizationService.GetString("Stop");
-            if (_useRemoteAudioCheckBox != null)
-                _useRemoteAudioCheckBox.Text = _localizationService.GetString("UseRemoteAudio");
             
             // Update status
             UpdateStatus(_localizationService.GetString("Ready"));
@@ -784,17 +734,11 @@ public class MainActivity : AppCompatActivity
         if (_localizationService != null)
         {
             _localizationService.CurrentLanguage = language;
+            UpdateLayoutDirection(language);
+            UpdateUIStringsForCurrentLanguage();
+            UpdateAdapterLocalization();
+            UpdateRuleDisplayNames();
         }
-        
-        // Update language spinner to match
-        var languageIndex = language switch
-        {
-            "ar" => 0,
-            "en" => 1,
-            "de" => 2,
-            _ => 1
-        };
-        _languageSpinner?.SetSelection(languageIndex);
 
         // Load search domain
         _searchDomainType = (SearchDomainType)(prefs?.GetInt("SearchDomainType", 0) ?? 0);
@@ -812,10 +756,6 @@ public class MainActivity : AppCompatActivity
         if (_pictureService != null)
         {
             _pictureService.UseRemoteSource = useRemoteImages;
-        }
-        if (_useRemoteAudioCheckBox != null)
-        {
-            _useRemoteAudioCheckBox.Checked = useRemoteAudio;
         }
     }
 

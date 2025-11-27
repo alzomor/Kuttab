@@ -7,7 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
         x:Class="QuranSearchApp.Views.SettingsWindow"
         x:DataType="vm:SettingsViewModel"
-        Title="⚙️ Settings"
+        Title="{Binding Localization.SettingsTitle}"
         Width="600" Height="550"
         Background="#F5F5DC"
         WindowStartupLocation="CenterOwner"
@@ -108,10 +108,10 @@
             <!-- Language Settings -->
             <Border Classes="settings-card">
                 <StackPanel>
-                    <TextBlock Classes="section-title" Text="🗣️ Language Settings"/>
+                    <TextBlock Classes="section-title" Text="{Binding Localization.LanguageSettingsTitle}"/>
                     
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                        <TextBlock Classes="label" Text="Select Language:" Width="150"/>
+                        <TextBlock Classes="label" Text="{Binding Localization.SelectLanguageLabel}" Width="150"/>
                         <ComboBox Classes="settings-combo"
                                   ItemsSource="{Binding AvailableLanguages}"
                                   SelectedItem="{Binding SelectedLanguage}">
@@ -128,10 +128,10 @@
             <!-- Search Domain Settings -->
             <Border Classes="settings-card">
                 <StackPanel>
-                    <TextBlock Classes="section-title" Text="🔍 Search Domain"/>
+                    <TextBlock Classes="section-title" Text="{Binding Localization.SearchDomainTitle}"/>
                     
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-                        <TextBlock Classes="label" Text="Search In:" Width="150"/>
+                        <TextBlock Classes="label" Text="{Binding Localization.SearchInLabel}" Width="150"/>
                         <ComboBox Classes="settings-combo"
                                   ItemsSource="{Binding SearchDomainOptions}"
                                   SelectedItem="{Binding SelectedSearchDomain}"
@@ -147,33 +147,48 @@
                     <!-- Single Surah Selection -->
                     <StackPanel IsVisible="{Binding IsSingleSurahSelected}" Margin="0,0,0,10">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Classes="label" Text="Surah Number:" Width="150"/>
-                            <NumericUpDown Value="{Binding StartSurah}"
-                                          Minimum="1"
-                                          Maximum="114"
-                                          Increment="1"
-                                          FormatString="0"/>
+                            <TextBlock Classes="label" Text="{Binding Localization.SurahNumberLabel}" Width="150"/>
+                            <ComboBox Classes="settings-combo"
+                                      ItemsSource="{Binding SurahList}"
+                                      SelectedItem="{Binding SelectedStartSurah}"
+                                      MinWidth="250">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="vm:SurahItem">
+                                        <TextBlock Text="{Binding DisplayText}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </StackPanel>
                     </StackPanel>
                     
                     <!-- Surah Range Selection -->
                     <StackPanel IsVisible="{Binding IsSurahRangeSelected}">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                            <TextBlock Classes="label" Text="From Surah:" Width="150"/>
-                            <NumericUpDown Value="{Binding StartSurah}"
-                                          Minimum="1"
-                                          Maximum="114"
-                                          Increment="1"
-                                          FormatString="0"/>
+                            <TextBlock Classes="label" Text="{Binding Localization.FromSurahLabel}" Width="150"/>
+                            <ComboBox Classes="settings-combo"
+                                      ItemsSource="{Binding SurahList}"
+                                      SelectedItem="{Binding SelectedStartSurah}"
+                                      MinWidth="250">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="vm:SurahItem">
+                                        <TextBlock Text="{Binding DisplayText}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </StackPanel>
                         
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Classes="label" Text="To Surah:" Width="150"/>
-                            <NumericUpDown Value="{Binding EndSurah}"
-                                          Minimum="1"
-                                          Maximum="114"
-                                          Increment="1"
-                                          FormatString="0"/>
+                            <TextBlock Classes="label" Text="{Binding Localization.ToSurahLabel}" Width="150"/>
+                            <ComboBox Classes="settings-combo"
+                                      ItemsSource="{Binding SurahList}"
+                                      SelectedItem="{Binding SelectedEndSurah}"
+                                      MinWidth="250">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="vm:SurahItem">
+                                        <TextBlock Text="{Binding DisplayText}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
@@ -182,16 +197,16 @@
             <!-- Online Resources Settings -->
             <Border Classes="settings-card">
                 <StackPanel>
-                    <TextBlock Classes="section-title" Text="🌐 Online Resources"/>
+                    <TextBlock Classes="section-title" Text="{Binding Localization.OnlineResourcesTitle}"/>
                     
-                    <CheckBox Content="🔊 Get Audio Files from Internet"
+                    <CheckBox Content="{Binding Localization.GetAudioFromInternetLabel}"
                               IsChecked="{Binding UseRemoteAudio}"
                               Margin="0,0,0,10"/>
                     
-                    <CheckBox Content="📷 Get Aya Images from Internet"
+                    <CheckBox Content="{Binding Localization.GetImagesFromInternetLabel}"
                               IsChecked="{Binding UseRemoteImages}"/>
                     
-                    <TextBlock Text="Note: Enable these options if local files are not available"
+                    <TextBlock Text="{Binding Localization.OnlineResourcesNoteText}"
                                FontSize="12"
                                FontStyle="Italic"
                                Foreground="#666666"
@@ -205,12 +220,12 @@
                        HorizontalAlignment="Center"
                        Margin="0,10,0,0">
                 <Button Classes="primary"
-                        Content="💾 Save Settings"
+                        Content="{Binding Localization.SaveSettingsButton}"
                         Command="{Binding SaveCommand}"
                         Margin="0,0,15,0"/>
                 
                 <Button Classes="secondary"
-                        Content="❌ Cancel"
+                        Content="{Binding Localization.CancelButton}"
                         Command="{Binding CancelCommand}"/>
             </StackPanel>
         </StackPanel>

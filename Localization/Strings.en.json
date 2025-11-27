@@ -69,5 +69,19 @@
   "GetImagesFromInternet": "Get Aya Images from Internet",
   "OnlineResourcesNote": "Note: Enable these options if local files are not available",
   "SaveSettings": "Save Settings",
-  "Cancel": "Cancel"
+  "Cancel": "Cancel",
+  "SettingsTitle": "⚙️ Settings",
+  "LanguageSettingsTitle": "🗣️ Language Settings",
+  "SelectLanguageLabel": "Select Language:",
+  "SearchDomainTitle": "🔍 Search Domain",
+  "SearchInLabel": "Search In:",
+  "SurahNumberLabel": "Surah:",
+  "FromSurahLabel": "From Surah:",
+  "ToSurahLabel": "To Surah:",
+  "OnlineResourcesTitle": "🌐 Online Resources",
+  "GetAudioFromInternetLabel": "🔊 Get Audio Files from Internet",
+  "GetImagesFromInternetLabel": "📷 Get Aya Images from Internet",
+  "OnlineResourcesNoteText": "Note: Enable these options if local files are not available",
+  "SaveSettingsButton": "💾 Save Settings",
+  "CancelButton": "❌ Cancel"
 }

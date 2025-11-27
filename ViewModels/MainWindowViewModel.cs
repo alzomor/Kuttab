@@ -897,11 +897,9 @@ public class MainWindowViewModel : ViewModelBase
             SelectedLanguage,
             UseRemoteAudio,
             UseRemoteImages,
-            currentSearchDomain)
-        {
-            StartSurah = _searchStartSurah,
-            EndSurah = _searchEndSurah
-        };
+            currentSearchDomain,
+            _searchStartSurah,
+            _searchEndSurah);
 
         var settingsWindow = new Views.SettingsWindow
         {
