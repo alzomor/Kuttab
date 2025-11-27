@@ -44,6 +44,9 @@ public class MainWindowViewModel : ViewModelBase
     private bool _useRemoteImages = false;
     private bool _useRemoteAudio = true; // Default to online audio for portability
     private bool _ignoreNextPlaybackCompleted = false;
+    private SearchDomainType _searchDomainType = SearchDomainType.WholeQuran;
+    private int _searchStartSurah = 1;
+    private int _searchEndSurah = 114;
 
     // Map from display name (may be localized) to Arabic rule name used in rules.json
     private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
@@ -74,6 +77,7 @@ public class MainWindowViewModel : ViewModelBase
         StopCommand = new SimpleCommand(StopPlayback);
         PauseSequenceCommand = new SimpleCommand(PauseSequence);
         ResumeSequenceCommand = new SimpleCommand(ResumeSequence);
+        OpenSettingsCommand = new SimpleCommand(OpenSettings);
         
         _ = LoadDataAsync();
     }
@@ -289,6 +293,7 @@ public class MainWindowViewModel : ViewModelBase
     public ICommand StopCommand { get; }
     public ICommand PauseSequenceCommand { get; }
     public ICommand ResumeSequenceCommand { get; }
+    public ICommand OpenSettingsCommand { get; }
 
     private async Task LoadDataAsync()
     {
@@ -407,8 +412,23 @@ public class MainWindowViewModel : ViewModelBase
                 arabicRuleName = selectedDisplayName; // Fallback: assume it's already Arabic
             }
 
-            // Run search on background thread using Arabic rule name
-            var results = await Task.Run(() => _searchService.SearchPattern(arabicRuleName));
+            // Run search on background thread using Arabic rule name with domain filtering
+            // Pass domain parameters to search service for efficient filtering BEFORE searching
+            var results = await Task.Run(() => 
+            {
+                if (_searchDomainType == SearchDomainType.SingleSurah)
+                {
+                    return _searchService.SearchPattern(arabicRuleName, _searchStartSurah, _searchStartSurah);
+                }
+                else if (_searchDomainType == SearchDomainType.SurahRange)
+                {
+                    return _searchService.SearchPattern(arabicRuleName, _searchStartSurah, _searchEndSurah);
+                }
+                else
+                {
+                    return _searchService.SearchPattern(arabicRuleName);
+                }
+            });
             
             // Update UI on main thread
             SearchResults = new ObservableCollection<QuranAya>(results);
@@ -856,6 +876,56 @@ public class MainWindowViewModel : ViewModelBase
         CurrentPlayingAya = null;
         IsPlayingSequence = false;
         IsSequencePaused = false;
+    }
+
+    private async void OpenSettings()
+    {
+        var currentSearchDomain = new SearchDomainOption
+        {
+            Type = _searchDomainType,
+            DisplayKey = _searchDomainType switch
+            {
+                SearchDomainType.WholeQuran => "WholeQuran",
+                SearchDomainType.SingleSurah => "SingleSurah",
+                SearchDomainType.SurahRange => "SurahRange",
+                _ => "WholeQuran"
+            }
+        };
+
+        var settingsViewModel = new SettingsViewModel(
+            _localizationService,
+            SelectedLanguage,
+            UseRemoteAudio,
+            UseRemoteImages,
+            currentSearchDomain)
+        {
+            StartSurah = _searchStartSurah,
+            EndSurah = _searchEndSurah
+        };
+
+        var settingsWindow = new Views.SettingsWindow
+        {
+            DataContext = settingsViewModel
+        };
+
+        var result = await settingsWindow.ShowDialog<SettingsSavedEventArgs?>(
+            Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow
+                : null);
+
+        if (result != null)
+        {
+            // Apply settings
+            SelectedLanguage = result.SelectedLanguage;
+            UseRemoteAudio = result.UseRemoteAudio;
+            UseRemoteImages = result.UseRemoteImages;
+            _searchDomainType = result.SearchDomain.Type;
+            _searchStartSurah = result.StartSurah;
+            _searchEndSurah = result.EndSurah;
+
+            // Update status message
+            StatusMessage = _localizationService.GetString("SettingsSaved");
+        }
     }
 }
 

@@ -5,29 +5,51 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Language Selector with Icon -->
+    <!-- Settings and Language Row -->
     <LinearLayout
-        android:id="@+id/languageContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginBottom="8dp"
         android:gravity="center_vertical">
-        
-        <TextView
-            android:id="@+id/languageIcon"
+
+        <!-- Settings Button (Gear Icon) -->
+        <Button
+            android:id="@+id/settingsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🌐"
-            android:textSize="24sp"
+            android:text="⚙️"
+            android:textSize="20sp"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp" />
-        
-        <Spinner
-            android:id="@+id/languageSpinner"
+            android:background="#8B7355"
+            android:textColor="#FFFFFF" />
+
+        <!-- Language Selector with Icon -->
+        <LinearLayout
+            android:id="@+id/languageContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            
+            <TextView
+                android:id="@+id/languageIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌐"
+                android:textSize="24sp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp" />
+            
+            <Spinner
+                android:id="@+id/languageSpinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Rule Selector with Icon -->

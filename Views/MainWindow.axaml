@@ -135,7 +135,21 @@
             <Border Grid.Row="0" Classes="islamic-card" Margin="0,0,0,6">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <!-- Language Selector -->
+                        <!-- Settings Button (Gear Icon) -->
+                        <Button Content="⚙️"
+                                Command="{Binding OpenSettingsCommand}"
+                                ToolTip.Tip="Settings"
+                                Background="#8B7355"
+                                Foreground="White"
+                                CornerRadius="8"
+                                Padding="12,8"
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Cursor="Hand"
+                                Margin="0,0,20,0"
+                                VerticalAlignment="Center"/>
+                        
+                        <!-- Language Selector (kept for quick access) -->
                         <TextBlock Text="{Binding Localization.Language}" 
                                    VerticalAlignment="Center" 
                                    Margin="0,0,8,0"
@@ -172,15 +186,6 @@
                                 Classes="primary"
                                 Command="{Binding SearchCommand}"
                                 Margin="0,0,15,0"/>
-                        
-                        <!-- Online Resources Options -->
-                        <CheckBox Content="{Binding Localization.OnlineImages}" 
-                                  IsChecked="{Binding UseRemoteImages}"
-                                  VerticalAlignment="Center"
-                                  Margin="0,0,15,0"/>
-                        <CheckBox Content="{Binding Localization.OnlineAudio}" 
-                                  IsChecked="{Binding UseRemoteAudio}"
-                                  VerticalAlignment="Center"/>
                     </StackPanel>
 
                     <!-- Grouped, expandable Tajweed rules -->

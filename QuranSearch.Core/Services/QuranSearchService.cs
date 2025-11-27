@@ -120,13 +120,25 @@ public class QuranSearchService
         return _rules.FirstOrDefault(r => r.Name == ruleName);
     }
 
-    public List<QuranAya> SearchByRuleName(string ruleName)
+    public List<QuranAya> SearchByRuleName(string ruleName, int? startSurah = null, int? endSurah = null)
     {
         var results = new List<QuranAya>();
         var rule = _rules.FirstOrDefault(r => r.Name == ruleName);
         if (rule == null) return results;
 
-        foreach (var aya in _quranText)
+        // Filter Quran text by domain BEFORE searching (more efficient)
+        var filteredText = _quranText;
+        if (startSurah.HasValue && endSurah.HasValue)
+        {
+            filteredText = _quranText.Where(a => a.SurahNumber >= startSurah.Value && 
+                                                  a.SurahNumber <= endSurah.Value).ToList();
+        }
+        else if (startSurah.HasValue)
+        {
+            filteredText = _quranText.Where(a => a.SurahNumber == startSurah.Value).ToList();
+        }
+
+        foreach (var aya in filteredText)
         {
             foreach (var ruleCase in rule.Cases)
             {
@@ -221,8 +233,8 @@ public class QuranSearchService
         return results;
     }
 
-    public List<QuranAya> SearchPattern(string pattern)
+    public List<QuranAya> SearchPattern(string pattern, int? startSurah = null, int? endSurah = null)
     {
-        return SearchByRuleName(pattern);
+        return SearchByRuleName(pattern, startSurah, endSurah);
     }
 }

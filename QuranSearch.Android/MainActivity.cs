@@ -1,4 +1,5 @@
 using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Widget;
 using Android.Graphics;
@@ -33,6 +34,7 @@ public class MainActivity : AppCompatActivity
     private string? _selectedRuleName;
     private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
     private readonly HashSet<string> _groupHeaders = new();
+    private Button? _settingsButton;
     private Button? _searchButton;
     private Button? _playButton;
     private Button? _playRepeatButton;
@@ -47,6 +49,11 @@ public class MainActivity : AppCompatActivity
     private List<QuranAya> _searchResults = new();
     private int _currentPlayingIndex = -1;
     private bool _isPlayingSequence = false;
+    private SearchDomainType _searchDomainType = SearchDomainType.WholeQuran;
+    private int _searchStartSurah = 1;
+    private int _searchEndSurah = 114;
+    
+    private const int SETTINGS_REQUEST_CODE = 1001;
     
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -59,6 +66,7 @@ public class MainActivity : AppCompatActivity
         InitializeServices();
         InitializeViews();
         SetupRecyclerView();
+        LoadSettings();
         LoadDataAsync();
     }
     
@@ -94,6 +102,7 @@ public class MainActivity : AppCompatActivity
         _ruleIcon = FindViewById<TextView>(Resource.Id.ruleIcon);
         _languageSpinner = FindViewById<Spinner>(Resource.Id.languageSpinner);
         _ruleSpinner = FindViewById<Spinner>(Resource.Id.ruleSpinner);
+        _settingsButton = FindViewById<Button>(Resource.Id.settingsButton);
         _searchButton = FindViewById<Button>(Resource.Id.searchButton);
         _playButton = FindViewById<Button>(Resource.Id.playButton);
         _playRepeatButton = FindViewById<Button>(Resource.Id.playRepeatButton);
@@ -105,6 +114,8 @@ public class MainActivity : AppCompatActivity
         _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerView);
         
         // Setup button click handlers
+        if (_settingsButton != null)
+            _settingsButton.Click += OnSettingsClick;
         if (_searchButton != null)
             _searchButton.Click += OnSearchClick;
         if (_playButton != null)
@@ -212,7 +223,19 @@ public class MainActivity : AppCompatActivity
 
             UpdateStatus(GetString(Resource.String.searching));
             
-            _searchResults = _searchService.SearchByRuleName(arabicRuleName);
+            // Pass domain parameters to search service for efficient filtering BEFORE searching
+            if (_searchDomainType == SearchDomainType.SingleSurah)
+            {
+                _searchResults = _searchService.SearchByRuleName(arabicRuleName, _searchStartSurah, _searchStartSurah);
+            }
+            else if (_searchDomainType == SearchDomainType.SurahRange)
+            {
+                _searchResults = _searchService.SearchByRuleName(arabicRuleName, _searchStartSurah, _searchEndSurah);
+            }
+            else
+            {
+                _searchResults = _searchService.SearchByRuleName(arabicRuleName);
+            }
             
             // Reset highlighted/selected index for new results
             _currentPlayingIndex = -1;
@@ -732,6 +755,70 @@ public class MainActivity : AppCompatActivity
             _stopButton.Enabled = isPlaying;
     }
     
+    private void OnSettingsClick(object? sender, EventArgs e)
+    {
+        var intent = new Intent(this, typeof(SettingsActivity));
+        StartActivityForResult(intent, SETTINGS_REQUEST_CODE);
+    }
+
+    protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
+    {
+        base.OnActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == SETTINGS_REQUEST_CODE && resultCode == Result.Ok)
+        {
+            // Reload settings from SharedPreferences
+            LoadSettings();
+            
+            // Show confirmation
+            Toast.MakeText(this, "Settings applied successfully", ToastLength.Short)?.Show();
+        }
+    }
+
+    private void LoadSettings()
+    {
+        var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
+        
+        // Load language
+        var language = prefs?.GetString("Language", "en") ?? "en";
+        if (_localizationService != null)
+        {
+            _localizationService.CurrentLanguage = language;
+        }
+        
+        // Update language spinner to match
+        var languageIndex = language switch
+        {
+            "ar" => 0,
+            "en" => 1,
+            "de" => 2,
+            _ => 1
+        };
+        _languageSpinner?.SetSelection(languageIndex);
+
+        // Load search domain
+        _searchDomainType = (SearchDomainType)(prefs?.GetInt("SearchDomainType", 0) ?? 0);
+        _searchStartSurah = prefs?.GetInt("StartSurah", 1) ?? 1;
+        _searchEndSurah = prefs?.GetInt("EndSurah", 114) ?? 114;
+
+        // Load online resource settings
+        var useRemoteAudio = prefs?.GetBoolean("UseRemoteAudio", true) ?? true;
+        var useRemoteImages = prefs?.GetBoolean("UseRemoteImages", false) ?? false;
+        
+        if (_audioService != null)
+        {
+            _audioService.UseRemoteSource = useRemoteAudio;
+        }
+        if (_pictureService != null)
+        {
+            _pictureService.UseRemoteSource = useRemoteImages;
+        }
+        if (_useRemoteAudioCheckBox != null)
+        {
+            _useRemoteAudioCheckBox.Checked = useRemoteAudio;
+        }
+    }
+
     protected override void OnDestroy()
     {
         _audioService?.Dispose();
