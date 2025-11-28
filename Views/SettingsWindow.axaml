@@ -203,6 +203,23 @@
                               IsChecked="{Binding UseRemoteAudio}"
                               Margin="0,0,0,10"/>
                     
+                    <!-- Reciter Selection (visible when remote audio is enabled) -->
+                    <StackPanel Orientation="Horizontal" 
+                                IsVisible="{Binding IsReciterSelectionVisible}"
+                                Margin="20,0,0,10">
+                        <TextBlock Classes="label" Text="{Binding Localization.SelectReciterLabel}" Width="130"/>
+                        <ComboBox Classes="settings-combo"
+                                  ItemsSource="{Binding ReciterOptions}"
+                                  SelectedItem="{Binding SelectedReciter}"
+                                  MinWidth="280">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="vm:ReciterOption" x:CompileBindings="False">
+                                    <TextBlock Text="{Binding $parent[Window].DataContext.Localization[DisplayKey]}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                    
                     <CheckBox Content="{Binding Localization.GetImagesFromInternetLabel}"
                               IsChecked="{Binding UseRemoteImages}"/>
                     

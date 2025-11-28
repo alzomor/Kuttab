@@ -1,16 +1,16 @@
 # Quraan App - Installation Instructions
 
-Version: 0.4.0
+Version: 0.6.0
 
 ## 📦 Distribution Packages
 
 This release includes builds for multiple platforms:
 
-- **Windows (x64)**: `Quraan-win-x64-0.4.0.zip`
-- **Linux (x64)**: `Quraan-linux-x64-0.4.0.tar.gz`
-- **macOS (Intel)**: `Quraan-macOS-x64-0.4.0.tar.gz`
-- **macOS (Apple Silicon)**: `Quraan-macOS-arm64-0.4.0.tar.gz`
-- **Android**: `Quraan-android-0.4.0.apk`
+- **Windows (x64)**: `Quraan-win-x64-0.6.0.zip`
+- **Linux (x64)**: `Quraan-linux-x64-0.6.0.tar.gz`
+- **macOS (Intel)**: `Quraan-macOS-x64-0.6.0.tar.gz`
+- **macOS (Apple Silicon)**: `Quraan-macOS-arm64-0.6.0.tar.gz`
+- **Android**: `Quraan-android-0.6.0.apk`
 
 ---
 
@@ -21,7 +21,7 @@ This release includes builds for multiple platforms:
 
 ### Installation Steps
 
-1. **Download** the file: `Quraan-win-x64-0.4.0.zip`
+1. **Download** the file: `Quraan-win-x64-0.6.0.zip`
 
 2. **Extract** the ZIP file:
    - Right-click on the ZIP file
@@ -51,20 +51,20 @@ This release includes builds for multiple platforms:
 
 ### Installation Steps
 
-1. **Download** the file: `Quraan-linux-x64-0.4.0.tar.gz`
+1. **Download** the file: `Quraan-linux-x64-0.6.0.tar.gz`
 
 2. **Extract** the archive:
    ```bash
-   tar -xzf Quraan-linux-x64-0.4.0.tar.gz
+   tar -xzf Quraan-linux-x64-0.6.0.tar.gz
    ```
 
 3. **Move** to installation directory (optional):
    ```bash
-   sudo mv Quraan-linux-x64-0.4.0 /opt/quraan
+   sudo mv Quraan-linux-x64-0.6.0 /opt/quraan
    ```
    Or keep it in your home directory:
    ```bash
-   mv Quraan-linux-x64-0.4.0 ~/quraan
+   mv Quraan-linux-x64-0.6.0 ~/quraan
    ```
 
 4. **Make executable** (if not already):
@@ -106,8 +106,8 @@ Replace `/path/to/quraan/` with your actual installation path.
 - macOS 10.15 (Catalina) or later
 
 ### Choose Your Version
-- **Intel Macs**: Use `Quraan-macOS-x64-0.4.0.tar.gz`
-- **Apple Silicon (M1/M2/M3)**: Use `Quraan-macOS-arm64-0.4.0.tar.gz`
+- **Intel Macs**: Use `Quraan-macOS-x64-0.6.0.tar.gz`
+- **Apple Silicon (M1/M2/M3)**: Use `Quraan-macOS-arm64-0.6.0.tar.gz`
 
 ### Installation Steps
 
@@ -117,9 +117,9 @@ Replace `/path/to/quraan/` with your actual installation path.
    - Double-click the `.tar.gz` file in Finder
    - Or use Terminal:
      ```bash
-     tar -xzf Quraan-macOS-x64-0.4.0.tar.gz
+     tar -xzf Quraan-macOS-x64-0.6.0.tar.gz
      # or for Apple Silicon:
-     tar -xzf Quraan-macOS-arm64-0.4.0.tar.gz
+     tar -xzf Quraan-macOS-arm64-0.6.0.tar.gz
      ```
 
 3. **Move** to Applications folder (optional):
@@ -168,7 +168,7 @@ xattr -cr /path/to/QuranSearchApp
    - Enable "Install unknown apps" or "Unknown sources"
    - Allow installation from your browser/file manager
 
-2. **Download** the file: `Quraan-android-0.4.0.apk`
+2. **Download** the file: `Quraan-android-0.6.0.apk`
    - Transfer to your device if downloaded on computer
 
 3. **Install** the APK:

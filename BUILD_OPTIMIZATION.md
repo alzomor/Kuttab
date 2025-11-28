@@ -77,11 +77,11 @@ python build.py
 
 # Output will be in dist/ folder only
 ls dist/
-# Quraan-win-x64-0.4.0.zip
-# Quraan-linux-x64-0.4.0.tar.gz
-# Quraan-macOS-x64-0.4.0.tar.gz
-# Quraan-macOS-AppleSilicon-0.4.0.tar.gz
-# Quraan-android-0.4.0.apk  ← NEW!
+# Quraan-win-x64-0.6.0.zip
+# Quraan-linux-x64-0.6.0.tar.gz
+# Quraan-macOS-x64-0.6.0.tar.gz
+# Quraan-macOS-AppleSilicon-0.6.0.tar.gz
+# Quraan-android-0.6.0.apk  ← NEW!
 ```
 
 ## Note for Users

@@ -228,6 +228,33 @@
                     android:textSize="14sp"
                     android:minHeight="48dp" />
 
+                <!-- Reciter Selection -->
+                <LinearLayout
+                    android:id="@+id/reciterContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/selectReciterLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/select_reciter_label"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <Spinner
+                        android:id="@+id/reciterSpinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.5"
+                        android:minHeight="48dp" />
+                </LinearLayout>
+
                 <CheckBox
                     android:id="@+id/useRemoteImagesCheckBox"
                     android:layout_width="match_parent"

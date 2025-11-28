@@ -48,6 +48,7 @@ public class MainActivity : AppCompatActivity
     private SearchDomainType _searchDomainType = SearchDomainType.WholeQuran;
     private int _searchStartSurah = 1;
     private int _searchEndSurah = 114;
+    private string _selectedReciter = "Husary_128kbps";
     
     private const int SETTINGS_REQUEST_CODE = 1001;
     
@@ -661,7 +662,7 @@ public class MainActivity : AppCompatActivity
     {
         var paddedSurah = surah.ToString("D3");
         var paddedAya = aya.ToString("D3");
-        return $"https://everyayah.com/data/Husary_128kbps/{paddedSurah}{paddedAya}.mp3";
+        return $"https://everyayah.com/data/{_selectedReciter}/{paddedSurah}{paddedAya}.mp3";
     }
     
     private string GetLocalAudioPath(int surah, int aya)
@@ -748,10 +749,12 @@ public class MainActivity : AppCompatActivity
         // Load online resource settings
         var useRemoteAudio = prefs?.GetBoolean("UseRemoteAudio", true) ?? true;
         var useRemoteImages = prefs?.GetBoolean("UseRemoteImages", false) ?? false;
+        _selectedReciter = prefs?.GetString("SelectedReciter", "Husary_128kbps") ?? "Husary_128kbps";
         
         if (_audioService != null)
         {
             _audioService.UseRemoteSource = useRemoteAudio;
+            _audioService.SelectedReciter = _selectedReciter;
         }
         if (_pictureService != null)
         {

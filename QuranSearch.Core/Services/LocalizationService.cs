@@ -144,6 +144,7 @@ public class LocalizationService : ReactiveObject
     public string GetAudioFromInternetLabel => this["GetAudioFromInternetLabel"];
     public string GetImagesFromInternetLabel => this["GetImagesFromInternetLabel"];
     public string OnlineResourcesNoteText => this["OnlineResourcesNoteText"];
+    public string SelectReciterLabel => this["SelectReciterLabel"];
     public string SaveSettingsButton => this["SaveSettingsButton"];
     public string CancelButton => this["CancelButton"];
 

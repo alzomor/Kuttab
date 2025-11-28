@@ -13,9 +13,10 @@ namespace QuranSearchApp.Services
     public class AudioService : IAudioService
     {
         private readonly string _audioBasePath;
-        private readonly string _remoteAudioBaseUrl = "https://everyayah.com/data/Husary_128kbps";
+        private string _remoteAudioBaseUrl = "https://everyayah.com/data/Husary_128kbps";
         private readonly HttpClient _httpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(30) };
         private bool _useRemoteSource = false;
+        private string _selectedReciter = "Husary_128kbps";
         private Process? _audioProcess;
         private bool _isPlaying;
         private bool _isRepeating;
@@ -30,11 +31,22 @@ namespace QuranSearchApp.Services
             set => _useRemoteSource = value;
         }
 
+        public string SelectedReciter
+        {
+            get => _selectedReciter;
+            set
+            {
+                _selectedReciter = value;
+                _remoteAudioBaseUrl = $"https://everyayah.com/data/{value}";
+                LogDebug($"Reciter changed to: {value}");
+            }
+        }
+
         public AudioService()
         {
             // Look for audio files in the same directory as the executable
             var exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            _audioBasePath = Path.Combine(exeDirectory, "Alhusary");
+            _audioBasePath = Path.Combine(exeDirectory, "AudioCache");
             
             // Log the path for debugging
             LogDebug($"Looking for audio files in: {_audioBasePath}");
@@ -170,9 +182,14 @@ namespace QuranSearchApp.Services
                     Directory.CreateDirectory(_audioBasePath);
                 }
 
-                // Check if file exists in cache
+                // Check if file exists in cache (use reciter-specific folder)
                 string fileName = $"{suraNumber:D3}{ayaNumber:D3}.mp3";
-                string cachedFilePath = Path.Combine(_audioBasePath, fileName);
+                string reciterCachePath = Path.Combine(_audioBasePath, _selectedReciter);
+                if (!Directory.Exists(reciterCachePath))
+                {
+                    Directory.CreateDirectory(reciterCachePath);
+                }
+                string cachedFilePath = Path.Combine(reciterCachePath, fileName);
 
                 if (File.Exists(cachedFilePath))
                 {

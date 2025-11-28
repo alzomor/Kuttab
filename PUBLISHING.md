@@ -103,7 +103,7 @@ Right-click the app and select "Open" the first time, or go to System Preference
 
 The version is automatically read from `QuranSearchApp.csproj`:
 ```xml
-<Version>0.2.0</Version>
+<Version>0.6.0</Version>
 ```
 
 Update this version number before publishing new releases.

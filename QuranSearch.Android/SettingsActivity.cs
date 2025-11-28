@@ -24,6 +24,9 @@ public class SettingsActivity : AppCompatActivity
     private Spinner? _endSurahSpinner;
     private CheckBox? _useRemoteAudioCheckBox;
     private CheckBox? _useRemoteImagesCheckBox;
+    private LinearLayout? _reciterContainer;
+    private TextView? _selectReciterLabel;
+    private Spinner? _reciterSpinner;
     private Button? _saveButton;
     private Button? _cancelButton;
     
@@ -42,6 +45,7 @@ public class SettingsActivity : AppCompatActivity
     private List<LanguageOption> _availableLanguages = new();
     private List<SearchDomainOption> _searchDomainOptions = new();
     private List<string> _surahDisplayNames = new();
+    private List<ReciterOption> _reciterOptions = new();
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -74,6 +78,20 @@ public class SettingsActivity : AppCompatActivity
             new SearchDomainOption { Type = SearchDomainType.SingleSurah, DisplayKey = "SingleSurah" },
             new SearchDomainOption { Type = SearchDomainType.SurahRange, DisplayKey = "SurahRange" }
         };
+        
+        // Initialize reciter options
+        _reciterOptions = new List<ReciterOption>
+        {
+            new ReciterOption { FolderName = "Abdul_Basit_Murattal_192kbps", DisplayNameResId = Resource.String.reciter_abdul_basit },
+            new ReciterOption { FolderName = "Ayman_Sowaid_64kbps", DisplayNameResId = Resource.String.reciter_ayman_sowaid },
+            new ReciterOption { FolderName = "Husary_128kbps", DisplayNameResId = Resource.String.reciter_husary },
+            new ReciterOption { FolderName = "Husary_Muallim_128kbps", DisplayNameResId = Resource.String.reciter_husary_muallim },
+            new ReciterOption { FolderName = "Menshawi_32kbps", DisplayNameResId = Resource.String.reciter_menshawi },
+            new ReciterOption { FolderName = "Mohammad_al_Tablaway_128kbps", DisplayNameResId = Resource.String.reciter_tablaway },
+            new ReciterOption { FolderName = "Mustafa_Ismail_48kbps", DisplayNameResId = Resource.String.reciter_mustafa_ismail },
+            new ReciterOption { FolderName = "Muhammad_Ayyoub_128kbps", DisplayNameResId = Resource.String.reciter_ayyoub },
+            new ReciterOption { FolderName = "mahmoud_ali_al_banna_32kbps", DisplayNameResId = Resource.String.reciter_banna }
+        };
     }
 
     private void InitializeViews()
@@ -86,6 +104,9 @@ public class SettingsActivity : AppCompatActivity
         _startSurahSpinner = FindViewById<Spinner>(Resource.Id.startSurahSpinner);
         _endSurahSpinner = FindViewById<Spinner>(Resource.Id.endSurahSpinner);
         _useRemoteAudioCheckBox = FindViewById<CheckBox>(Resource.Id.useRemoteAudioCheckBox);
+        _reciterContainer = FindViewById<LinearLayout>(Resource.Id.reciterContainer);
+        _selectReciterLabel = FindViewById<TextView>(Resource.Id.selectReciterLabel);
+        _reciterSpinner = FindViewById<Spinner>(Resource.Id.reciterSpinner);
         _useRemoteImagesCheckBox = FindViewById<CheckBox>(Resource.Id.useRemoteImagesCheckBox);
         _saveButton = FindViewById<Button>(Resource.Id.saveButton);
         _cancelButton = FindViewById<Button>(Resource.Id.cancelButton);
@@ -121,6 +142,19 @@ public class SettingsActivity : AppCompatActivity
         
         // Setup surah spinners with number and name
         SetupSurahSpinners();
+        
+        // Setup reciter spinner
+        SetupReciterSpinner();
+    }
+    
+    private void SetupReciterSpinner()
+    {
+        if (_reciterSpinner == null) return;
+        
+        var reciterNames = _reciterOptions.Select(r => GetString(r.DisplayNameResId)).ToList();
+        var adapter = new ArrayAdapter<string>(this, global::Android.Resource.Layout.SimpleSpinnerItem, reciterNames);
+        adapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
+        _reciterSpinner.Adapter = adapter;
     }
     
     private void SetupSurahSpinners()
@@ -196,6 +230,7 @@ public class SettingsActivity : AppCompatActivity
         // Load online resource settings
         var useRemoteAudio = prefs?.GetBoolean("UseRemoteAudio", true) ?? true;
         var useRemoteImages = prefs?.GetBoolean("UseRemoteImages", false) ?? false;
+        var selectedReciter = prefs?.GetString("SelectedReciter", "Husary_128kbps") ?? "Husary_128kbps";
         
         if (_useRemoteAudioCheckBox != null)
         {
@@ -205,6 +240,19 @@ public class SettingsActivity : AppCompatActivity
         {
             _useRemoteImagesCheckBox.Checked = useRemoteImages;
         }
+        
+        // Load reciter selection
+        if (_reciterSpinner != null)
+        {
+            var reciterIndex = _reciterOptions.FindIndex(r => r.FolderName == selectedReciter);
+            if (reciterIndex >= 0)
+            {
+                _reciterSpinner.SetSelection(reciterIndex);
+            }
+        }
+        
+        // Update reciter container visibility based on remote audio setting
+        UpdateReciterVisibility(useRemoteAudio);
 
         // Update visibility based on search domain
         UpdateSearchDomainVisibility(searchDomainType);
@@ -222,6 +270,14 @@ public class SettingsActivity : AppCompatActivity
             _searchDomainSpinner.ItemSelected += (s, e) =>
             {
                 UpdateSearchDomainVisibility(e.Position);
+            };
+        }
+        
+        if (_useRemoteAudioCheckBox != null)
+        {
+            _useRemoteAudioCheckBox.CheckedChange += (s, e) =>
+            {
+                UpdateReciterVisibility(e.IsChecked);
             };
         }
 
@@ -301,6 +357,25 @@ public class SettingsActivity : AppCompatActivity
         if (_useRemoteImagesCheckBox != null)
             _useRemoteImagesCheckBox.Text = _localizationService["GetImagesFromInternetLabel"];
         
+        // Update reciter label
+        if (_selectReciterLabel != null)
+            _selectReciterLabel.Text = GetString(Resource.String.select_reciter_label);
+        
+        // Update reciter spinner with localized names
+        SetupReciterSpinner();
+        
+        // Restore reciter selection after refreshing spinner
+        var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
+        var selectedReciter = prefs?.GetString("SelectedReciter", "Husary_128kbps") ?? "Husary_128kbps";
+        if (_reciterSpinner != null)
+        {
+            var reciterIndex = _reciterOptions.FindIndex(r => r.FolderName == selectedReciter);
+            if (reciterIndex >= 0)
+            {
+                _reciterSpinner.SetSelection(reciterIndex);
+            }
+        }
+        
         // Update buttons
         if (_saveButton != null)
             _saveButton.Text = _localizationService["SaveSettingsButton"];
@@ -326,6 +401,12 @@ public class SettingsActivity : AppCompatActivity
 
         _singleSurahContainer.Visibility = domainType == 1 ? ViewStates.Visible : ViewStates.Gone;
         _surahRangeContainer.Visibility = domainType == 2 ? ViewStates.Visible : ViewStates.Gone;
+    }
+    
+    private void UpdateReciterVisibility(bool useRemoteAudio)
+    {
+        if (_reciterContainer == null) return;
+        _reciterContainer.Visibility = useRemoteAudio ? ViewStates.Visible : ViewStates.Gone;
     }
 
     private void SaveButton_Click(object? sender, EventArgs e)
@@ -374,6 +455,13 @@ public class SettingsActivity : AppCompatActivity
                 // Save online resource settings
                 editor.PutBoolean("UseRemoteAudio", _useRemoteAudioCheckBox?.Checked ?? true);
                 editor.PutBoolean("UseRemoteImages", _useRemoteImagesCheckBox?.Checked ?? false);
+                
+                // Save reciter selection
+                var selectedReciterIndex = _reciterSpinner?.SelectedItemPosition ?? 2; // Default to Husary
+                if (selectedReciterIndex >= 0 && selectedReciterIndex < _reciterOptions.Count)
+                {
+                    editor.PutString("SelectedReciter", _reciterOptions[selectedReciterIndex].FolderName);
+                }
 
                 editor.Apply();
             }
@@ -417,4 +505,10 @@ public enum SearchDomainType
     WholeQuran = 0,
     SingleSurah = 1,
     SurahRange = 2
+}
+
+public class ReciterOption
+{
+    public string FolderName { get; set; } = string.Empty;
+    public int DisplayNameResId { get; set; }
 }

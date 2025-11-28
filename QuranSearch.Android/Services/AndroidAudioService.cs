@@ -24,6 +24,7 @@ public class AndroidAudioService : IAudioService
     }
     
     public bool UseRemoteSource { get; set; } = true;
+    public string SelectedReciter { get; set; } = "Husary_128kbps";
     public bool IsPlaying => _isPlaying;
     public bool IsRepeating => _isRepeating;
     
@@ -236,7 +237,7 @@ public class AndroidAudioService : IAudioService
     {
         var paddedSurah = surah.ToString("D3");
         var paddedAya = aya.ToString("D3");
-        return $"https://everyayah.com/data/Husary_128kbps/{paddedSurah}{paddedAya}.mp3";
+        return $"https://everyayah.com/data/{SelectedReciter}/{paddedSurah}{paddedAya}.mp3";
     }
     
     private string GetLocalAudioAssetsPath(int surah, int aya)
@@ -250,7 +251,8 @@ public class AndroidAudioService : IAudioService
     {
         var paddedSurah = surah.ToString("D3");
         var paddedAya = aya.ToString("D3");
-        var audioDir = Path.Combine(_context.FilesDir!.AbsolutePath, "audio", "AL Husary", "000_versebyverse");
+        // Use reciter-specific folder to cache audio files per reciter
+        var audioDir = Path.Combine(_context.FilesDir!.AbsolutePath, "audio", SelectedReciter);
         Directory.CreateDirectory(audioDir);
         return Path.Combine(audioDir, $"{paddedSurah}{paddedAya}.mp3");
     }

@@ -45,6 +45,18 @@
     <string name="get_audio_from_internet">🔊 Audiodateien aus dem Internet abrufen</string>
     <string name="get_images_from_internet">📷 Aya-Bilder aus dem Internet abrufen</string>
     <string name="online_resources_note">Hinweis: Aktivieren Sie diese Optionen, wenn lokale Dateien nicht verfügbar sind</string>
+    <string name="select_reciter_label">Rezitator:</string>
+    
+    <!-- Reciters -->
+    <string name="reciter_abdul_basit">Abdul Basit (Murattal)</string>
+    <string name="reciter_ayman_sowaid">Ayman Sowaid</string>
+    <string name="reciter_husary">Mahmoud Khalil Al-Husary</string>
+    <string name="reciter_husary_muallim">Al-Husary (Muallim)</string>
+    <string name="reciter_menshawi">Mohamed Siddiq Al-Menshawi</string>
+    <string name="reciter_tablaway">Mohammad Al-Tablaway</string>
+    <string name="reciter_mustafa_ismail">Mustafa Ismail</string>
+    <string name="reciter_ayyoub">Muhammad Ayyoub</string>
+    <string name="reciter_banna">Mahmoud Ali Al-Banna</string>
     <string name="save_settings">💾 Einstellungen speichern</string>
     <string name="cancel">❌ Abbrechen</string>
     <string name="whole_quran">Gesamter Koran (Alle 114 Suren)</string>

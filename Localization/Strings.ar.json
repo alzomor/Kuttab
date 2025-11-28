@@ -82,6 +82,16 @@
   "GetAudioFromInternetLabel": "🔊 الحصول على ملفات الصوت من الإنترنت",
   "GetImagesFromInternetLabel": "📷 الحصول على صور الآيات من الإنترنت",
   "OnlineResourcesNoteText": "ملاحظة: فعّل هذه الخيارات إذا لم تكن الملفات المحلية متاحة",
+  "SelectReciterLabel": "القارئ:",
+  "ReciterAbdulBasit": "عبد الباسط عبد الصمد (مرتل)",
+  "ReciterAymanSowaid": "أيمن سويد",
+  "ReciterHusary": "محمود خليل الحصري",
+  "ReciterHusaryMuallim": "الحصري (المعلم)",
+  "ReciterMenshawi": "محمد صديق المنشاوي",
+  "ReciterTablaway": "محمد الطبلاوي",
+  "ReciterMustafaIsmail": "مصطفى إسماعيل",
+  "ReciterAyyoub": "محمد أيوب",
+  "ReciterBanna": "محمود علي البنا",
   "SaveSettingsButton": "💾 حفظ الإعدادات",
   "CancelButton": "❌ إلغاء"
 }

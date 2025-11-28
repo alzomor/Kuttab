@@ -82,6 +82,16 @@
   "GetAudioFromInternetLabel": "🔊 Audiodateien aus dem Internet abrufen",
   "GetImagesFromInternetLabel": "📷 Aya-Bilder aus dem Internet abrufen",
   "OnlineResourcesNoteText": "Hinweis: Aktivieren Sie diese Optionen, wenn lokale Dateien nicht verfügbar sind",
+  "SelectReciterLabel": "Rezitator:",
+  "ReciterAbdulBasit": "Abdul Basit (Murattal)",
+  "ReciterAymanSowaid": "Ayman Sowaid",
+  "ReciterHusary": "Mahmoud Khalil Al-Husary",
+  "ReciterHusaryMuallim": "Al-Husary (Muallim)",
+  "ReciterMenshawi": "Mohamed Siddiq Al-Menshawi",
+  "ReciterTablaway": "Mohammad Al-Tablaway",
+  "ReciterMustafaIsmail": "Mustafa Ismail",
+  "ReciterAyyoub": "Muhammad Ayyoub",
+  "ReciterBanna": "Mahmoud Ali Al-Banna",
   "SaveSettingsButton": "💾 Einstellungen speichern",
   "CancelButton": "❌ Abbrechen"
 }

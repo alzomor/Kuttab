@@ -47,6 +47,7 @@ public class MainWindowViewModel : ViewModelBase
     private SearchDomainType _searchDomainType = SearchDomainType.WholeQuran;
     private int _searchStartSurah = 1;
     private int _searchEndSurah = 114;
+    private string _selectedReciterFolder = "Husary_128kbps";
 
     // Map from display name (may be localized) to Arabic rule name used in rules.json
     private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
@@ -899,7 +900,8 @@ public class MainWindowViewModel : ViewModelBase
             UseRemoteImages,
             currentSearchDomain,
             _searchStartSurah,
-            _searchEndSurah);
+            _searchEndSurah,
+            _selectedReciterFolder);
 
         var settingsWindow = new Views.SettingsWindow
         {
@@ -920,6 +922,13 @@ public class MainWindowViewModel : ViewModelBase
             _searchDomainType = result.SearchDomain.Type;
             _searchStartSurah = result.StartSurah;
             _searchEndSurah = result.EndSurah;
+            _selectedReciterFolder = result.SelectedReciterFolder;
+            
+            // Update audio service with new reciter
+            if (_audioService is Services.AudioService audioService)
+            {
+                audioService.SelectedReciter = _selectedReciterFolder;
+            }
 
             // Update status message
             StatusMessage = _localizationService.GetString("SettingsSaved");

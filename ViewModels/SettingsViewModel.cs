@@ -17,6 +17,12 @@ public class SurahItem
     public string DisplayText => $"{Number}. {Name}";
 }
 
+public class ReciterOption
+{
+    public string FolderName { get; set; } = string.Empty;
+    public string DisplayKey { get; set; } = string.Empty;
+}
+
 public class SettingsViewModel : ViewModelBase
 {
     private readonly LocalizationService _localizationService;
@@ -28,6 +34,7 @@ public class SettingsViewModel : ViewModelBase
     private int _endSurah = 114;
     private SurahItem? _selectedStartSurah;
     private SurahItem? _selectedEndSurah;
+    private ReciterOption _selectedReciter;
 
     public SettingsViewModel(LocalizationService localizationService, 
                             LanguageOption currentLanguage,
@@ -35,7 +42,8 @@ public class SettingsViewModel : ViewModelBase
                             bool useRemoteImages,
                             SearchDomainOption? currentSearchDomain = null,
                             int startSurah = 1,
-                            int endSurah = 114)
+                            int endSurah = 114,
+                            string? selectedReciterFolder = null)
     {
         _localizationService = localizationService;
         _selectedLanguage = currentLanguage;
@@ -44,6 +52,8 @@ public class SettingsViewModel : ViewModelBase
         _selectedSearchDomain = currentSearchDomain ?? SearchDomainOptions[0];
         _startSurah = startSurah;
         _endSurah = endSurah;
+        _selectedReciter = ReciterOptions.FirstOrDefault(r => r.FolderName == selectedReciterFolder) 
+                          ?? ReciterOptions.First(r => r.FolderName == "Husary_128kbps");
         
         // Initialize surah list
         InitializeSurahList();
@@ -101,6 +111,25 @@ public class SettingsViewModel : ViewModelBase
 
     public bool IsSingleSurahSelected => _selectedSearchDomain?.Type == SearchDomainType.SingleSurah;
     public bool IsSurahRangeSelected => _selectedSearchDomain?.Type == SearchDomainType.SurahRange;
+
+    public List<ReciterOption> ReciterOptions { get; } = new()
+    {
+        new ReciterOption { FolderName = "Abdul_Basit_Murattal_192kbps", DisplayKey = "ReciterAbdulBasit" },
+        new ReciterOption { FolderName = "Ayman_Sowaid_64kbps", DisplayKey = "ReciterAymanSowaid" },
+        new ReciterOption { FolderName = "Husary_128kbps", DisplayKey = "ReciterHusary" },
+        new ReciterOption { FolderName = "Husary_Muallim_128kbps", DisplayKey = "ReciterHusaryMuallim" },
+        new ReciterOption { FolderName = "Menshawi_32kbps", DisplayKey = "ReciterMenshawi" },
+        new ReciterOption { FolderName = "Mohammad_al_Tablaway_128kbps", DisplayKey = "ReciterTablaway" },
+        new ReciterOption { FolderName = "Mustafa_Ismail_48kbps", DisplayKey = "ReciterMustafaIsmail" },
+        new ReciterOption { FolderName = "Muhammad_Ayyoub_128kbps", DisplayKey = "ReciterAyyoub" },
+        new ReciterOption { FolderName = "mahmoud_ali_al_banna_32kbps", DisplayKey = "ReciterBanna" }
+    };
+
+    public ReciterOption SelectedReciter
+    {
+        get => _selectedReciter;
+        set => this.RaiseAndSetIfChanged(ref _selectedReciter, value);
+    }
 
     public ObservableCollection<SurahItem> SurahList { get; } = new();
 
@@ -177,8 +206,14 @@ public class SettingsViewModel : ViewModelBase
     public bool UseRemoteAudio
     {
         get => _useRemoteAudio;
-        set => this.RaiseAndSetIfChanged(ref _useRemoteAudio, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _useRemoteAudio, value);
+            this.RaisePropertyChanged(nameof(IsReciterSelectionVisible));
+        }
     }
+
+    public bool IsReciterSelectionVisible => _useRemoteAudio;
 
     public bool UseRemoteImages
     {
@@ -201,7 +236,8 @@ public class SettingsViewModel : ViewModelBase
             StartSurah = StartSurah,
             EndSurah = EndSurah,
             UseRemoteAudio = UseRemoteAudio,
-            UseRemoteImages = UseRemoteImages
+            UseRemoteImages = UseRemoteImages,
+            SelectedReciterFolder = SelectedReciter?.FolderName ?? "Husary_128kbps"
         };
         
         SettingsSaved?.Invoke(this, args);
@@ -239,4 +275,5 @@ public class SettingsSavedEventArgs : EventArgs
     public int EndSurah { get; set; }
     public bool UseRemoteAudio { get; set; }
     public bool UseRemoteImages { get; set; }
+    public string SelectedReciterFolder { get; set; } = "Husary_128kbps";
 }

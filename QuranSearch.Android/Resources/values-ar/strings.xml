@@ -45,6 +45,18 @@
     <string name="get_audio_from_internet">🔊 الحصول على ملفات الصوت من الإنترنت</string>
     <string name="get_images_from_internet">📷 الحصول على صور الآيات من الإنترنت</string>
     <string name="online_resources_note">ملاحظة: فعّل هذه الخيارات إذا لم تكن الملفات المحلية متاحة</string>
+    <string name="select_reciter_label">القارئ:</string>
+    
+    <!-- Reciters -->
+    <string name="reciter_abdul_basit">عبد الباسط عبد الصمد (مرتل)</string>
+    <string name="reciter_ayman_sowaid">أيمن سويد</string>
+    <string name="reciter_husary">محمود خليل الحصري</string>
+    <string name="reciter_husary_muallim">الحصري (المعلم)</string>
+    <string name="reciter_menshawi">محمد صديق المنشاوي</string>
+    <string name="reciter_tablaway">محمد الطبلاوي</string>
+    <string name="reciter_mustafa_ismail">مصطفى إسماعيل</string>
+    <string name="reciter_ayyoub">محمد أيوب</string>
+    <string name="reciter_banna">محمود علي البنا</string>
     <string name="save_settings">💾 حفظ الإعدادات</string>
     <string name="cancel">❌ إلغاء</string>
     <string name="whole_quran">القرآن الكريم كاملاً (114 سورة)</string>
