@@ -15,6 +15,10 @@
     <!-- Disable AOT compilation to avoid SDK resolution issues -->
     <RunAOTCompilation>false</RunAOTCompilation>
     <EnableLLVM>false</EnableLLVM>
+    <!-- Disable IL Linker trimming to prevent ReactiveUI issues -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <AndroidLinkMode>None</AndroidLinkMode>
   </PropertyGroup>
 
   <ItemGroup>
