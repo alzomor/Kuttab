@@ -24,6 +24,18 @@
             android:layout_marginStart="8dp" />
 
         <Button
+            android:id="@+id/recitationButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="🎧"
+            android:textSize="24sp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:textColor="#FFFFFF"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/settingsButton"
+            android:layout_marginEnd="8dp" />
+
+        <Button
             android:id="@+id/settingsButton"
             android:layout_width="48dp"
             android:layout_height="48dp"

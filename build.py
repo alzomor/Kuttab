@@ -7,7 +7,7 @@ from pathlib import Path
 
 # Configuration
 PROJECT_NAME = "Kuttab"
-VERSION = "0.6.0"
+VERSION = "0.7.0"
 TARGETS = [
     {"rid": "win-x64", "ext": "zip"},
     {"rid": "linux-x64", "ext": "tar.gz"},
@@ -86,11 +86,12 @@ def build_android_apk():
         print("⚠️  Android project not found, skipping Android build")
         return False
     
-    # Build command for Android
+    # Publish command for Android (creates signed APK)
     cmd = [
-        "dotnet", "build",
+        "dotnet", "publish",
         "-c", "Release",
         "-f", "net8.0-android",
+        "-r", "android-arm64",
         "QuranSearch.Android.csproj"
     ]
     
@@ -98,14 +99,22 @@ def build_android_apk():
         print("❌ Failed to build Android APK")
         return False
     
-    # Find the generated APK
-    apk_search_dir = os.path.join(android_project_dir, "bin/Release/net8.0-android")
+    # Find the generated APK (publish outputs to android-arm64 subfolder)
+    apk_search_dir = os.path.join(android_project_dir, "bin/Release/net8.0-android/android-arm64")
+    if not os.path.exists(apk_search_dir):
+        # Fallback to non-RID path
+        apk_search_dir = os.path.join(android_project_dir, "bin/Release/net8.0-android")
+    
     if not os.path.exists(apk_search_dir):
         print("❌ APK output directory not found")
         return False
     
-    # Find APK files (usually named like com.quransearch.android-Signed.apk)
-    apk_files = [f for f in os.listdir(apk_search_dir) if f.endswith(".apk")]
+    # Find signed APK files
+    apk_files = [f for f in os.listdir(apk_search_dir) if f.endswith("-Signed.apk")]
+    if not apk_files:
+        # Fallback to any APK
+        apk_files = [f for f in os.listdir(apk_search_dir) if f.endswith(".apk")]
+    
     if not apk_files:
         print("❌ No APK file found in output directory")
         return False
@@ -118,6 +127,7 @@ def build_android_apk():
         dest_apk = os.path.join("dist", f"{PROJECT_NAME}-android-{VERSION}.apk")
         shutil.copy2(src_apk, dest_apk)
         print(f"✅ Copied APK to: {dest_apk}")
+        break  # Only copy the first (signed) APK
     
     return True
 

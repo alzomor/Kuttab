@@ -32,6 +32,7 @@ public class MainActivity : AppCompatActivity
     private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
     private readonly HashSet<string> _groupHeaders = new();
     private Button? _settingsButton;
+    private Button? _recitationButton;
     private Button? _searchButton;
     private Button? _playButton;
     private Button? _playRepeatButton;
@@ -97,6 +98,7 @@ public class MainActivity : AppCompatActivity
         _ruleIcon = FindViewById<TextView>(Resource.Id.ruleIcon);
         _ruleSpinner = FindViewById<Spinner>(Resource.Id.ruleSpinner);
         _settingsButton = FindViewById<Button>(Resource.Id.settingsButton);
+        _recitationButton = FindViewById<Button>(Resource.Id.recitationButton);
         _searchButton = FindViewById<Button>(Resource.Id.searchButton);
         _playButton = FindViewById<Button>(Resource.Id.playButton);
         _playRepeatButton = FindViewById<Button>(Resource.Id.playRepeatButton);
@@ -109,6 +111,8 @@ public class MainActivity : AppCompatActivity
         // Setup button click handlers
         if (_settingsButton != null)
             _settingsButton.Click += OnSettingsClick;
+        if (_recitationButton != null)
+            _recitationButton.Click += OnRecitationClick;
         if (_searchButton != null)
             _searchButton.Click += OnSearchClick;
         if (_playButton != null)
@@ -710,6 +714,12 @@ public class MainActivity : AppCompatActivity
     {
         var intent = new Intent(this, typeof(SettingsActivity));
         StartActivityForResult(intent, SETTINGS_REQUEST_CODE);
+    }
+    
+    private void OnRecitationClick(object? sender, EventArgs e)
+    {
+        var intent = new Intent(this, typeof(RecitationActivity));
+        StartActivity(intent);
     }
 
     protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
