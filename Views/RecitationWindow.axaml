@@ -1,0 +1,279 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuranSearchApp.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="QuranSearchApp.Views.RecitationWindow"
+        x:DataType="vm:RecitationViewModel"
+        Title="{Binding RecitationModeTitle}"
+        Width="800" Height="600"
+        Background="#F5F5DC"
+        RequestedThemeVariant="Light"
+        FlowDirection="{Binding CurrentFlowDirection}">
+
+    <Design.DataContext>
+        <vm:RecitationViewModel/>
+    </Design.DataContext>
+
+    <Window.Styles>
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#2C5F2D"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="Button.primary:pointerover">
+            <Setter Property="Background" Value="#3A7A3C"/>
+        </Style>
+        <Style Selector="Button.secondary">
+            <Setter Property="Background" Value="#8B7355"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.secondary:pointerover">
+            <Setter Property="Background" Value="#A68968"/>
+        </Style>
+        <Style Selector="Button.danger">
+            <Setter Property="Background" Value="#C84B31"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.danger:pointerover">
+            <Setter Property="Background" Value="#E05A3F"/>
+        </Style>
+        <Style Selector="ComboBox.islamic">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#2C5F2D"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+        <Style Selector="Border.islamic-card">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BoxShadow" Value="0 4 12 0 #20000000"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#2C5F2D" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+            <TextBlock Text="{Binding RecitationModeTitle}" 
+                       FontSize="24" 
+                       FontWeight="Bold" 
+                       Foreground="White"
+                       HorizontalAlignment="Center"/>
+        </Border>
+
+        <!-- Reciter Selection -->
+        <Border Grid.Row="1" Classes="islamic-card" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock Text="{Binding SelectReciterLabel}" 
+                           FontSize="14" 
+                           FontWeight="SemiBold"
+                           Foreground="#2C5F2D"
+                           Margin="0,0,0,8"/>
+                <ComboBox Classes="islamic"
+                          ItemsSource="{Binding Reciters}"
+                          SelectedItem="{Binding SelectedReciter}"
+                          MinWidth="300"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Surah and Aya Selection -->
+        <Border Grid.Row="2" Classes="islamic-card" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Surah Selection -->
+                <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                    <TextBlock Text="{Binding SelectSurahLabel}" 
+                               FontSize="14" 
+                               FontWeight="SemiBold"
+                               Foreground="#2C5F2D"
+                               Margin="0,0,0,8"/>
+                    <ComboBox Classes="islamic"
+                              ItemsSource="{Binding Surahs}"
+                              SelectedItem="{Binding SelectedSurah}"
+                              MinWidth="200"/>
+                </StackPanel>
+
+                <!-- From Aya -->
+                <StackPanel Grid.Column="1" Margin="8,0,8,0">
+                    <TextBlock Text="{Binding FromAyaLabel}" 
+                               FontSize="14" 
+                               FontWeight="SemiBold"
+                               Foreground="#2C5F2D"
+                               Margin="0,0,0,8"/>
+                    <ComboBox Classes="islamic"
+                              ItemsSource="{Binding AyaNumbers}"
+                              SelectedItem="{Binding FromAya}"
+                              MinWidth="100"/>
+                </StackPanel>
+
+                <!-- To Aya -->
+                <StackPanel Grid.Column="2" Margin="8,0,0,0">
+                    <TextBlock Text="{Binding ToAyaLabel}" 
+                               FontSize="14" 
+                               FontWeight="SemiBold"
+                               Foreground="#2C5F2D"
+                               Margin="0,0,0,8"/>
+                    <ComboBox Classes="islamic"
+                              ItemsSource="{Binding AyaNumbers}"
+                              SelectedItem="{Binding ToAya}"
+                              MinWidth="100"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Repeat Settings -->
+        <Border Grid.Row="3" Classes="islamic-card" Margin="0,0,0,12">
+            <StackPanel>
+                <!-- Repeat Mode Selection -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,12">
+                    <TextBlock Text="{Binding RepeatModeLabel}" 
+                               FontSize="14" 
+                               FontWeight="SemiBold"
+                               Foreground="#2C5F2D"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0"/>
+                    <ComboBox Classes="islamic"
+                              ItemsSource="{Binding RepeatModeOptions}"
+                              SelectedItem="{Binding SelectedRepeatMode}"
+                              MinWidth="200"/>
+                </StackPanel>
+                
+                <!-- Repeat Count Selection -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding RepeatCountLabel}" 
+                               FontSize="14" 
+                               FontWeight="SemiBold"
+                               Foreground="#2C5F2D"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0"/>
+                    <ComboBox Classes="islamic"
+                              ItemsSource="{Binding RepeatCountOptions}"
+                              SelectedItem="{Binding RepeatCount}"
+                              MinWidth="80"/>
+                    <TextBlock Text="{Binding TimesLabel}" 
+                               FontSize="14" 
+                               Foreground="#666666"
+                               VerticalAlignment="Center"
+                               Margin="12,0,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Control Buttons -->
+        <Border Grid.Row="4" Classes="islamic-card" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="{Binding StartRecitationLabel}" 
+                        Classes="primary"
+                        Command="{Binding StartCommand}"
+                        IsEnabled="{Binding !IsPlaying}"
+                        Margin="0,0,10,0"/>
+                <Button Content="{Binding StopRecitationLabel}" 
+                        Classes="danger"
+                        Command="{Binding StopCommand}"
+                        IsEnabled="{Binding IsPlaying}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Current Aya Display -->
+        <Border Grid.Row="5" Classes="islamic-card">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Now Playing Label -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="{Binding NowPlayingLabel}" 
+                               FontSize="14" 
+                               FontWeight="SemiBold"
+                               Foreground="#2C5F2D"/>
+                    <TextBlock Text="{Binding CurrentAyaInfo}" 
+                               FontSize="14" 
+                               FontWeight="Bold"
+                               Foreground="#4CAF50"
+                               Margin="8,0,0,0"/>
+                </StackPanel>
+
+                <!-- Playback Status -->
+                <Border Grid.Row="1" 
+                        Background="#FFF3CD" 
+                        BorderBrush="#FFE69C"
+                        BorderThickness="2"
+                        CornerRadius="6"
+                        Padding="12,6"
+                        Margin="0,0,0,12"
+                        IsVisible="{Binding IsPlaying}">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="🔴" FontSize="14" Margin="0,0,6,0"/>
+                        <TextBlock Text="{Binding PlayingLabel}" 
+                                   FontWeight="SemiBold"
+                                   Foreground="#856404"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Aya Text Display -->
+                <Border Grid.Row="2" 
+                        Background="#FAFAF8"
+                        BorderBrush="#D4C5B0"
+                        BorderThickness="2"
+                        CornerRadius="8"
+                        Padding="20">
+                    <ScrollViewer>
+                        <TextBlock Text="{Binding CurrentAyaText}" 
+                                   FontSize="28"
+                                   FontFamily="Traditional Arabic"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="#333333"/>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="6" 
+                Background="#2C5F2D" 
+                CornerRadius="8"
+                Padding="12,8" 
+                Margin="0,12,0,0">
+            <TextBlock Text="{Binding StatusMessage}" 
+                       Foreground="White"
+                       FontWeight="SemiBold"
+                       FontSize="13"/>
+        </Border>
+    </Grid>
+</Window>

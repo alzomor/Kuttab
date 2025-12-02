@@ -147,6 +147,22 @@ public class LocalizationService : ReactiveObject
     public string SelectReciterLabel => this["SelectReciterLabel"];
     public string SaveSettingsButton => this["SaveSettingsButton"];
     public string CancelButton => this["CancelButton"];
+    
+    // Recitation mode properties
+    public string OpenRecitation => this["OpenRecitation"];
+    public string RecitationMode => this["RecitationMode"];
+    public string SelectReciter => this["SelectReciter"];
+    public string SelectSurah => this["SelectSurah"];
+    public string FromAya => this["FromAya"];
+    public string ToAya => this["ToAya"];
+    public string StartRecitation => this["StartRecitation"];
+    public string StopRecitation => this["StopRecitation"];
+    public string PreviousAya => this["PreviousAya"];
+    public string NextAya => this["NextAya"];
+    public string NowPlaying => this["NowPlaying"];
+    public string Stopped => this["Stopped"];
+    public string RecitationComplete => this["RecitationComplete"];
+    public string Basmalah => this["Basmalah"];
 
     public bool IsRightToLeft => _currentLanguage == "ar";
 

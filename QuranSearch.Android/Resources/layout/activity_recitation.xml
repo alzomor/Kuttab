@@ -24,6 +24,7 @@
             android:layout_alignParentStart="true" />
 
         <TextView
+            android:id="@+id/titleTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/recitation_mode"
@@ -59,6 +60,7 @@
 
             <!-- Reciter Selection -->
             <TextView
+                android:id="@+id/reciterLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/select_reciter_label"
@@ -75,6 +77,7 @@
 
             <!-- Surah Selection -->
             <TextView
+                android:id="@+id/surahLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/select_surah"
@@ -104,6 +107,7 @@
                     android:layout_marginEnd="8dp">
 
                     <TextView
+                        android:id="@+id/fromAyaLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/from_aya"
@@ -125,6 +129,7 @@
                     android:layout_marginStart="8dp">
 
                     <TextView
+                        android:id="@+id/toAyaLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/to_aya"
@@ -139,12 +144,70 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Repeat Mode Selection -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/repeatModeLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/repeat_mode"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="12dp" />
+
+                <Spinner
+                    android:id="@+id/repeatModeSpinner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/btn_dropdown" />
+            </LinearLayout>
+
+            <!-- Repeat Count Selection -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/repeatCountLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/repeat_count"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="12dp" />
+
+                <Spinner
+                    android:id="@+id/repeatCountSpinner"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/btn_dropdown" />
+
+                <TextView
+                    android:id="@+id/timesLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/times"
+                    android:textSize="14sp"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
+
             <!-- Control Buttons -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:gravity="center"
+                android:layout_marginBottom="16dp">
 
                 <Button
                     android:id="@+id/startButton"
@@ -160,32 +223,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/stop_recitation"
-                    android:enabled="false"
-                    android:layout_marginStart="4dp" />
-            </LinearLayout>
-
-            <!-- Navigation Buttons -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-                <Button
-                    android:id="@+id/previousButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/previous_aya"
-                    android:enabled="false"
-                    android:layout_marginEnd="4dp" />
-
-                <Button
-                    android:id="@+id/nextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/next_aya"
                     android:enabled="false"
                     android:layout_marginStart="4dp" />
             </LinearLayout>

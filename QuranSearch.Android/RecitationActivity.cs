@@ -8,6 +8,7 @@ using AndroidX.AppCompat.App;
 using QuranSearch.Android.Services;
 using QuranSearch.Core.Models;
 using QuranSearch.Core.Services;
+using LocalizationService = QuranSearch.Core.Services.LocalizationService;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ public class RecitationActivity : AppCompatActivity
     private AndroidAudioService? _audioService;
     private AndroidPictureService? _pictureService;
     private QuranSearchService? _searchService;
+    private LocalizationService? _localizationService;
     
     // UI Elements
     private Button? _backButton;
@@ -31,11 +33,22 @@ public class RecitationActivity : AppCompatActivity
     private Spinner? _toAyaSpinner;
     private Button? _startButton;
     private Button? _stopButton;
-    private Button? _previousButton;
-    private Button? _nextButton;
+    private Spinner? _repeatCountSpinner;
+    private Spinner? _repeatModeSpinner;
     private TextView? _currentAyaInfo;
     private TextView? _ayaTextView;
     private ImageView? _ayaImage;
+    
+    // Labels for dynamic language update
+    private TextView? _titleTextView;
+    private TextView? _reciterLabel;
+    private TextView? _surahLabel;
+    private TextView? _fromAyaLabel;
+    private TextView? _toAyaLabel;
+    private TextView? _repeatCountLabel;
+    private TextView? _timesLabel;
+    private TextView? _repeatModeLabel;
+    private TextView? _nowPlayingLabel;
     
     // State
     private int _selectedSurah = 1;
@@ -48,6 +61,12 @@ public class RecitationActivity : AppCompatActivity
     private bool _playingBasmalah = false;
     private string _selectedReciter = "Husary_128kbps";
     private List<QuranAya> _quranData = new();
+    
+    // Repeat count state
+    private int _repeatCount = 1;
+    private int _currentRepeat = 1;
+    private int _currentAyaRepeat = 1;
+    private bool _repeatEachAya = false;
     
     // Reciters list (same as SettingsActivity)
     private readonly List<(string Key, string Name)> _reciters = new()
@@ -90,6 +109,7 @@ public class RecitationActivity : AppCompatActivity
             _audioService = new AndroidAudioService(this);
             _pictureService = new AndroidPictureService(this);
             _searchService = new QuranSearchService(fileService);
+            _localizationService = new LocalizationService(fileService);
             
             if (_audioService != null)
             {
@@ -114,11 +134,22 @@ public class RecitationActivity : AppCompatActivity
         _toAyaSpinner = FindViewById<Spinner>(Resource.Id.toAyaSpinner);
         _startButton = FindViewById<Button>(Resource.Id.startButton);
         _stopButton = FindViewById<Button>(Resource.Id.stopButton);
-        _previousButton = FindViewById<Button>(Resource.Id.previousButton);
-        _nextButton = FindViewById<Button>(Resource.Id.nextButton);
+        _repeatCountSpinner = FindViewById<Spinner>(Resource.Id.repeatCountSpinner);
+        _repeatModeSpinner = FindViewById<Spinner>(Resource.Id.repeatModeSpinner);
         _currentAyaInfo = FindViewById<TextView>(Resource.Id.currentAyaInfo);
         _ayaTextView = FindViewById<TextView>(Resource.Id.ayaTextView);
         _ayaImage = FindViewById<ImageView>(Resource.Id.ayaImage);
+        
+        // Labels for dynamic language update
+        _titleTextView = FindViewById<TextView>(Resource.Id.titleTextView);
+        _reciterLabel = FindViewById<TextView>(Resource.Id.reciterLabel);
+        _surahLabel = FindViewById<TextView>(Resource.Id.surahLabel);
+        _fromAyaLabel = FindViewById<TextView>(Resource.Id.fromAyaLabel);
+        _toAyaLabel = FindViewById<TextView>(Resource.Id.toAyaLabel);
+        _repeatCountLabel = FindViewById<TextView>(Resource.Id.repeatCountLabel);
+        _timesLabel = FindViewById<TextView>(Resource.Id.timesLabel);
+        _repeatModeLabel = FindViewById<TextView>(Resource.Id.repeatModeLabel);
+        _nowPlayingLabel = FindViewById<TextView>(Resource.Id.nowPlayingLabel);
         
         // Setup click handlers
         if (_backButton != null)
@@ -129,15 +160,20 @@ public class RecitationActivity : AppCompatActivity
             _startButton.Click += OnStartClick;
         if (_stopButton != null)
             _stopButton.Click += OnStopClick;
-        if (_previousButton != null)
-            _previousButton.Click += OnPreviousClick;
-        if (_nextButton != null)
-            _nextButton.Click += OnNextClick;
     }
     
     private void LoadSettings()
     {
         var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
+        
+        // Load language setting
+        var language = prefs?.GetString("Language", "en") ?? "en";
+        if (_localizationService != null)
+        {
+            _localizationService.CurrentLanguage = language;
+            UpdateUIStrings();
+            UpdateLayoutDirection(language);
+        }
         
         var useRemoteAudio = prefs?.GetBoolean("UseRemoteAudio", true) ?? true;
         var useRemoteImages = prefs?.GetBoolean("UseRemoteImages", false) ?? false;
@@ -151,6 +187,50 @@ public class RecitationActivity : AppCompatActivity
         if (_pictureService != null)
         {
             _pictureService.UseRemoteSource = useRemoteImages;
+        }
+    }
+    
+    private void UpdateUIStrings()
+    {
+        if (_localizationService == null) return;
+        
+        // Update title
+        if (_titleTextView != null)
+            _titleTextView.Text = _localizationService["RecitationMode"];
+        
+        // Update labels
+        if (_reciterLabel != null)
+            _reciterLabel.Text = _localizationService["SelectReciter"];
+        if (_surahLabel != null)
+            _surahLabel.Text = _localizationService["SelectSurah"];
+        if (_fromAyaLabel != null)
+            _fromAyaLabel.Text = _localizationService["FromAya"];
+        if (_toAyaLabel != null)
+            _toAyaLabel.Text = _localizationService["ToAya"];
+        if (_repeatCountLabel != null)
+            _repeatCountLabel.Text = _localizationService["RepeatCount"];
+        if (_timesLabel != null)
+            _timesLabel.Text = _localizationService["Times"];
+        if (_repeatModeLabel != null)
+            _repeatModeLabel.Text = _localizationService["RepeatMode"];
+        if (_nowPlayingLabel != null)
+            _nowPlayingLabel.Text = _localizationService["NowPlaying"];
+        
+        // Update buttons
+        if (_startButton != null)
+            _startButton.Text = _localizationService["StartRecitation"];
+        if (_stopButton != null)
+            _stopButton.Text = _localizationService["StopRecitation"];
+    }
+    
+    private void UpdateLayoutDirection(string language)
+    {
+        var layoutDirection = language == "ar" ? LayoutDirection.Rtl : LayoutDirection.Ltr;
+        
+        // Set layout direction on the root view
+        if (Window?.DecorView != null)
+        {
+            Window.DecorView.LayoutDirection = layoutDirection;
         }
     }
     
@@ -194,6 +274,58 @@ public class RecitationActivity : AppCompatActivity
         
         // Initial Aya spinners setup
         UpdateAyaSpinners();
+        
+        // Setup Repeat Spinners
+        SetupRepeatSpinners();
+    }
+    
+    private void SetupRepeatSpinners()
+    {
+        // Setup Repeat Count Spinner (1-100)
+        var repeatCounts = new List<string>();
+        for (int i = 1; i <= 100; i++)
+        {
+            repeatCounts.Add(i.ToString());
+        }
+        
+        var repeatAdapter = new ArrayAdapter<string>(this,
+            global::Android.Resource.Layout.SimpleSpinnerItem, repeatCounts);
+        repeatAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
+        
+        if (_repeatCountSpinner != null)
+        {
+            _repeatCountSpinner.Adapter = repeatAdapter;
+            _repeatCountSpinner.SetSelection(0); // Default to 1
+            _repeatCountSpinner.ItemSelected += OnRepeatCountSelected;
+        }
+        
+        // Setup Repeat Mode Spinner
+        var repeatModes = new List<string>
+        {
+            _localizationService?["RepeatWholeRange"] ?? "Repeat Whole Range",
+            _localizationService?["RepeatEachAya"] ?? "Repeat Each Aya"
+        };
+        
+        var modeAdapter = new ArrayAdapter<string>(this,
+            global::Android.Resource.Layout.SimpleSpinnerItem, repeatModes);
+        modeAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
+        
+        if (_repeatModeSpinner != null)
+        {
+            _repeatModeSpinner.Adapter = modeAdapter;
+            _repeatModeSpinner.SetSelection(0); // Default to Repeat Whole Range
+            _repeatModeSpinner.ItemSelected += OnRepeatModeSelected;
+        }
+    }
+    
+    private void OnRepeatCountSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
+    {
+        _repeatCount = e.Position + 1; // 1-based
+    }
+    
+    private void OnRepeatModeSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
+    {
+        _repeatEachAya = (e.Position == 1); // 0 = Whole Range, 1 = Each Aya
     }
     
     private void UpdateAyaSpinners()
@@ -305,20 +437,12 @@ public class RecitationActivity : AppCompatActivity
         StopRecitation();
     }
     
-    private void OnPreviousClick(object? sender, EventArgs e)
-    {
-        PlayPreviousAya();
-    }
-    
-    private void OnNextClick(object? sender, EventArgs e)
-    {
-        PlayNextAya();
-    }
-    
     private void StartRecitation()
     {
         _currentSurah = _selectedSurah;
         _currentAya = _fromAya;
+        _currentRepeat = 1;
+        _currentAyaRepeat = 1;
         _isPlaying = true;
         
         // Check if we need Basmalah for the first Aya
@@ -332,38 +456,13 @@ public class RecitationActivity : AppCompatActivity
     {
         _isPlaying = false;
         _playingBasmalah = false;
+        _currentRepeat = 1;
+        _currentAyaRepeat = 1;
         _audioService?.StopAsync();
         UpdateButtonStates();
         
         if (_currentAyaInfo != null)
-            _currentAyaInfo.Text = GetString(Resource.String.stopped);
-    }
-    
-    private void PlayPreviousAya()
-    {
-        if (_currentAya > _fromAya)
-        {
-            _currentAya--;
-        }
-        else if (_currentSurah > _selectedSurah)
-        {
-            // Go to previous surah's last aya in range
-            _currentSurah--;
-            _currentAya = SurahInfo.GetAyaCount(_currentSurah);
-        }
-        
-        _needsBasmalah = false; // Don't play Basmalah when navigating manually
-        PlayCurrentAya();
-    }
-    
-    private void PlayNextAya()
-    {
-        MoveToNextAya();
-        if (_isPlaying)
-        {
-            _needsBasmalah = false; // Don't play Basmalah when navigating manually
-            PlayCurrentAya();
-        }
+            _currentAyaInfo.Text = _localizationService?["Stopped"] ?? GetString(Resource.String.stopped);
     }
     
     private bool ShouldPlayBasmalah(int surah, int aya, bool isStartOfRecitation)
@@ -422,16 +521,42 @@ public class RecitationActivity : AppCompatActivity
             if (isBasmalah)
             {
                 if (_currentAyaInfo != null)
-                    _currentAyaInfo.Text = GetString(Resource.String.playing_basmalah);
+                    _currentAyaInfo.Text = _localizationService?["PlayingBasmala"] ?? GetString(Resource.String.playing_basmalah);
                 if (_ayaTextView != null)
-                    _ayaTextView.Text = GetString(Resource.String.basmalah);
+                    _ayaTextView.Text = _localizationService?["Basmalah"] ?? GetString(Resource.String.basmalah);
             }
             else
             {
                 string surahName = SurahInfo.GetSurahName(_currentSurah);
                 if (_currentAyaInfo != null)
-                    _currentAyaInfo.Text = string.Format(GetString(Resource.String.surah_aya_format), 
-                        surahName, _currentAya);
+                {
+                    var surahLabel = _localizationService?["Surah"] ?? "Surah";
+                    var ayaLabel = _localizationService?["Aya"] ?? "Aya";
+                    
+                    // Add repeat info if repeating more than once
+                    string repeatInfo = "";
+                    if (_repeatCount > 1)
+                    {
+                        if (_repeatEachAya)
+                        {
+                            // Show aya repeat info: "Aya 5 - Repeat 2 of 3"
+                            var ayaRepeatStr = _localizationService?["AyaRepeat"] ?? "Aya {0} - Repeat {1} of {2}";
+                            repeatInfo = $" - {string.Format(ayaRepeatStr, _currentAya, _currentAyaRepeat, _repeatCount)}";
+                            _currentAyaInfo.Text = $"{surahLabel} {surahName}{repeatInfo}";
+                        }
+                        else
+                        {
+                            // Show range repeat info: "Repeat 2 of 3"
+                            var currentRepeatStr = _localizationService?["CurrentRepeat"] ?? "Repeat {0} of {1}";
+                            repeatInfo = $" - {string.Format(currentRepeatStr, _currentRepeat, _repeatCount)}";
+                            _currentAyaInfo.Text = $"{surahLabel} {surahName} - {ayaLabel} {_currentAya}{repeatInfo}";
+                        }
+                    }
+                    else
+                    {
+                        _currentAyaInfo.Text = $"{surahLabel} {surahName} - {ayaLabel} {_currentAya}";
+                    }
+                }
                 
                 // Get and display the Aya text
                 var ayaText = GetAyaText(_currentSurah, _currentAya);
@@ -517,6 +642,7 @@ public class RecitationActivity : AppCompatActivity
             if (_playingBasmalah)
             {
                 _playingBasmalah = false;
+                _needsBasmalah = false; // Clear the flag so we don't play Basmalah again
                 PlayCurrentAya();
                 return;
             }
@@ -533,50 +659,89 @@ public class RecitationActivity : AppCompatActivity
     
     private void MoveToNextAya()
     {
-        int maxAyaInCurrentSurah = (_currentSurah == _selectedSurah) ? _toAya : SurahInfo.GetAyaCount(_currentSurah);
-        
-        if (_currentAya < maxAyaInCurrentSurah)
+        if (_repeatEachAya)
         {
-            _currentAya++;
+            // Repeat Each Aya mode
+            if (_currentAyaRepeat < _repeatCount)
+            {
+                // Repeat current aya
+                _currentAyaRepeat++;
+            }
+            else
+            {
+                // Move to next aya
+                _currentAyaRepeat = 1;
+                if (_currentAya < _toAya)
+                {
+                    _currentAya++;
+                    _needsBasmalah = ShouldPlayBasmalah(_currentSurah, _currentAya, false);
+                }
+                else
+                {
+                    // All ayas complete
+                    _isPlaying = false;
+                    UpdateButtonStates();
+                    
+                    var completeText = _localizationService?["RecitationComplete"] ?? GetString(Resource.String.recitation_complete);
+                    if (_currentAyaInfo != null)
+                        _currentAyaInfo.Text = completeText;
+                    
+                    Toast.MakeText(this, completeText, ToastLength.Short)?.Show();
+                }
+            }
         }
         else
         {
-            // Check if we should continue to next Surah
-            // For now, we only play within the selected Surah range
-            if (_currentSurah == _selectedSurah && _currentAya >= _toAya)
+            // Repeat Whole Range mode
+            int maxAyaInCurrentSurah = (_currentSurah == _selectedSurah) ? _toAya : SurahInfo.GetAyaCount(_currentSurah);
+            
+            if (_currentAya < maxAyaInCurrentSurah)
             {
-                // Recitation complete
-                _isPlaying = false;
-                UpdateButtonStates();
-                
-                if (_currentAyaInfo != null)
-                    _currentAyaInfo.Text = GetString(Resource.String.recitation_complete);
-                
-                Toast.MakeText(this, GetString(Resource.String.recitation_complete), ToastLength.Short)?.Show();
-                return;
+                _currentAya++;
+                _needsBasmalah = ShouldPlayBasmalah(_currentSurah, _currentAya, false);
             }
-            
-            // Move to next Surah
-            _currentSurah++;
-            _currentAya = 1;
-            
-            // Check if we need Basmalah for the new Surah
-            _needsBasmalah = ShouldPlayBasmalah(_currentSurah, _currentAya, false);
+            else
+            {
+                // Check if we should continue to next Surah or repeat
+                if (_currentSurah == _selectedSurah && _currentAya >= _toAya)
+                {
+                    // Finished one repeat cycle
+                    if (_currentRepeat < _repeatCount)
+                    {
+                        // Start next repeat cycle
+                        _currentRepeat++;
+                        _currentAya = _fromAya;
+                        _needsBasmalah = ShouldPlayBasmalah(_currentSurah, _currentAya, true);
+                    }
+                    else
+                    {
+                        // All repeats complete
+                        _isPlaying = false;
+                        UpdateButtonStates();
+                        
+                        var completeText = _localizationService?["RecitationComplete"] ?? GetString(Resource.String.recitation_complete);
+                        if (_currentAyaInfo != null)
+                            _currentAyaInfo.Text = completeText;
+                        
+                        Toast.MakeText(this, completeText, ToastLength.Short)?.Show();
+                    }
+                    return;
+                }
+                
+                // Move to next Surah
+                _currentSurah++;
+                _currentAya = 1;
+                _needsBasmalah = ShouldPlayBasmalah(_currentSurah, _currentAya, false);
+            }
         }
     }
     
     private void UpdateButtonStates()
     {
-        bool isAudioPlaying = _audioService?.IsPlaying ?? false;
-        
         if (_startButton != null)
             _startButton.Enabled = !_isPlaying;
         if (_stopButton != null)
             _stopButton.Enabled = _isPlaying;
-        if (_previousButton != null)
-            _previousButton.Enabled = _isPlaying;
-        if (_nextButton != null)
-            _nextButton.Enabled = _isPlaying;
     }
     
     private void OnSettingsClick(object? sender, EventArgs e)

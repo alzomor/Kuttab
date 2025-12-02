@@ -79,6 +79,7 @@ public class MainWindowViewModel : ViewModelBase
         PauseSequenceCommand = new SimpleCommand(PauseSequence);
         ResumeSequenceCommand = new SimpleCommand(ResumeSequence);
         OpenSettingsCommand = new SimpleCommand(OpenSettings);
+        OpenRecitationCommand = new SimpleCommand(OpenRecitation);
         
         _ = LoadDataAsync();
     }
@@ -295,6 +296,7 @@ public class MainWindowViewModel : ViewModelBase
     public ICommand PauseSequenceCommand { get; }
     public ICommand ResumeSequenceCommand { get; }
     public ICommand OpenSettingsCommand { get; }
+    public ICommand OpenRecitationCommand { get; }
 
     private async Task LoadDataAsync()
     {
@@ -877,6 +879,21 @@ public class MainWindowViewModel : ViewModelBase
         CurrentPlayingAya = null;
         IsPlayingSequence = false;
         IsSequencePaused = false;
+    }
+
+    private async void OpenRecitation()
+    {
+        var recitationViewModel = new RecitationViewModel(_localizationService, _selectedReciterFolder);
+        
+        var recitationWindow = new Views.RecitationWindow
+        {
+            DataContext = recitationViewModel
+        };
+        
+        await recitationWindow.ShowDialog(
+            Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow
+                : null);
     }
 
     private async void OpenSettings()
