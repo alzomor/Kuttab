@@ -1,0 +1,209 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuranSearchApp.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="650" d:DesignHeight="600"
+        x:Class="QuranSearchApp.Views.InfoWindow"
+        x:DataType="vm:InfoViewModel"
+        Title="{Binding Localization.InfoTitle}"
+        Width="650" Height="600"
+        Background="#F5F5DC"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Design.DataContext>
+        <vm:InfoViewModel/>
+    </Design.DataContext>
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="CardBackground" Color="White"/>
+        <SolidColorBrush x:Key="TextColor" Color="#333333"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#2C5F2D"/>
+        <SolidColorBrush x:Key="LinkColor" Color="#1565C0"/>
+    </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextColor}"/>
+        </Style>
+        
+        <Style Selector="Border.info-card">
+            <Setter Property="Background" Value="{DynamicResource CardBackground}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BoxShadow" Value="0 4 12 0 #20000000"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+        </Style>
+        
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource AccentColor}"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+        
+        <Style Selector="TextBlock.resource-title">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#444444"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        
+        <Style Selector="TextBlock.resource-description">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#666666"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        
+        <Style Selector="TextBlock.link">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{DynamicResource LinkColor}"/>
+            <Setter Property="TextDecorations" Value="Underline"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#2C5F2D"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="30,12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        
+        <Style Selector="Button.primary:pointerover">
+            <Setter Property="Background" Value="#3A7A3C"/>
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20">
+            <!-- App Title and Version -->
+            <Border Classes="info-card">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="📖 القرآن الكريم" 
+                               FontSize="28" 
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AccentColor}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding Localization.AppSubtitle}" 
+                               FontSize="16" 
+                               Foreground="#666666"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding AppVersion}" 
+                               FontSize="14" 
+                               Foreground="#888888"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Resources & Credits -->
+            <Border Classes="info-card">
+                <StackPanel>
+                    <TextBlock Classes="section-title" Text="{Binding Localization.ResourcesCreditsTitle}"/>
+                    
+                    <!-- EveryAyah.com -->
+                    <Border Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="🔊 " FontSize="16"/>
+                                <TextBlock Classes="resource-title" Text="{Binding Localization.AudioImagesSource}"/>
+                            </StackPanel>
+                            <TextBlock Classes="resource-description" Text="{Binding Localization.EveryAyahDescription}"/>
+                            <TextBlock Classes="link" 
+                                       Text="https://www.everyayah.com/"
+                                       PointerPressed="OnLinkClicked"
+                                       Tag="https://www.everyayah.com/"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Tanzil.net -->
+                    <Border Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="📜 " FontSize="16"/>
+                                <TextBlock Classes="resource-title" Text="{Binding Localization.QuranTextSource}"/>
+                            </StackPanel>
+                            <TextBlock Classes="resource-description" Text="{Binding Localization.TanzilDescription}"/>
+                            <TextBlock Classes="link" 
+                                       Text="https://tanzil.net/"
+                                       PointerPressed="OnLinkClicked"
+                                       Tag="https://tanzil.net/"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Development Tools -->
+            <Border Classes="info-card">
+                <StackPanel>
+                    <TextBlock Classes="section-title" Text="{Binding Localization.DevelopmentToolsTitle}"/>
+                    
+                    <!-- Usul.ai -->
+                    <Border Background="#FFF8E1" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="📚 " FontSize="16"/>
+                                <TextBlock Classes="resource-title" Text="{Binding Localization.TajweedReviewTitle}"/>
+                            </StackPanel>
+                            <TextBlock Classes="resource-description" Text="{Binding Localization.UsulAiDescription}"/>
+                            <TextBlock Classes="link" 
+                                       Text="https://usul.ai/"
+                                       PointerPressed="OnLinkClicked"
+                                       Tag="https://usul.ai/"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Windsurf -->
+                    <Border Background="#E3F2FD" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="💻 " FontSize="16"/>
+                                <TextBlock Classes="resource-title" Text="{Binding Localization.CodingAssistantTitle}"/>
+                            </StackPanel>
+                            <TextBlock Classes="resource-description" Text="{Binding Localization.WindsurfDescription}"/>
+                            <TextBlock Classes="link" 
+                                       Text="https://codeium.com/windsurf"
+                                       PointerPressed="OnLinkClicked"
+                                       Tag="https://codeium.com/windsurf"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Acknowledgment -->
+            <Border Classes="info-card">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding Localization.AcknowledgmentText}" 
+                               FontSize="14" 
+                               FontStyle="Italic"
+                               Foreground="#666666"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ" 
+                               FontSize="20" 
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource AccentColor}"
+                               HorizontalAlignment="Center"
+                               FontFamily="Traditional Arabic"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Close Button -->
+            <StackPanel Orientation="Horizontal" 
+                       HorizontalAlignment="Center"
+                       Margin="0,5,0,0">
+                <Button Classes="primary"
+                        Content="{Binding Localization.CloseButton}"
+                        Command="{Binding CloseCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

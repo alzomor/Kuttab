@@ -38,6 +38,7 @@ public class RecitationActivity : AppCompatActivity
     private TextView? _currentAyaInfo;
     private TextView? _ayaTextView;
     private ImageView? _ayaImage;
+    private CheckBox? _teacherModeCheckbox;
     
     // Labels for dynamic language update
     private TextView? _titleTextView;
@@ -67,6 +68,8 @@ public class RecitationActivity : AppCompatActivity
     private int _currentRepeat = 1;
     private int _currentAyaRepeat = 1;
     private bool _repeatEachAya = false;
+    private bool _teacherModeEnabled = false;
+    private DateTime _currentAyaStartTime = DateTime.UtcNow;
     
     // Reciters list (same as SettingsActivity)
     private readonly List<(string Key, string Name)> _reciters = new()
@@ -139,6 +142,7 @@ public class RecitationActivity : AppCompatActivity
         _currentAyaInfo = FindViewById<TextView>(Resource.Id.currentAyaInfo);
         _ayaTextView = FindViewById<TextView>(Resource.Id.ayaTextView);
         _ayaImage = FindViewById<ImageView>(Resource.Id.ayaImage);
+        _teacherModeCheckbox = FindViewById<CheckBox>(Resource.Id.teacherModeCheckbox);
         
         // Labels for dynamic language update
         _titleTextView = FindViewById<TextView>(Resource.Id.titleTextView);
@@ -160,6 +164,8 @@ public class RecitationActivity : AppCompatActivity
             _startButton.Click += OnStartClick;
         if (_stopButton != null)
             _stopButton.Click += OnStopClick;
+        if (_teacherModeCheckbox != null)
+            _teacherModeCheckbox.CheckedChange += (s, e) => _teacherModeEnabled = e.IsChecked;
     }
     
     private void LoadSettings()
@@ -215,6 +221,8 @@ public class RecitationActivity : AppCompatActivity
             _repeatModeLabel.Text = _localizationService["RepeatMode"];
         if (_nowPlayingLabel != null)
             _nowPlayingLabel.Text = _localizationService["NowPlaying"];
+        if (_teacherModeCheckbox != null)
+            _teacherModeCheckbox.Text = _localizationService["TeacherMode"];
         
         // Update buttons
         if (_startButton != null)
@@ -443,6 +451,7 @@ public class RecitationActivity : AppCompatActivity
         _currentAya = _fromAya;
         _currentRepeat = 1;
         _currentAyaRepeat = 1;
+        _currentAyaStartTime = DateTime.UtcNow;
         _isPlaying = true;
         
         // Check if we need Basmalah for the first Aya
@@ -503,6 +512,7 @@ public class RecitationActivity : AppCompatActivity
             _needsBasmalah = false;
             
             UpdateCurrentAyaDisplay(false);
+            _currentAyaStartTime = DateTime.UtcNow;
             await _audioService.PlayAyaAsync(_currentSurah, _currentAya);
             
             // Show the Aya image
@@ -634,22 +644,51 @@ public class RecitationActivity : AppCompatActivity
     
     private void OnAyaPlaybackEnded(object? sender, EventArgs e)
     {
-        RunOnUiThread(() =>
+        HandleAyaPlaybackEnded();
+    }
+
+    private async void HandleAyaPlaybackEnded()
+    {
+        if (!_isPlaying) return;
+
+        // If we just finished playing Basmalah, now play the actual Aya
+        if (_playingBasmalah)
         {
-            if (!_isPlaying) return;
-            
-            // If we just finished playing Basmalah, now play the actual Aya
-            if (_playingBasmalah)
+            RunOnUiThread(() =>
             {
+                if (!_isPlaying) return;
                 _playingBasmalah = false;
                 _needsBasmalah = false; // Clear the flag so we don't play Basmalah again
                 PlayCurrentAya();
-                return;
+            });
+            return;
+        }
+
+        if (_teacherModeEnabled)
+        {
+            var ayaDuration = DateTime.UtcNow - _currentAyaStartTime;
+            if (ayaDuration < TimeSpan.FromSeconds(1))
+            {
+                ayaDuration = TimeSpan.FromSeconds(1);
             }
-            
-            // Move to next Aya
+            var pauseDuration = ayaDuration + TimeSpan.FromSeconds(1);
+            try
+            {
+                await Task.Delay(pauseDuration);
+            }
+            catch
+            {
+                // Ignore delay cancellation
+            }
+            if (!_isPlaying)
+                return;
+        }
+
+        RunOnUiThread(() =>
+        {
+            if (!_isPlaying) return;
             MoveToNextAya();
-            
+
             if (_isPlaying)
             {
                 PlayCurrentAya();

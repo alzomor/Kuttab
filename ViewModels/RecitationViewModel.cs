@@ -54,6 +54,8 @@ public class RecitationViewModel : ViewModelBase
     private int _currentAyaRepeat = 1;
     private bool _repeatEachAya = false; // false = repeat whole range, true = repeat each aya
     private string _selectedRepeatMode = "";
+    private bool _teacherModeEnabled = false;
+    private DateTime _currentAyaStartTime = DateTime.UtcNow;
     
     // Surah At-Tawbah number (no Basmalah)
     private const int SURAH_TAWBAH = 9;
@@ -259,6 +261,12 @@ public class RecitationViewModel : ViewModelBase
         ? FlowDirection.RightToLeft 
         : FlowDirection.LeftToRight;
     
+    public bool TeacherModeEnabled
+    {
+        get => _teacherModeEnabled;
+        set => this.RaiseAndSetIfChanged(ref _teacherModeEnabled, value);
+    }
+    
     #endregion
     
     #region Localized Labels
@@ -273,6 +281,7 @@ public class RecitationViewModel : ViewModelBase
     public string RepeatCountLabel => _localizationService["RepeatCount"];
     public string TimesLabel => _localizationService["Times"];
     public string RepeatModeLabel => _localizationService["RepeatMode"];
+    public string TeacherModeLabel => _localizationService["TeacherMode"];
     public string NowPlayingLabel => _localizationService["NowPlaying"];
     public string PlayingLabel => _localizationService["Playing"];
     
@@ -373,6 +382,7 @@ public class RecitationViewModel : ViewModelBase
         _currentAya = _fromAya;
         _currentRepeat = 1;
         _currentAyaRepeat = 1;
+        _currentAyaStartTime = DateTime.UtcNow;
         IsPlaying = true;
         
         // Check if we need Basmalah for the first Aya
@@ -431,6 +441,7 @@ public class RecitationViewModel : ViewModelBase
             _needsBasmalah = false;
             
             UpdateCurrentAyaDisplay(false);
+            _currentAyaStartTime = DateTime.UtcNow;
             await _audioService.PlayAyaAsync(_currentSurah, _currentAya);
         }
         catch (Exception ex)
@@ -565,20 +576,45 @@ public class RecitationViewModel : ViewModelBase
     
     private void OnAyaPlaybackEnded(object? sender, EventArgs e)
     {
+        HandleAyaPlaybackEndedAsync();
+    }
+    
+    private async void HandleAyaPlaybackEndedAsync()
+    {
+        if (!IsPlaying) return;
+        
+        // If we just finished playing Basmalah, now play the actual Aya
+        if (_playingBasmalah)
+        {
+            _playingBasmalah = false;
+            _needsBasmalah = false; // Clear the flag so we don't play Basmalah again
+            PlayCurrentAya();
+            return;
+        }
+        
+        if (_teacherModeEnabled)
+        {
+            var ayaDuration = DateTime.UtcNow - _currentAyaStartTime;
+            if (ayaDuration < TimeSpan.FromSeconds(1))
+            {
+                ayaDuration = TimeSpan.FromSeconds(1);
+            }
+            var pauseDuration = ayaDuration + TimeSpan.FromSeconds(1);
+            try
+            {
+                await Task.Delay(pauseDuration);
+            }
+            catch
+            {
+                // Ignore delay cancellation
+            }
+            if (!IsPlaying)
+                return;
+        }
+        
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
             if (!IsPlaying) return;
-            
-            // If we just finished playing Basmalah, now play the actual Aya
-            if (_playingBasmalah)
-            {
-                _playingBasmalah = false;
-                _needsBasmalah = false; // Clear the flag so we don't play Basmalah again
-                PlayCurrentAya();
-                return;
-            }
-            
-            // Move to next Aya
             MoveToNextAya();
             
             if (IsPlaying)
@@ -601,6 +637,7 @@ public class RecitationViewModel : ViewModelBase
         this.RaisePropertyChanged(nameof(RepeatCountLabel));
         this.RaisePropertyChanged(nameof(TimesLabel));
         this.RaisePropertyChanged(nameof(RepeatModeLabel));
+        this.RaisePropertyChanged(nameof(TeacherModeLabel));
         this.RaisePropertyChanged(nameof(NowPlayingLabel));
         
         // Update repeat mode options with new language

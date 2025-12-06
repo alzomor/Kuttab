@@ -149,6 +149,20 @@
                                 Margin="0,0,10,0"
                                 VerticalAlignment="Center"/>
                         
+                        <!-- Info Button -->
+                        <Button Content="ℹ️"
+                                Command="{Binding OpenInfoCommand}"
+                                ToolTip.Tip="{Binding Localization.OpenInfo}"
+                                Background="#1565C0"
+                                Foreground="White"
+                                CornerRadius="8"
+                                Padding="12,8"
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Cursor="Hand"
+                                Margin="0,0,10,0"
+                                VerticalAlignment="Center"/>
+                        
                         <!-- Recitation Mode Button -->
                         <Button Content="{Binding Localization.OpenRecitation}"
                                 Command="{Binding OpenRecitationCommand}"

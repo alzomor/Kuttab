@@ -201,6 +201,17 @@
                     android:layout_marginStart="12dp" />
             </LinearLayout>
 
+            <!-- Teacher Mode Toggle -->
+            <CheckBox
+                android:id="@+id/teacherModeCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/teacher_mode"
+                android:textSize="14sp"
+                android:textColor="#2C5F2D"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp" />
+
             <!-- Control Buttons -->
             <LinearLayout
                 android:layout_width="match_parent"

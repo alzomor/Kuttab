@@ -80,6 +80,7 @@ public class MainWindowViewModel : ViewModelBase
         ResumeSequenceCommand = new SimpleCommand(ResumeSequence);
         OpenSettingsCommand = new SimpleCommand(OpenSettings);
         OpenRecitationCommand = new SimpleCommand(OpenRecitation);
+        OpenInfoCommand = new SimpleCommand(OpenInfo);
         
         _ = LoadDataAsync();
     }
@@ -297,6 +298,7 @@ public class MainWindowViewModel : ViewModelBase
     public ICommand ResumeSequenceCommand { get; }
     public ICommand OpenSettingsCommand { get; }
     public ICommand OpenRecitationCommand { get; }
+    public ICommand OpenInfoCommand { get; }
 
     private async Task LoadDataAsync()
     {
@@ -950,6 +952,21 @@ public class MainWindowViewModel : ViewModelBase
             // Update status message
             StatusMessage = _localizationService.GetString("SettingsSaved");
         }
+    }
+
+    private async void OpenInfo()
+    {
+        var infoViewModel = new InfoViewModel(_localizationService);
+
+        var infoWindow = new Views.InfoWindow
+        {
+            DataContext = infoViewModel
+        };
+
+        await infoWindow.ShowDialog(
+            Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow
+                : null);
     }
 }
 

@@ -164,6 +164,23 @@ public class LocalizationService : ReactiveObject
     public string RecitationComplete => this["RecitationComplete"];
     public string Basmalah => this["Basmalah"];
 
+    // Info window properties
+    public string OpenInfo => this["OpenInfo"];
+    public string InfoTitle => this["InfoTitle"];
+    public string AppSubtitle => this["AppSubtitle"];
+    public string ResourcesCreditsTitle => this["ResourcesCreditsTitle"];
+    public string AudioImagesSource => this["AudioImagesSource"];
+    public string EveryAyahDescription => this["EveryAyahDescription"];
+    public string QuranTextSource => this["QuranTextSource"];
+    public string TanzilDescription => this["TanzilDescription"];
+    public string DevelopmentToolsTitle => this["DevelopmentToolsTitle"];
+    public string TajweedReviewTitle => this["TajweedReviewTitle"];
+    public string UsulAiDescription => this["UsulAiDescription"];
+    public string CodingAssistantTitle => this["CodingAssistantTitle"];
+    public string WindsurfDescription => this["WindsurfDescription"];
+    public string AcknowledgmentText => this["AcknowledgmentText"];
+    public string CloseButton => this["CloseButton"];
+
     public bool IsRightToLeft => _currentLanguage == "ar";
 
     public List<LanguageOption> AvailableLanguages => new()

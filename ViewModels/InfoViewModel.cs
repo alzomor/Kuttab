@@ -1,0 +1,35 @@
+using System;
+using System.Windows.Input;
+using ReactiveUI;
+using QuranSearch.Core.Services;
+using QuranSearch.Core.ViewModels;
+
+namespace QuranSearchApp.ViewModels;
+
+public class InfoViewModel : ViewModelBase
+{
+    private readonly LocalizationService _localizationService;
+
+    public InfoViewModel() : this(new LocalizationService(new QuranSearchApp.Services.DesktopFileService()))
+    {
+    }
+
+    public InfoViewModel(LocalizationService localizationService)
+    {
+        _localizationService = localizationService;
+        CloseCommand = new SimpleCommand(OnClose);
+    }
+
+    public LocalizationService Localization => _localizationService;
+
+    public string AppVersion => "v0.3 TEST VERSION";
+
+    public ICommand CloseCommand { get; }
+
+    public event EventHandler? CloseRequested;
+
+    private void OnClose()
+    {
+        CloseRequested?.Invoke(this, EventArgs.Empty);
+    }
+}

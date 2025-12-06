@@ -168,23 +168,40 @@
                               MinWidth="200"/>
                 </StackPanel>
                 
-                <!-- Repeat Count Selection -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding RepeatCountLabel}" 
-                               FontSize="14" 
-                               FontWeight="SemiBold"
-                               Foreground="#2C5F2D"
-                               VerticalAlignment="Center"
-                               Margin="0,0,12,0"/>
-                    <ComboBox Classes="islamic"
-                              ItemsSource="{Binding RepeatCountOptions}"
-                              SelectedItem="{Binding RepeatCount}"
-                              MinWidth="80"/>
-                    <TextBlock Text="{Binding TimesLabel}" 
-                               FontSize="14" 
-                               Foreground="#666666"
-                               VerticalAlignment="Center"
-                               Margin="12,0,0,0"/>
+                <!-- Repeat Count Selection + Teacher Mode -->
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="20">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding RepeatCountLabel}" 
+                                   FontSize="14" 
+                                   FontWeight="SemiBold"
+                                   Foreground="#2C5F2D"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,12,0"/>
+                        <ComboBox Classes="islamic"
+                                  ItemsSource="{Binding RepeatCountOptions}"
+                                  SelectedItem="{Binding RepeatCount}"
+                                  MinWidth="80">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding .}" HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <TextBlock Text="{Binding TimesLabel}" 
+                                   FontSize="14" 
+                                   Foreground="#666666"
+                                   VerticalAlignment="Center"
+                                   Margin="12,0,0,0"/>
+                    </StackPanel>
+
+                    <CheckBox Content="{Binding TeacherModeLabel}"
+                              IsChecked="{Binding TeacherModeEnabled}"
+                              VerticalAlignment="Center"
+                              FontSize="14"
+                              Foreground="#2C5F2D"/>
                 </StackPanel>
             </StackPanel>
         </Border>
