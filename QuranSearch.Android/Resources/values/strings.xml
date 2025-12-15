@@ -88,4 +88,21 @@
     <string name="playing_basmalah">Playing Basmalah...</string>
     <string name="aya_range">Aya Range</string>
     <string name="full_surah">Full Surah</string>
+    
+    <!-- Donation Page -->
+    <string name="donate">🕌 Donate</string>
+    <string name="donate_title">🕌 Support BBF Center Project</string>
+    <string name="donate_subtitle">Help us build the BBF Community Center in Freiburg! The land (1,307 m²) costs €1,000,000 - we have raised €700,000 and still need €300,000.</string>
+    <string name="donate_via_paypal">💳 Donate via PayPal</string>
+    <string name="paypal_description">Quick and secure online donation through PayPal.</string>
+    <string name="donate_via_bank">🏦 Donate via Bank Transfer</string>
+    <string name="account_holder">Account Holder:</string>
+    <string name="payment_reference">Payment Reference (Verwendungszweck):</string>
+    <string name="copy_button">📋 Copy</string>
+    <string name="bank_transfer_note">Please include the payment reference to ensure your donation supports the BBF Center building project.</string>
+    <string name="about_association">🏛️ About the Association</string>
+    <string name="association_description">Bildungs- und Begegnungsverein Freiburg e.V. (BBF) is a registered charity in Germany dedicated to education and community building. We are building a community center on 1,307 m² of land.</string>
+    <string name="tax_deduction_note">✅ BBF is a registered public benefit association (gemeinnütziger Verein) in Germany. Your donation is tax-deductible.</string>
+    <string name="barakah_message">May Allah bless you for your generosity and reward you abundantly in this life and the hereafter.</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
 </resources>

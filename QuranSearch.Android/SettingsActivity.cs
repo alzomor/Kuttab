@@ -69,6 +69,12 @@ public class SettingsActivity : AppCompatActivity
     {
         var fileService = new Services.AndroidFileService(this);
         _localizationService = new LocalizationService(fileService);
+        
+        // Load saved language from SharedPreferences
+        var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
+        var language = prefs?.GetString("Language", "en") ?? "en";
+        _localizationService.CurrentLanguage = language;
+        
         _availableLanguages = _localizationService.AvailableLanguages;
         
         // Initialize search domain options

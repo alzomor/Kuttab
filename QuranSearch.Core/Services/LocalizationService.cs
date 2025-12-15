@@ -47,6 +47,105 @@ public class LocalizationService : ReactiveObject
         
         // Notify that RTL status may have changed
         this.RaisePropertyChanged(nameof(IsRightToLeft));
+        
+        // Raise property changed for all convenience properties (for XAML bindings)
+        RaiseAllConveniencePropertiesChanged();
+    }
+    
+    private void RaiseAllConveniencePropertiesChanged()
+    {
+        // Main window properties
+        this.RaisePropertyChanged(nameof(WindowTitle));
+        this.RaisePropertyChanged(nameof(SelectTajweedRule));
+        this.RaisePropertyChanged(nameof(Search));
+        this.RaisePropertyChanged(nameof(OnlineImages));
+        this.RaisePropertyChanged(nameof(OnlineAudio));
+        this.RaisePropertyChanged(nameof(Ready));
+        this.RaisePropertyChanged(nameof(Surah));
+        this.RaisePropertyChanged(nameof(Aya));
+        this.RaisePropertyChanged(nameof(AudioControls));
+        this.RaisePropertyChanged(nameof(PlaySingle));
+        this.RaisePropertyChanged(nameof(PlayRepeat));
+        this.RaisePropertyChanged(nameof(PlayAllSequence));
+        this.RaisePropertyChanged(nameof(PauseSequence));
+        this.RaisePropertyChanged(nameof(ResumeSequence));
+        this.RaisePropertyChanged(nameof(Stop));
+        this.RaisePropertyChanged(nameof(Playing));
+        this.RaisePropertyChanged(nameof(Repeat));
+        this.RaisePropertyChanged(nameof(SequencePaused));
+        this.RaisePropertyChanged(nameof(QuranicPageView));
+        this.RaisePropertyChanged(nameof(SelectAyaToViewImage));
+        this.RaisePropertyChanged(nameof(Language));
+        this.RaisePropertyChanged(nameof(Arabic));
+        this.RaisePropertyChanged(nameof(English));
+        this.RaisePropertyChanged(nameof(German));
+        this.RaisePropertyChanged(nameof(Matched));
+        
+        // Settings window properties
+        this.RaisePropertyChanged(nameof(SettingsTitle));
+        this.RaisePropertyChanged(nameof(LanguageSettingsTitle));
+        this.RaisePropertyChanged(nameof(SelectLanguageLabel));
+        this.RaisePropertyChanged(nameof(SearchDomainTitle));
+        this.RaisePropertyChanged(nameof(SearchInLabel));
+        this.RaisePropertyChanged(nameof(SurahNumberLabel));
+        this.RaisePropertyChanged(nameof(FromSurahLabel));
+        this.RaisePropertyChanged(nameof(ToSurahLabel));
+        this.RaisePropertyChanged(nameof(OnlineResourcesTitle));
+        this.RaisePropertyChanged(nameof(GetAudioFromInternetLabel));
+        this.RaisePropertyChanged(nameof(GetImagesFromInternetLabel));
+        this.RaisePropertyChanged(nameof(OnlineResourcesNoteText));
+        this.RaisePropertyChanged(nameof(SelectReciterLabel));
+        this.RaisePropertyChanged(nameof(SaveSettingsButton));
+        this.RaisePropertyChanged(nameof(CancelButton));
+        
+        // Recitation mode properties
+        this.RaisePropertyChanged(nameof(OpenRecitation));
+        this.RaisePropertyChanged(nameof(RecitationMode));
+        this.RaisePropertyChanged(nameof(SelectReciter));
+        this.RaisePropertyChanged(nameof(SelectSurah));
+        this.RaisePropertyChanged(nameof(FromAya));
+        this.RaisePropertyChanged(nameof(ToAya));
+        this.RaisePropertyChanged(nameof(StartRecitation));
+        this.RaisePropertyChanged(nameof(StopRecitation));
+        this.RaisePropertyChanged(nameof(PreviousAya));
+        this.RaisePropertyChanged(nameof(NextAya));
+        this.RaisePropertyChanged(nameof(NowPlaying));
+        this.RaisePropertyChanged(nameof(Stopped));
+        this.RaisePropertyChanged(nameof(RecitationComplete));
+        this.RaisePropertyChanged(nameof(Basmalah));
+        
+        // Info window properties
+        this.RaisePropertyChanged(nameof(OpenInfo));
+        this.RaisePropertyChanged(nameof(InfoTitle));
+        this.RaisePropertyChanged(nameof(AppSubtitle));
+        this.RaisePropertyChanged(nameof(ResourcesCreditsTitle));
+        this.RaisePropertyChanged(nameof(AudioImagesSource));
+        this.RaisePropertyChanged(nameof(EveryAyahDescription));
+        this.RaisePropertyChanged(nameof(QuranTextSource));
+        this.RaisePropertyChanged(nameof(TanzilDescription));
+        this.RaisePropertyChanged(nameof(DevelopmentToolsTitle));
+        this.RaisePropertyChanged(nameof(TajweedReviewTitle));
+        this.RaisePropertyChanged(nameof(UsulAiDescription));
+        this.RaisePropertyChanged(nameof(CodingAssistantTitle));
+        this.RaisePropertyChanged(nameof(WindsurfDescription));
+        this.RaisePropertyChanged(nameof(AcknowledgmentText));
+        this.RaisePropertyChanged(nameof(CloseButton));
+        
+        // Donate window properties
+        this.RaisePropertyChanged(nameof(OpenDonate));
+        this.RaisePropertyChanged(nameof(DonateTitle));
+        this.RaisePropertyChanged(nameof(DonateSubtitle));
+        this.RaisePropertyChanged(nameof(DonateViaPayPal));
+        this.RaisePropertyChanged(nameof(PayPalDescription));
+        this.RaisePropertyChanged(nameof(DonateViaBankTransfer));
+        this.RaisePropertyChanged(nameof(AccountHolder));
+        this.RaisePropertyChanged(nameof(PaymentReference));
+        this.RaisePropertyChanged(nameof(CopyButton));
+        this.RaisePropertyChanged(nameof(BankTransferNote));
+        this.RaisePropertyChanged(nameof(AboutAssociation));
+        this.RaisePropertyChanged(nameof(AssociationDescription));
+        this.RaisePropertyChanged(nameof(BarakahMessage));
+        this.RaisePropertyChanged(nameof(TaxDeductionNote));
     }
 
     private void LoadLanguage(string languageCode)
@@ -180,6 +279,22 @@ public class LocalizationService : ReactiveObject
     public string WindsurfDescription => this["WindsurfDescription"];
     public string AcknowledgmentText => this["AcknowledgmentText"];
     public string CloseButton => this["CloseButton"];
+
+    // Donate window properties
+    public string OpenDonate => this["OpenDonate"];
+    public string DonateTitle => this["DonateTitle"];
+    public string DonateSubtitle => this["DonateSubtitle"];
+    public string DonateViaPayPal => this["DonateViaPayPal"];
+    public string PayPalDescription => this["PayPalDescription"];
+    public string DonateViaBankTransfer => this["DonateViaBankTransfer"];
+    public string AccountHolder => this["AccountHolder"];
+    public string PaymentReference => this["PaymentReference"];
+    public string CopyButton => this["CopyButton"];
+    public string BankTransferNote => this["BankTransferNote"];
+    public string AboutAssociation => this["AboutAssociation"];
+    public string AssociationDescription => this["AssociationDescription"];
+    public string BarakahMessage => this["BarakahMessage"];
+    public string TaxDeductionNote => this["TaxDeductionNote"];
 
     public bool IsRightToLeft => _currentLanguage == "ar";
 

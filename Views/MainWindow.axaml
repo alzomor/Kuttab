@@ -163,6 +163,20 @@
                                 Margin="0,0,10,0"
                                 VerticalAlignment="Center"/>
                         
+                        <!-- Donate Button -->
+                        <Button Content="🕌"
+                                Command="{Binding OpenDonateCommand}"
+                                ToolTip.Tip="{Binding Localization.OpenDonate}"
+                                Background="#2C5F2D"
+                                Foreground="White"
+                                CornerRadius="8"
+                                Padding="12,8"
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Cursor="Hand"
+                                Margin="0,0,10,0"
+                                VerticalAlignment="Center"/>
+                        
                         <!-- Recitation Mode Button -->
                         <Button Content="{Binding Localization.OpenRecitation}"
                                 Command="{Binding OpenRecitationCommand}"

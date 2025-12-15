@@ -81,6 +81,7 @@ public class MainWindowViewModel : ViewModelBase
         OpenSettingsCommand = new SimpleCommand(OpenSettings);
         OpenRecitationCommand = new SimpleCommand(OpenRecitation);
         OpenInfoCommand = new SimpleCommand(OpenInfo);
+        OpenDonateCommand = new SimpleCommand(OpenDonate);
         
         _ = LoadDataAsync();
     }
@@ -299,6 +300,7 @@ public class MainWindowViewModel : ViewModelBase
     public ICommand OpenSettingsCommand { get; }
     public ICommand OpenRecitationCommand { get; }
     public ICommand OpenInfoCommand { get; }
+    public ICommand OpenDonateCommand { get; }
 
     private async Task LoadDataAsync()
     {
@@ -964,6 +966,21 @@ public class MainWindowViewModel : ViewModelBase
         };
 
         await infoWindow.ShowDialog(
+            Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow
+                : null);
+    }
+
+    private async void OpenDonate()
+    {
+        var donateViewModel = new DonateViewModel(_localizationService);
+
+        var donateWindow = new Views.DonateWindow
+        {
+            DataContext = donateViewModel
+        };
+
+        await donateWindow.ShowDialog(
             Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
                 ? desktop.MainWindow
                 : null);

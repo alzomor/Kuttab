@@ -62,4 +62,21 @@
     <string name="whole_quran">القرآن الكريم كاملاً (114 سورة)</string>
     <string name="single_surah">سورة واحدة</string>
     <string name="surah_range">نطاق من السور</string>
+    
+    <!-- Donation Page -->
+    <string name="donate">🕌 تبرع</string>
+    <string name="donate_title">🕌 ادعم مشروع بناء مركز الجمعية</string>
+    <string name="donate_subtitle">ساعدنا في بناء مركز جمعية الثقافة والتواصل في فرايبورغ! تكلفة الأرض (1,307 م²) مليون يورو - تم جمع 700,000 يورو ولا يزال مطلوباً 300,000 يورو.</string>
+    <string name="donate_via_paypal">💳 التبرع عبر PayPal</string>
+    <string name="paypal_description">تبرع سريع وآمن عبر الإنترنت من خلال PayPal.</string>
+    <string name="donate_via_bank">🏦 التبرع عبر التحويل البنكي</string>
+    <string name="account_holder">صاحب الحساب:</string>
+    <string name="payment_reference">الغرض من التحويل (Verwendungszweck):</string>
+    <string name="copy_button">📋 نسخ</string>
+    <string name="bank_transfer_note">يرجى كتابة الغرض من التحويل لضمان وصول تبرعك لمشروع بناء مركز الجمعية.</string>
+    <string name="about_association">🏛️ عن الجمعية</string>
+    <string name="association_description">جمعية الثقافة والتواصل في فرايبورغ (BBF) هي جمعية خيرية مسجلة في ألمانيا مكرسة للتعليم وبناء المجتمع. نحن نبني مركزاً مجتمعياً على أرض مساحتها 1,307 م².</string>
+    <string name="tax_deduction_note">✅ جمعية BBF معترف بها كجمعية ذات نفع عام في ألمانيا. تبرعاتكم قابلة للخصم من الضرائب.</string>
+    <string name="barakah_message">بارك الله فيكم على كرمكم وجزاكم خيراً في الدنيا والآخرة.</string>
+    <string name="copied_to_clipboard">تم النسخ إلى الحافظة</string>
 </resources>

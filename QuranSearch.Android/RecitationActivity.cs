@@ -74,7 +74,7 @@ public class RecitationActivity : AppCompatActivity
     // Reciters list (same as SettingsActivity)
     private readonly List<(string Key, string Name)> _reciters = new()
     {
-        ("Abdul_Basit_Murattal_128kbps", "Abdul Basit (Murattal)"),
+        ("Abdul_Basit_Murattal_192kbps", "Abdul Basit (Murattal)"),
         ("Ayman_Sowaid_64kbps", "Ayman Sowaid"),
         ("Husary_128kbps", "Mahmoud Khalil Al-Husary"),
         ("Husary_Muallim_128kbps", "Al-Husary (Muallim)"),
@@ -82,7 +82,7 @@ public class RecitationActivity : AppCompatActivity
         ("Mohammad_al_Tablaway_128kbps", "Mohammad Al-Tablaway"),
         ("Mustafa_Ismail_48kbps", "Mustafa Ismail"),
         ("Muhammad_Ayyoub_128kbps", "Muhammad Ayyoub"),
-        ("Mahmoud_Ali_Al_Banna_32kbps", "Mahmoud Ali Al-Banna")
+        ("mahmoud_ali_al_banna_32kbps", "Mahmoud Ali Al-Banna")
     };
     
     private const int SETTINGS_REQUEST_CODE = 1002;
@@ -476,16 +476,13 @@ public class RecitationActivity : AppCompatActivity
     
     private bool ShouldPlayBasmalah(int surah, int aya, bool isStartOfRecitation)
     {
-        // Don't play Basmalah for Surah At-Tawbah (9)
-        if (surah == SURAH_TAWBAH)
-            return false;
-        
-        // Don't play Basmalah for Al-Fatiha (it's part of the Surah)
-        if (surah == SURAH_FATIHA)
-            return false;
-        
-        // Play Basmalah only for first Aya of a Surah
+        // Play Basmalah before the first Aya of each Surah, except:
+        // - Surah Al-Fatiha (1): Basmalah is already part of the Surah's audio
+        // - Surah At-Tawbah (9): No Basmalah for this Surah
         if (aya != 1)
+            return false;
+        
+        if (surah == SURAH_FATIHA || surah == SURAH_TAWBAH)
             return false;
         
         return true;

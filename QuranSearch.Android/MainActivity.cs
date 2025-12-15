@@ -33,6 +33,7 @@ public class MainActivity : AppCompatActivity
     private readonly HashSet<string> _groupHeaders = new();
     private Button? _settingsButton;
     private Button? _recitationButton;
+    private Button? _donateButton;
     private Button? _searchButton;
     private Button? _playButton;
     private Button? _playRepeatButton;
@@ -99,6 +100,7 @@ public class MainActivity : AppCompatActivity
         _ruleSpinner = FindViewById<Spinner>(Resource.Id.ruleSpinner);
         _settingsButton = FindViewById<Button>(Resource.Id.settingsButton);
         _recitationButton = FindViewById<Button>(Resource.Id.recitationButton);
+        _donateButton = FindViewById<Button>(Resource.Id.donateButton);
         _searchButton = FindViewById<Button>(Resource.Id.searchButton);
         _playButton = FindViewById<Button>(Resource.Id.playButton);
         _playRepeatButton = FindViewById<Button>(Resource.Id.playRepeatButton);
@@ -113,6 +115,8 @@ public class MainActivity : AppCompatActivity
             _settingsButton.Click += OnSettingsClick;
         if (_recitationButton != null)
             _recitationButton.Click += OnRecitationClick;
+        if (_donateButton != null)
+            _donateButton.Click += OnDonateClick;
         if (_searchButton != null)
             _searchButton.Click += OnSearchClick;
         if (_playButton != null)
@@ -719,6 +723,12 @@ public class MainActivity : AppCompatActivity
     private void OnRecitationClick(object? sender, EventArgs e)
     {
         var intent = new Intent(this, typeof(RecitationActivity));
+        StartActivity(intent);
+    }
+
+    private void OnDonateClick(object? sender, EventArgs e)
+    {
+        var intent = new Intent(this, typeof(DonateActivity));
         StartActivity(intent);
     }
 

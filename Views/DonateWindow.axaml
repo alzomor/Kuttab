@@ -1,0 +1,250 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuranSearchApp.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
+        x:Class="QuranSearchApp.Views.DonateWindow"
+        x:DataType="vm:DonateViewModel"
+        Title="{Binding Localization.DonateTitle}"
+        Width="600" Height="700"
+        Background="#F5F5DC"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Design.DataContext>
+        <vm:DonateViewModel/>
+    </Design.DataContext>
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="CardBackground" Color="White"/>
+        <SolidColorBrush x:Key="TextColor" Color="#333333"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#2C5F2D"/>
+        <SolidColorBrush x:Key="PayPalBlue" Color="#003087"/>
+        <SolidColorBrush x:Key="LinkColor" Color="#1565C0"/>
+    </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextColor}"/>
+        </Style>
+        
+        <Style Selector="Border.donate-card">
+            <Setter Property="Background" Value="{DynamicResource CardBackground}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BoxShadow" Value="0 4 12 0 #20000000"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+        </Style>
+        
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource AccentColor}"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+        
+        <Style Selector="TextBlock.info-label">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#666666"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+        </Style>
+        
+        <Style Selector="TextBlock.info-value">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+        
+        <Style Selector="TextBlock.link">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{DynamicResource LinkColor}"/>
+            <Setter Property="TextDecorations" Value="Underline"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        
+        <Style Selector="Button.paypal">
+            <Setter Property="Background" Value="#FFC439"/>
+            <Setter Property="Foreground" Value="#003087"/>
+            <Setter Property="CornerRadius" Value="25"/>
+            <Setter Property="Padding" Value="40,15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        
+        <Style Selector="Button.paypal:pointerover">
+            <Setter Property="Background" Value="#FFD700"/>
+        </Style>
+        
+        <Style Selector="Button.copy">
+            <Setter Property="Background" Value="#E0E0E0"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        
+        <Style Selector="Button.copy:pointerover">
+            <Setter Property="Background" Value="#BDBDBD"/>
+        </Style>
+        
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#2C5F2D"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="30,12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        
+        <Style Selector="Button.primary:pointerover">
+            <Setter Property="Background" Value="#3A7A3C"/>
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20">
+            <!-- Header -->
+            <Border Classes="donate-card">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="🕌" 
+                               FontSize="48" 
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,10"/>
+                    <TextBlock Text="{Binding Localization.DonateTitle}" 
+                               FontSize="24" 
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AccentColor}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding Localization.DonateSubtitle}" 
+                               FontSize="14" 
+                               Foreground="#666666"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- PayPal Donation -->
+            <Border Classes="donate-card">
+                <StackPanel>
+                    <TextBlock Classes="section-title" Text="{Binding Localization.DonateViaPayPal}"/>
+                    <TextBlock Text="{Binding Localization.PayPalDescription}" 
+                               FontSize="13" 
+                               Foreground="#666666"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,15"/>
+                    <Button Classes="paypal"
+                            Content="💳 PayPal"
+                            Command="{Binding OpenPayPalCommand}"
+                            HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Bank Transfer -->
+            <Border Classes="donate-card">
+                <StackPanel>
+                    <TextBlock Classes="section-title" Text="{Binding Localization.DonateViaBankTransfer}"/>
+                    
+                    <Border Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Classes="info-label" Text="{Binding Localization.AccountHolder}"/>
+                            <TextBlock Classes="info-value" Text="Bildungs- und Begegnungsverein Freiburg e.V."/>
+                            
+                            <TextBlock Classes="info-label" Text="IBAN:"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Classes="info-value" Text="DE11 6805 0101 0014 3501 24" Margin="0,0,10,0"/>
+                                <Button Classes="copy" 
+                                        Content="{Binding Localization.CopyButton}"
+                                        Command="{Binding CopyIbanCommand}"/>
+                            </StackPanel>
+                            
+                            <TextBlock Classes="info-label" Text="BIC:"/>
+                            <TextBlock Classes="info-value" Text="FRSPDE66XXX"/>
+                            
+                            <TextBlock Classes="info-label" Text="{Binding Localization.PaymentReference}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Classes="info-value" Text="Spende BBF-Bauprojekt | über die App Kuttab" Foreground="{DynamicResource AccentColor}" Margin="0,0,10,0"/>
+                                <Button Classes="copy" 
+                                        Content="{Binding Localization.CopyButton}"
+                                        Command="{Binding CopyReferenceCommand}"/>
+                            </StackPanel>
+                            <TextBlock Text="🇬🇧 Donation to BBF Building Project Kuttab" 
+                                       FontSize="11" 
+                                       Foreground="#888888"
+                                       Margin="0,0,0,2"/>
+                            <TextBlock Text="🇸🇦 تبرع لمشروع بناء كُتّاب" 
+                                       FontSize="11" 
+                                       Foreground="#888888"
+                                       FontFamily="Traditional Arabic"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <TextBlock Text="{Binding Localization.BankTransferNote}" 
+                               FontSize="12" 
+                               FontStyle="Italic"
+                               Foreground="#888888"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Association Info -->
+            <Border Classes="donate-card">
+                <StackPanel>
+                    <TextBlock Classes="section-title" Text="{Binding Localization.AboutAssociation}"/>
+                    <TextBlock Text="{Binding Localization.AssociationDescription}" 
+                               FontSize="13" 
+                               Foreground="#666666"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,10"/>
+                    <TextBlock Text="{Binding Localization.TaxDeductionNote}" 
+                               FontSize="13" 
+                               Foreground="#2E7D32"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,10"/>
+                    <TextBlock Classes="link" 
+                               Text="🌐 https://bbfverein.de/"
+                               PointerPressed="OnLinkClicked"
+                               Tag="https://bbfverein.de/"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Barakah Message -->
+            <Border Classes="donate-card">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding Localization.BarakahMessage}" 
+                               FontSize="14" 
+                               FontStyle="Italic"
+                               Foreground="#666666"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="جَزَاكُمُ ٱللَّهُ خَيْرًا" 
+                               FontSize="22" 
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource AccentColor}"
+                               HorizontalAlignment="Center"
+                               FontFamily="Traditional Arabic"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Close Button -->
+            <StackPanel Orientation="Horizontal" 
+                       HorizontalAlignment="Center"
+                       Margin="0,5,0,0">
+                <Button Classes="primary"
+                        Content="{Binding Localization.CloseButton}"
+                        Command="{Binding CloseCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

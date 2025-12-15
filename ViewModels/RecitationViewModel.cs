@@ -22,7 +22,7 @@ public class RecitationViewModel : ViewModelBase
     // Reciters list
     private readonly List<ReciterInfo> _recitersList = new()
     {
-        new ReciterInfo("Abdul_Basit_Murattal_128kbps", "Abdul Basit (Murattal)"),
+        new ReciterInfo("Abdul_Basit_Murattal_192kbps", "Abdul Basit (Murattal)"),
         new ReciterInfo("Ayman_Sowaid_64kbps", "Ayman Sowaid"),
         new ReciterInfo("Husary_128kbps", "Mahmoud Khalil Al-Husary"),
         new ReciterInfo("Husary_Muallim_128kbps", "Al-Husary (Muallim)"),
@@ -30,7 +30,7 @@ public class RecitationViewModel : ViewModelBase
         new ReciterInfo("Mohammad_al_Tablaway_128kbps", "Mohammad Al-Tablaway"),
         new ReciterInfo("Mustafa_Ismail_48kbps", "Mustafa Ismail"),
         new ReciterInfo("Muhammad_Ayyoub_128kbps", "Muhammad Ayyoub"),
-        new ReciterInfo("Mahmoud_Ali_Al_Banna_32kbps", "Mahmoud Ali Al-Banna")
+        new ReciterInfo("mahmoud_ali_al_banna_32kbps", "Mahmoud Ali Al-Banna")
     };
     
     // State
@@ -405,19 +405,9 @@ public class RecitationViewModel : ViewModelBase
     
     private bool ShouldPlayBasmalah(int surah, int aya)
     {
-        // Don't play Basmalah for Surah At-Tawbah (9)
-        if (surah == SURAH_TAWBAH)
-            return false;
-        
-        // Don't play Basmalah for Al-Fatiha (it's part of the Surah)
-        if (surah == SURAH_FATIHA)
-            return false;
-        
-        // Play Basmalah only for first Aya of a Surah
-        if (aya != 1)
-            return false;
-        
-        return true;
+        // Basmalah is already included in the audio files for each Surah's first Aya
+        // No need to play it separately
+        return false;
     }
     
     private async void PlayCurrentAya()
