@@ -177,11 +177,11 @@
                                         Content="{Binding Localization.CopyButton}"
                                         Command="{Binding CopyReferenceCommand}"/>
                             </StackPanel>
-                            <TextBlock Text="🇬🇧 Donation to BBF Building Project Kuttab" 
+                            <TextBlock Text="🇬🇧 Donation to BBF Building Project | via the App Kuttab" 
                                        FontSize="11" 
                                        Foreground="#888888"
                                        Margin="0,0,0,2"/>
-                            <TextBlock Text="🇸🇦 تبرع لمشروع بناء كُتّاب" 
+                            <TextBlock Text="🇸🇦 تبرع لمشروع بناء BBF | عبر تطبيق كُتّاب" 
                                        FontSize="11" 
                                        Foreground="#888888"
                                        FontFamily="Traditional Arabic"/>

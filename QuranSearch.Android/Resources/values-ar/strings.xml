@@ -71,7 +71,7 @@
     <string name="paypal_description">تبرع سريع وآمن عبر الإنترنت من خلال PayPal.</string>
     <string name="donate_via_bank">🏦 التبرع عبر التحويل البنكي</string>
     <string name="account_holder">صاحب الحساب:</string>
-    <string name="payment_reference">الغرض من التحويل (Verwendungszweck):</string>
+    <string name="payment_reference">الغرض من التحويل:</string>
     <string name="copy_button">📋 نسخ</string>
     <string name="bank_transfer_note">يرجى كتابة الغرض من التحويل لضمان وصول تبرعك لمشروع بناء مركز الجمعية.</string>
     <string name="about_association">🏛️ عن الجمعية</string>

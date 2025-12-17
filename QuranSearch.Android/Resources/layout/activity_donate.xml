@@ -250,7 +250,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🇬🇧 Donation to BBF Building Project Kuttab"
+                        android:text="🇬🇧 Donation to BBF Building Project | via the App Kuttab"
                         android:textSize="11sp"
                         android:textColor="#888888"
                         android:layout_marginTop="4dp" />
@@ -258,7 +258,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🇸🇦 تبرع لمشروع بناء كُتّاب"
+                        android:text="🇸🇦 تبرع لمشروع بناء BBF | عبر تطبيق كُتّاب"
                         android:textSize="11sp"
                         android:textColor="#888888" />
                 </LinearLayout>

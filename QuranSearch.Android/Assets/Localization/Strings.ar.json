@@ -77,7 +77,7 @@
   "PayPalDescription": "تبرع سريع وآمن عبر الإنترنت من خلال PayPal.",
   "DonateViaBankTransfer": "🏦 التبرع عبر التحويل البنكي",
   "AccountHolder": "صاحب الحساب:",
-  "PaymentReference": "الغرض من التحويل (Verwendungszweck):",
+  "PaymentReference": "الغرض من التحويل:",
   "CopyButton": "📋 نسخ",
   "BankTransferNote": "يرجى كتابة الغرض من التحويل لضمان وصول تبرعك لمشروع بناء مركز الجمعية.",
   "AboutAssociation": "🏛️ عن الجمعية",

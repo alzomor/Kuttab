@@ -97,7 +97,7 @@
     <string name="paypal_description">Quick and secure online donation through PayPal.</string>
     <string name="donate_via_bank">🏦 Donate via Bank Transfer</string>
     <string name="account_holder">Account Holder:</string>
-    <string name="payment_reference">Payment Reference (Verwendungszweck):</string>
+    <string name="payment_reference">Payment Reference:</string>
     <string name="copy_button">📋 Copy</string>
     <string name="bank_transfer_note">Please include the payment reference to ensure your donation supports the BBF Center building project.</string>
     <string name="about_association">🏛️ About the Association</string>
