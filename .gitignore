@@ -3,6 +3,17 @@ bin/
 obj/
 out/
 dist/
+distribution/
+pub/
+publish/
+**/publish/
+**/bin/
+**/obj/
+
+# APK and archive files
+*.apk
+*.apks
+*.aab
 
 # Executable files
 *.exe
