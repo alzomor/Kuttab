@@ -15,6 +15,7 @@ public class AyaAdapter : RecyclerView.Adapter
 {
     private List<QuranAya> _items = new();
     private int _selectedPosition = -1;
+    private int _playingPosition = -1;
     public event EventHandler<int>? ItemClick;
     private LocalizationService? _localization;
     private bool _isRtl = false;
@@ -50,6 +51,37 @@ public class AyaAdapter : RecyclerView.Adapter
     }
     
     public int GetSelectedPosition() => _selectedPosition;
+    
+    public int GetPlayingPosition() => _playingPosition;
+    
+    public void SetPlayingPosition(int position)
+    {
+        var previousPosition = _playingPosition;
+        _playingPosition = position;
+        
+        // Update previous playing item
+        if (previousPosition != -1)
+        {
+            NotifyItemChanged(previousPosition);
+        }
+        
+        // Update new playing item
+        if (position != -1)
+        {
+            NotifyItemChanged(position);
+        }
+    }
+    
+    public void ClearPlayingPosition()
+    {
+        var previousPosition = _playingPosition;
+        _playingPosition = -1;
+        
+        if (previousPosition != -1)
+        {
+            NotifyItemChanged(previousPosition);
+        }
+    }
     
     public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
     {
@@ -418,8 +450,12 @@ public class AyaViewHolder : RecyclerView.ViewHolder
             _arabicText.TextAlignment = global::Android.Views.TextAlignment.ViewEnd;
         }
         
-        // Set selection background
-        if (AdapterPosition == _adapter.GetSelectedPosition())
+        // Set selection/playing background
+        if (AdapterPosition == _adapter.GetPlayingPosition())
+        {
+            _itemView.SetBackgroundColor(Color.ParseColor("#C8E6C9")); // Light green for currently playing
+        }
+        else if (AdapterPosition == _adapter.GetSelectedPosition())
         {
             _itemView.SetBackgroundColor(Color.ParseColor("#E3F2FD")); // Light blue for selected
         }

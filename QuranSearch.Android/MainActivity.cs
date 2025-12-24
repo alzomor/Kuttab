@@ -325,6 +325,7 @@ public class MainActivity : AppCompatActivity
         {
             _isPlayingSequence = true;
             _currentPlayingIndex = 0;
+            HighlightAndScrollToPlayingAya();
             PlayCurrentAya(false);
         }
     }
@@ -333,6 +334,7 @@ public class MainActivity : AppCompatActivity
     {
         _audioService?.StopPlayback();
         _isPlayingSequence = false;
+        _adapter?.ClearPlayingPosition();
         UpdateStatus(GetString(Resource.String.stopped));
     }
     
@@ -655,15 +657,42 @@ public class MainActivity : AppCompatActivity
                 _currentPlayingIndex++;
                 if (_currentPlayingIndex < _searchResults.Count)
                 {
+                    HighlightAndScrollToPlayingAya();
                     PlayCurrentAya(false);
                 }
                 else
                 {
                     _isPlayingSequence = false;
+                    _adapter?.ClearPlayingPosition();
                     UpdateStatus(GetString(Resource.String.ready));
                 }
             }
         });
+    }
+    
+    private void HighlightAndScrollToPlayingAya()
+    {
+        if (_adapter == null || _recyclerView == null || _currentPlayingIndex < 0)
+            return;
+        
+        // Highlight the currently playing ayah
+        _adapter.SetPlayingPosition(_currentPlayingIndex);
+        
+        // Scroll to make the playing ayah visible
+        var layoutManager = _recyclerView.GetLayoutManager() as LinearLayoutManager;
+        if (layoutManager != null)
+        {
+            // Check if the item is visible
+            var firstVisible = layoutManager.FindFirstCompletelyVisibleItemPosition();
+            var lastVisible = layoutManager.FindLastCompletelyVisibleItemPosition();
+            
+            // If the playing item is not visible, scroll to it
+            if (_currentPlayingIndex < firstVisible || _currentPlayingIndex > lastVisible)
+            {
+                // Use smooth scroll for better UX
+                _recyclerView.SmoothScrollToPosition(_currentPlayingIndex);
+            }
+        }
     }
     
     private string GetRemoteAudioUrl(int surah, int aya)
