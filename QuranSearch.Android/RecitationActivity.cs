@@ -70,6 +70,7 @@ public class RecitationActivity : AppCompatActivity
     private bool _repeatEachAya = false;
     private bool _teacherModeEnabled = false;
     private DateTime _currentAyaStartTime = DateTime.UtcNow;
+    private PowerManager.WakeLock? _wakeLock;
     
     // Reciters list (same as SettingsActivity)
     private readonly List<(string Key, string Name)> _reciters = new()
@@ -114,6 +115,13 @@ public class RecitationActivity : AppCompatActivity
             _searchService = new QuranSearchService(fileService);
             _localizationService = new LocalizationService(fileService);
             
+            // Initialize wake lock to keep screen on during recitation
+            var powerManager = (PowerManager?)GetSystemService(PowerService);
+            if (powerManager != null)
+            {
+                _wakeLock = powerManager.NewWakeLock(WakeLockFlags.ScreenDim, "QuranSearch::RecitationWakeLock");
+            }
+            
             if (_audioService != null)
             {
                 _audioService.PlaybackStateChanged += OnPlaybackStateChanged;
@@ -124,6 +132,36 @@ public class RecitationActivity : AppCompatActivity
         catch (Exception ex)
         {
             ShowError($"Failed to initialize services: {ex.Message}");
+        }
+    }
+    
+    private void AcquireWakeLock()
+    {
+        try
+        {
+            if (_wakeLock != null && !_wakeLock.IsHeld)
+            {
+                _wakeLock.Acquire();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to acquire wake lock: {ex.Message}");
+        }
+    }
+    
+    private void ReleaseWakeLock()
+    {
+        try
+        {
+            if (_wakeLock != null && _wakeLock.IsHeld)
+            {
+                _wakeLock.Release();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to release wake lock: {ex.Message}");
         }
     }
     
@@ -454,6 +492,9 @@ public class RecitationActivity : AppCompatActivity
         _currentAyaStartTime = DateTime.UtcNow;
         _isPlaying = true;
         
+        // Keep screen on during recitation
+        AcquireWakeLock();
+        
         // Check if we need Basmalah for the first Aya
         _needsBasmalah = ShouldPlayBasmalah(_currentSurah, _currentAya, true);
         
@@ -468,6 +509,7 @@ public class RecitationActivity : AppCompatActivity
         _currentRepeat = 1;
         _currentAyaRepeat = 1;
         _audioService?.StopAsync();
+        ReleaseWakeLock();
         UpdateButtonStates();
         
         if (_currentAyaInfo != null)
@@ -716,6 +758,7 @@ public class RecitationActivity : AppCompatActivity
                 {
                     // All ayas complete
                     _isPlaying = false;
+                    ReleaseWakeLock();
                     UpdateButtonStates();
                     
                     var completeText = _localizationService?["RecitationComplete"] ?? GetString(Resource.String.recitation_complete);
@@ -753,6 +796,7 @@ public class RecitationActivity : AppCompatActivity
                     {
                         // All repeats complete
                         _isPlaying = false;
+                        ReleaseWakeLock();
                         UpdateButtonStates();
                         
                         var completeText = _localizationService?["RecitationComplete"] ?? GetString(Resource.String.recitation_complete);
@@ -818,6 +862,7 @@ public class RecitationActivity : AppCompatActivity
     
     protected override void OnDestroy()
     {
+        ReleaseWakeLock();
         _audioService?.Dispose();
         base.OnDestroy();
     }

@@ -51,6 +51,7 @@ public class MainActivity : AppCompatActivity
     private int _searchStartSurah = 1;
     private int _searchEndSurah = 114;
     private string _selectedReciter = "Husary_128kbps";
+    private PowerManager.WakeLock? _wakeLock;
     
     private const int SETTINGS_REQUEST_CODE = 1001;
     
@@ -79,6 +80,13 @@ public class MainActivity : AppCompatActivity
             _pictureService = new AndroidPictureService(this);
             _localizationService = new LocalizationService(fileService);
             
+            // Initialize wake lock to keep screen on during playback
+            var powerManager = (PowerManager?)GetSystemService(PowerService);
+            if (powerManager != null)
+            {
+                _wakeLock = powerManager.NewWakeLock(WakeLockFlags.ScreenDim, "QuranSearch::PlaybackWakeLock");
+            }
+            
             // Setup audio event handlers
             if (_audioService != null)
             {
@@ -90,6 +98,36 @@ public class MainActivity : AppCompatActivity
         catch (Exception ex)
         {
             ShowError($"Failed to initialize services: {ex.Message}");
+        }
+    }
+    
+    private void AcquireWakeLock()
+    {
+        try
+        {
+            if (_wakeLock != null && !_wakeLock.IsHeld)
+            {
+                _wakeLock.Acquire();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to acquire wake lock: {ex.Message}");
+        }
+    }
+    
+    private void ReleaseWakeLock()
+    {
+        try
+        {
+            if (_wakeLock != null && _wakeLock.IsHeld)
+            {
+                _wakeLock.Release();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to release wake lock: {ex.Message}");
         }
     }
     
@@ -335,6 +373,7 @@ public class MainActivity : AppCompatActivity
         _audioService?.StopPlayback();
         _isPlayingSequence = false;
         _adapter?.ClearPlayingPosition();
+        ReleaseWakeLock();
         UpdateStatus(GetString(Resource.String.stopped));
     }
     
@@ -595,6 +634,9 @@ public class MainActivity : AppCompatActivity
                 return;
             }
             
+            // Keep screen on during playback
+            AcquireWakeLock();
+            
             var aya = _searchResults[_currentPlayingIndex];
             _audioService.SetRepeatMode(repeat);
             
@@ -604,6 +646,7 @@ public class MainActivity : AppCompatActivity
         }
         catch (Exception ex)
         {
+            ReleaseWakeLock();
             ShowError($"Playback failed: {ex.Message}");
         }
     }
@@ -614,6 +657,12 @@ public class MainActivity : AppCompatActivity
         {
             // Only update UI state - sequence playback is handled by OnSequencePlaybackEnded
             UpdateAudioButtonsState(_searchResults.Count > 0);
+            
+            // Release wake lock when single ayah playback ends (not in sequence mode)
+            if (!isPlaying && !_isPlayingSequence)
+            {
+                ReleaseWakeLock();
+            }
         });
     }
     
@@ -664,6 +713,7 @@ public class MainActivity : AppCompatActivity
                 {
                     _isPlayingSequence = false;
                     _adapter?.ClearPlayingPosition();
+                    ReleaseWakeLock();
                     UpdateStatus(GetString(Resource.String.ready));
                 }
             }
@@ -813,6 +863,7 @@ public class MainActivity : AppCompatActivity
 
     protected override void OnDestroy()
     {
+        ReleaseWakeLock();
         _audioService?.Dispose();
         base.OnDestroy();
     }
