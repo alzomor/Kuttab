@@ -521,11 +521,22 @@ public class RecitationActivity : AppCompatActivity
         // Play Basmalah before the first Aya of each Surah, except:
         // - Surah Al-Fatiha (1): Basmalah is already part of the Surah's audio
         // - Surah At-Tawbah (9): No Basmalah for this Surah
+        // - Menshawi reciter: His recordings already include Basmalah
         if (aya != 1)
             return false;
         
         if (surah == SURAH_FATIHA || surah == SURAH_TAWBAH)
             return false;
+        
+        // Skip Basmalah for reciters whose recordings already include it
+        // Menshawi and Mustafa Ismail always include Basmalah
+        if (_selectedReciter == "Menshawi_32kbps" ||
+            _selectedReciter == "Mustafa_Ismail_48kbps")
+            return false;
+        
+        // Mahmoud Ali Al-Banna includes Basmalah except for Surah 108 (Al-Kawthar)
+        if (_selectedReciter == "mahmoud_ali_al_banna_32kbps")
+            return surah == 108; // Only play Basmalah for Surah 108
         
         return true;
     }

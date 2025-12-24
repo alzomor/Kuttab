@@ -504,7 +504,8 @@ public class MainWindowViewModel : ViewModelBase
         
         // Check if this is Aya 1 from any Sura (except Sura 1 and Sura 9)
         // If so, play Basmala (Sura 1, Aya 1) first
-        if (SelectedAya.AyaNumber == 1 && SelectedAya.SurahNumber != 1 && SelectedAya.SurahNumber != 9)
+        // Skip Basmalah for Menshawi reciter (his recordings already include it)
+        if (SelectedAya.AyaNumber == 1 && SelectedAya.SurahNumber != 1 && SelectedAya.SurahNumber != 9 && !ShouldSkipBasmalah(SelectedAya.SurahNumber))
         {
             if (_audioService.AudioFileExists(1, 1))
             {
@@ -542,7 +543,8 @@ public class MainWindowViewModel : ViewModelBase
         
         // Check if this is Aya 1 from any Sura (except Sura 1 and Sura 9)
         // If so, play Basmala (Sura 1, Aya 1) first (only once, not repeated)
-        if (SelectedAya.AyaNumber == 1 && SelectedAya.SurahNumber != 1 && SelectedAya.SurahNumber != 9)
+        // Skip Basmalah for Menshawi reciter (his recordings already include it)
+        if (SelectedAya.AyaNumber == 1 && SelectedAya.SurahNumber != 1 && SelectedAya.SurahNumber != 9 && !ShouldSkipBasmalah(SelectedAya.SurahNumber))
         {
             if (_audioService.AudioFileExists(1, 1))
             {
@@ -653,7 +655,8 @@ public class MainWindowViewModel : ViewModelBase
         SelectedAya = aya;
         
         // Play Basmala before Aya 1 of any Surah (except Surah 1 and 9)
-        if (aya.AyaNumber == 1 && aya.SurahNumber != 1 && aya.SurahNumber != 9)
+        // Skip Basmalah for Menshawi reciter (his recordings already include it)
+        if (aya.AyaNumber == 1 && aya.SurahNumber != 1 && aya.SurahNumber != 9 && !ShouldSkipBasmalah(aya.SurahNumber))
         {
             if (_audioService.AudioFileExists(1, 1))
             {
@@ -1022,6 +1025,24 @@ public class MainWindowViewModel : ViewModelBase
             Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
                 ? desktop.MainWindow
                 : null);
+    }
+    
+    /// <summary>
+    /// Returns true if Basmalah should be skipped for the current reciter and surah.
+    /// Some reciters already include Basmalah in their recordings.
+    /// </summary>
+    private bool ShouldSkipBasmalah(int surahNumber = 0)
+    {
+        // Menshawi and Mustafa Ismail always include Basmalah
+        if (_selectedReciterFolder == "Menshawi_32kbps" ||
+            _selectedReciterFolder == "Mustafa_Ismail_48kbps")
+            return true;
+        
+        // Mahmoud Ali Al-Banna includes Basmalah except for Surah 108 (Al-Kawthar)
+        if (_selectedReciterFolder == "mahmoud_ali_al_banna_32kbps")
+            return surahNumber != 108;
+        
+        return false;
     }
 }
 
