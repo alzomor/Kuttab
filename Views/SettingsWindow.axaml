@@ -232,6 +232,22 @@
                 </StackPanel>
             </Border>
 
+            <!-- Display Settings -->
+            <Border Classes="settings-card">
+                <StackPanel>
+                    <TextBlock Classes="section-title" Text="{Binding Localization[DisplaySettingsTitle]}"/>
+                    
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Classes="label" Text="{Binding Localization[FontSizeLabel]}" Width="150"/>
+                        <ComboBox Classes="settings-combo"
+                                  ItemsSource="{Binding FontSizeOptions}"
+                                  SelectedItem="{Binding FontSize}"
+                                  MinWidth="100"/>
+                        <TextBlock Text="pt" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <!-- Action Buttons -->
             <StackPanel Orientation="Horizontal" 
                        HorizontalAlignment="Center"

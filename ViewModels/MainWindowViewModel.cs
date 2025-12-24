@@ -49,6 +49,7 @@ public class MainWindowViewModel : ViewModelBase
     private int _searchStartSurah = 1;
     private int _searchEndSurah = 114;
     private string _selectedReciterFolder = "Husary_128kbps";
+    private int _fontSize = 18;
 
     // Map from display name (may be localized) to Arabic rule name used in rules.json
     private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
@@ -253,6 +254,18 @@ public class MainWindowViewModel : ViewModelBase
         {
             this.RaiseAndSetIfChanged(ref _useRemoteAudio, value);
             _audioService.UseRemoteSource = value;
+        }
+    }
+
+    public int FontSize
+    {
+        get => _fontSize;
+        set
+        {
+            if (value >= 12 && value <= 32)
+            {
+                this.RaiseAndSetIfChanged(ref _fontSize, value);
+            }
         }
     }
 
@@ -945,7 +958,8 @@ public class MainWindowViewModel : ViewModelBase
             currentSearchDomain,
             _searchStartSurah,
             _searchEndSurah,
-            _selectedReciterFolder);
+            _selectedReciterFolder,
+            _fontSize);
 
         var settingsWindow = new Views.SettingsWindow
         {
@@ -967,6 +981,7 @@ public class MainWindowViewModel : ViewModelBase
             _searchStartSurah = result.StartSurah;
             _searchEndSurah = result.EndSurah;
             _selectedReciterFolder = result.SelectedReciterFolder;
+            FontSize = result.FontSize;
             
             // Update audio service with new reciter
             if (_audioService is Services.AudioService audioService)

@@ -142,5 +142,7 @@
   "CodingAssistantTitle": "Programmierassistent",
   "WindsurfDescription": "Die KI-gestützte IDE Windsurf wurde für die Entwicklung und Programmierunterstützung verwendet.",
   "AcknowledgmentText": "Alles Lob gebührt Allah, dem Herrn der Welten. Möge diese Anwendung denjenigen von Nutzen sein, die den Heiligen Koran lernen und verstehen möchten.",
-  "CloseButton": "✓ Schließen"
+  "CloseButton": "✓ Schließen",
+  "DisplaySettingsTitle": "🔤 Anzeigeeinstellungen",
+  "FontSizeLabel": "Schriftgröße:"
 }

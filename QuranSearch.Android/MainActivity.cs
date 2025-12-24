@@ -859,6 +859,13 @@ public class MainActivity : AppCompatActivity
         {
             _pictureService.UseRemoteSource = useRemoteImages;
         }
+        
+        // Load font size setting
+        var fontSize = prefs?.GetInt("FontSize", 18) ?? 18;
+        if (_adapter != null)
+        {
+            _adapter.SetFontSize(fontSize);
+        }
     }
 
     protected override void OnDestroy()

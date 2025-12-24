@@ -105,4 +105,8 @@
     <string name="tax_deduction_note">✅ BBF is a registered public benefit association (gemeinnütziger Verein) in Germany. Your donation is tax-deductible.</string>
     <string name="barakah_message">May Allah bless you for your generosity and reward you abundantly in this life and the hereafter.</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
+    
+    <!-- Display Settings -->
+    <string name="display_settings_title">🔤 Display Settings</string>
+    <string name="font_size_label">Font Size:</string>
 </resources>

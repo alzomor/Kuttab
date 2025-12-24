@@ -27,11 +27,14 @@ public class SettingsActivity : AppCompatActivity
     private LinearLayout? _reciterContainer;
     private TextView? _selectReciterLabel;
     private Spinner? _reciterSpinner;
+    private Spinner? _fontSizeSpinner;
     private Button? _saveButton;
     private Button? _cancelButton;
     
     // Text views for dynamic language update
     private TextView? _languageSettingsTitle;
+    private TextView? _displaySettingsTitle;
+    private TextView? _fontSizeLabel;
     private TextView? _selectLanguageLabel;
     private TextView? _searchDomainTitle;
     private TextView? _searchInLabel;
@@ -46,6 +49,7 @@ public class SettingsActivity : AppCompatActivity
     private List<SearchDomainOption> _searchDomainOptions = new();
     private List<string> _surahDisplayNames = new();
     private List<ReciterOption> _reciterOptions = new();
+    private List<int> _fontSizeOptions = new() { 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32 };
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -127,6 +131,9 @@ public class SettingsActivity : AppCompatActivity
         _toSurahLabel = FindViewById<TextView>(Resource.Id.toSurahLabel);
         _onlineResourcesTitle = FindViewById<TextView>(Resource.Id.onlineResourcesTitle);
         _onlineResourcesNote = FindViewById<TextView>(Resource.Id.onlineResourcesNote);
+        _displaySettingsTitle = FindViewById<TextView>(Resource.Id.displaySettingsTitle);
+        _fontSizeLabel = FindViewById<TextView>(Resource.Id.fontSizeLabel);
+        _fontSizeSpinner = FindViewById<Spinner>(Resource.Id.fontSizeSpinner);
 
         // Setup language spinner
         if (_languageSpinner != null)
@@ -151,6 +158,19 @@ public class SettingsActivity : AppCompatActivity
         
         // Setup reciter spinner
         SetupReciterSpinner();
+        
+        // Setup font size spinner
+        SetupFontSizeSpinner();
+    }
+    
+    private void SetupFontSizeSpinner()
+    {
+        if (_fontSizeSpinner == null) return;
+        
+        var fontSizeStrings = _fontSizeOptions.Select(s => $"{s} pt").ToList();
+        var adapter = new ArrayAdapter<string>(this, global::Android.Resource.Layout.SimpleSpinnerItem, fontSizeStrings);
+        adapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
+        _fontSizeSpinner.Adapter = adapter;
     }
     
     private void SetupReciterSpinner()
@@ -257,6 +277,22 @@ public class SettingsActivity : AppCompatActivity
             }
         }
         
+        // Load font size setting
+        var fontSize = prefs?.GetInt("FontSize", 18) ?? 18;
+        if (_fontSizeSpinner != null)
+        {
+            var fontSizeIndex = _fontSizeOptions.IndexOf(fontSize);
+            if (fontSizeIndex >= 0)
+            {
+                _fontSizeSpinner.SetSelection(fontSizeIndex);
+            }
+            else
+            {
+                // Default to 18pt (index 3)
+                _fontSizeSpinner.SetSelection(3);
+            }
+        }
+        
         // Update reciter container visibility based on remote audio setting
         UpdateReciterVisibility(useRemoteAudio);
 
@@ -356,6 +392,10 @@ public class SettingsActivity : AppCompatActivity
             _onlineResourcesTitle.Text = _localizationService["OnlineResourcesTitle"];
         if (_onlineResourcesNote != null)
             _onlineResourcesNote.Text = _localizationService["OnlineResourcesNoteText"];
+        if (_displaySettingsTitle != null)
+            _displaySettingsTitle.Text = _localizationService["DisplaySettingsTitle"];
+        if (_fontSizeLabel != null)
+            _fontSizeLabel.Text = _localizationService["FontSizeLabel"];
         
         // Update checkboxes
         if (_useRemoteAudioCheckBox != null)
@@ -467,6 +507,13 @@ public class SettingsActivity : AppCompatActivity
                 if (selectedReciterIndex >= 0 && selectedReciterIndex < _reciterOptions.Count)
                 {
                     editor.PutString("SelectedReciter", _reciterOptions[selectedReciterIndex].FolderName);
+                }
+                
+                // Save font size
+                var selectedFontSizeIndex = _fontSizeSpinner?.SelectedItemPosition ?? 3; // Default to 18pt
+                if (selectedFontSizeIndex >= 0 && selectedFontSizeIndex < _fontSizeOptions.Count)
+                {
+                    editor.PutInt("FontSize", _fontSizeOptions[selectedFontSizeIndex]);
                 }
 
                 editor.Apply();

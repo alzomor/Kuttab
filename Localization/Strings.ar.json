@@ -142,5 +142,7 @@
   "CodingAssistantTitle": "مساعد البرمجة",
   "WindsurfDescription": "تم استخدام بيئة التطوير Windsurf المدعومة بالذكاء الاصطناعي للتطوير والمساعدة في البرمجة.",
   "AcknowledgmentText": "الحمد لله رب العالمين. نسأل الله أن يكون هذا التطبيق نافعاً لمن يسعى لتعلم وفهم القرآن الكريم.",
-  "CloseButton": "✓ إغلاق"
+  "CloseButton": "✓ إغلاق",
+  "DisplaySettingsTitle": "🔤 إعدادات العرض",
+  "FontSizeLabel": "حجم الخط:"
 }

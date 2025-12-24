@@ -343,6 +343,7 @@
                                             <!-- Arabic text with highlighted matches -->
                                             <views:HighlightedTextBlock Text="{Binding Text}"
                                                                         MatchPositions="{Binding MatchPositions}"
+                                                                        FontSize="{Binding $parent[Window].DataContext.FontSize}"
                                                                         Margin="0,0,0,8"/>
                                             
                                             <!-- Matched characters display -->

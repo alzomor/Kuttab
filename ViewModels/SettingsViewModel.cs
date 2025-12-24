@@ -35,6 +35,7 @@ public class SettingsViewModel : ViewModelBase
     private SurahItem? _selectedStartSurah;
     private SurahItem? _selectedEndSurah;
     private ReciterOption _selectedReciter;
+    private int _fontSize = 18;
 
     public SettingsViewModel(LocalizationService localizationService, 
                             LanguageOption currentLanguage,
@@ -43,7 +44,8 @@ public class SettingsViewModel : ViewModelBase
                             SearchDomainOption? currentSearchDomain = null,
                             int startSurah = 1,
                             int endSurah = 114,
-                            string? selectedReciterFolder = null)
+                            string? selectedReciterFolder = null,
+                            int fontSize = 18)
     {
         _localizationService = localizationService;
         _selectedLanguage = currentLanguage;
@@ -52,6 +54,7 @@ public class SettingsViewModel : ViewModelBase
         _selectedSearchDomain = currentSearchDomain ?? SearchDomainOptions[0];
         _startSurah = startSurah;
         _endSurah = endSurah;
+        _fontSize = fontSize;
         _selectedReciter = ReciterOptions.FirstOrDefault(r => r.FolderName == selectedReciterFolder) 
                           ?? ReciterOptions.First(r => r.FolderName == "Husary_128kbps");
         
@@ -221,6 +224,20 @@ public class SettingsViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _useRemoteImages, value);
     }
 
+    public int FontSize
+    {
+        get => _fontSize;
+        set
+        {
+            if (value >= 12 && value <= 32)
+            {
+                this.RaiseAndSetIfChanged(ref _fontSize, value);
+            }
+        }
+    }
+
+    public List<int> FontSizeOptions { get; } = new() { 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32 };
+
     public ICommand SaveCommand { get; }
     public ICommand CancelCommand { get; }
 
@@ -237,7 +254,8 @@ public class SettingsViewModel : ViewModelBase
             EndSurah = EndSurah,
             UseRemoteAudio = UseRemoteAudio,
             UseRemoteImages = UseRemoteImages,
-            SelectedReciterFolder = SelectedReciter?.FolderName ?? "Husary_128kbps"
+            SelectedReciterFolder = SelectedReciter?.FolderName ?? "Husary_128kbps",
+            FontSize = FontSize
         };
         
         SettingsSaved?.Invoke(this, args);
@@ -276,4 +294,5 @@ public class SettingsSavedEventArgs : EventArgs
     public bool UseRemoteAudio { get; set; }
     public bool UseRemoteImages { get; set; }
     public string SelectedReciterFolder { get; set; } = "Husary_128kbps";
+    public int FontSize { get; set; } = 18;
 }

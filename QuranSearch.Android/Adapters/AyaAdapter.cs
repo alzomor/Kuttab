@@ -19,6 +19,7 @@ public class AyaAdapter : RecyclerView.Adapter
     public event EventHandler<int>? ItemClick;
     private LocalizationService? _localization;
     private bool _isRtl = false;
+    private int _fontSize = 18;
     
     public void UpdateData(List<QuranAya> items)
     {
@@ -34,6 +35,17 @@ public class AyaAdapter : RecyclerView.Adapter
         _isRtl = isRtl;
         NotifyDataSetChanged();
     }
+    
+    public void SetFontSize(int fontSize)
+    {
+        if (fontSize >= 12 && fontSize <= 32)
+        {
+            _fontSize = fontSize;
+            NotifyDataSetChanged();
+        }
+    }
+    
+    public int GetFontSize() => _fontSize;
     
     public string GetMatchedLabel()
     {
@@ -440,6 +452,7 @@ public class AyaViewHolder : RecyclerView.ViewHolder
             _arabicText.TextDirection = global::Android.Views.TextDirection.Rtl;
             _arabicText.Gravity = global::Android.Views.GravityFlags.Right;
             _arabicText.TextAlignment = global::Android.Views.TextAlignment.ViewEnd;
+            _arabicText.SetTextSize(global::Android.Util.ComplexUnitType.Sp, _adapter.GetFontSize());
         }
         else
         {
@@ -448,6 +461,7 @@ public class AyaViewHolder : RecyclerView.ViewHolder
             _arabicText.TextDirection = global::Android.Views.TextDirection.Rtl;
             _arabicText.Gravity = global::Android.Views.GravityFlags.Right;
             _arabicText.TextAlignment = global::Android.Views.TextAlignment.ViewEnd;
+            _arabicText.SetTextSize(global::Android.Util.ComplexUnitType.Sp, _adapter.GetFontSize());
         }
         
         // Set selection/playing background

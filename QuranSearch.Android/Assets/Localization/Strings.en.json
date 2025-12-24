@@ -83,5 +83,7 @@
   "AboutAssociation": "🏛️ About the Association",
   "AssociationDescription": "Bildungs- und Begegnungsverein Freiburg e.V. (BBF) is a registered charity in Germany dedicated to education and community building. We are building a community center on 1,307 m² of land.",
   "BarakahMessage": "May Allah bless you for your generosity and reward you abundantly in this life and the hereafter.",
-  "CloseButton": "✓ Close"
+  "CloseButton": "✓ Close",
+  "DisplaySettingsTitle": "🔤 Display Settings",
+  "FontSizeLabel": "Font Size:"
 }
