@@ -22,6 +22,7 @@ public class MainWindowViewModel : ViewModelBase
     private readonly IAudioService _audioService;
     private readonly IPictureService _pictureService;
     private readonly LocalizationService _localizationService;
+    private readonly ScreenKeepAwakeService _screenKeepAwakeService;
     private ObservableCollection<string> _rules = new();
     private ObservableCollection<RuleGroupNode> _ruleGroups = new();
     private ObservableCollection<QuranAya> _searchResults = new();
@@ -58,6 +59,7 @@ public class MainWindowViewModel : ViewModelBase
         _searchService = new QuranSearchService(fileService);
         _audioService = new AudioService();
         _pictureService = new PictureService();
+        _screenKeepAwakeService = new ScreenKeepAwakeService();
         _localizationService = new LocalizationService(fileService);
         
         // Initialize audio remote source setting
@@ -482,6 +484,9 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
         
+        // Prevent screen from sleeping during playback
+        _screenKeepAwakeService.PreventSleep();
+        
         _audioService.SetRepeatMode(false);
         
         // Check if this is Aya 1 from any Sura (except Sura 1 and Sura 9)
@@ -519,6 +524,9 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
         
+        // Prevent screen from sleeping during playback
+        _screenKeepAwakeService.PreventSleep();
+        
         // Check if this is Aya 1 from any Sura (except Sura 1 and Sura 9)
         // If so, play Basmala (Sura 1, Aya 1) first (only once, not repeated)
         if (SelectedAya.AyaNumber == 1 && SelectedAya.SurahNumber != 1 && SelectedAya.SurahNumber != 9)
@@ -550,6 +558,9 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
         
+        // Prevent screen from sleeping during playback
+        _screenKeepAwakeService.PreventSleep();
+        
         // Reset sequence state
         _isPlayingSequence = true;
         _isSequencePaused = false;
@@ -578,6 +589,9 @@ public class MainWindowViewModel : ViewModelBase
             _lastPlayedAyaIndex = -1;
             _currentPlayingAyaIndex = -1;
             StatusMessage = _localizationService.GetString("FinishedPlayingAll");
+            
+            // Allow screen to sleep again
+            _screenKeepAwakeService.AllowSleep();
             
             // Clear highlighting
             if (CurrentPlayingAya != null)
@@ -683,6 +697,9 @@ public class MainWindowViewModel : ViewModelBase
         CancelSequence();
         await _audioService.StopAsync();
         
+        // Allow screen to sleep again
+        _screenKeepAwakeService.AllowSleep();
+        
         // Update UI state on the UI thread
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
@@ -778,6 +795,12 @@ public class MainWindowViewModel : ViewModelBase
                 IsRepeating = false;
                 this.RaisePropertyChanged(nameof(IsPlaying));
                 this.RaisePropertyChanged(nameof(IsRepeating));
+                
+                // Allow screen to sleep when single playback ends (not in sequence mode)
+                if (!_isPlayingSequence)
+                {
+                    _screenKeepAwakeService.AllowSleep();
+                }
             }
         });
     }
