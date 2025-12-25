@@ -12,14 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:padding="8dp"
         android:layoutDirection="locale">
 
         <!-- Language Settings Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="6dp"
             android:elevation="4dp"
             android:radius="12dp">
 
@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="12dp">
 
                 <TextView
                     android:id="@+id/languageSettingsTitle"
@@ -37,7 +37,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#2C5F2D"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginBottom="6dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -68,7 +68,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="6dp"
             android:elevation="4dp"
             android:radius="12dp">
 
@@ -76,7 +76,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="12dp">
 
                 <TextView
                     android:id="@+id/searchDomainTitle"
@@ -86,14 +86,14 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#2C5F2D"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginBottom="6dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="6dp">
 
                     <TextView
                         android:id="@+id/searchInLabel"
@@ -200,7 +200,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="6dp"
             android:elevation="4dp"
             android:radius="12dp">
 
@@ -208,7 +208,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="12dp">
 
                 <TextView
                     android:id="@+id/onlineResourcesTitle"
@@ -218,7 +218,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#2C5F2D"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginBottom="6dp" />
 
                 <CheckBox
                     android:id="@+id/useRemoteAudioCheckBox"
@@ -280,7 +280,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="6dp"
             android:elevation="4dp"
             android:radius="12dp">
 
@@ -288,7 +288,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="12dp">
 
                 <TextView
                     android:id="@+id/displaySettingsTitle"
@@ -298,7 +298,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#2C5F2D"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginBottom="6dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

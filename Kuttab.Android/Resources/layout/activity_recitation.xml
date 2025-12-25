@@ -59,89 +59,100 @@
             android:padding="16dp">
 
             <!-- Reciter Selection -->
-            <TextView
-                android:id="@+id/reciterLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/select_reciter_label"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="4dp" />
-
-            <Spinner
-                android:id="@+id/reciterSpinner"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:background="@android:drawable/btn_dropdown" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
+
+                <TextView
+                    android:id="@+id/reciterLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_reciter_label"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="12dp"
+                    android:minWidth="80dp" />
+
+                <Spinner
+                    android:id="@+id/reciterSpinner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/btn_dropdown" />
+            </LinearLayout>
 
             <!-- Surah Selection -->
-            <TextView
-                android:id="@+id/surahLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/select_surah"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="4dp" />
-
-            <Spinner
-                android:id="@+id/surahSpinner"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:background="@android:drawable/btn_dropdown" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
+
+                <TextView
+                    android:id="@+id/surahLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/select_surah"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="12dp"
+                    android:minWidth="80dp" />
+
+                <Spinner
+                    android:id="@+id/surahSpinner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/btn_dropdown" />
+            </LinearLayout>
 
             <!-- Aya Range Selection -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="6dp">
 
-                <LinearLayout
-                    android:layout_width="0dp"
+                <!-- From Aya -->
+                <TextView
+                    android:id="@+id/fromAyaLabel"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginEnd="8dp">
+                    android:text="@string/from_aya"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="12dp"
+                    android:minWidth="80dp"
+                    android:gravity="center_vertical" />
 
-                    <TextView
-                        android:id="@+id/fromAyaLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/from_aya"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="4dp" />
-
-                    <Spinner
-                        android:id="@+id/fromAyaSpinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@android:drawable/btn_dropdown" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
+                <Spinner
+                    android:id="@+id/fromAyaSpinner"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="8dp">
+                    android:background="@android:drawable/btn_dropdown"
+                    android:layout_marginEnd="20dp" />
 
-                    <TextView
-                        android:id="@+id/toAyaLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/to_aya"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="4dp" />
+                <!-- To Aya -->
+                <TextView
+                    android:id="@+id/toAyaLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/to_aya"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="12dp"
+                    android:minWidth="50dp"
+                    android:gravity="center_vertical" />
 
-                    <Spinner
-                        android:id="@+id/toAyaSpinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@android:drawable/btn_dropdown" />
-                </LinearLayout>
+                <Spinner
+                    android:id="@+id/toAyaSpinner"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/btn_dropdown" />
             </LinearLayout>
 
             <!-- Repeat Mode Selection -->
@@ -150,7 +161,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="6dp">
 
                 <TextView
                     android:id="@+id/repeatModeLabel"
@@ -169,7 +180,7 @@
                     android:background="@android:drawable/btn_dropdown" />
             </LinearLayout>
 
-            <!-- Repeat Count Selection -->
+            <!-- Repeat Count Selection + Teacher Mode -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -199,18 +210,21 @@
                     android:text="@string/times"
                     android:textSize="14sp"
                     android:layout_marginStart="12dp" />
-            </LinearLayout>
 
-            <!-- Teacher Mode Toggle -->
-            <CheckBox
-                android:id="@+id/teacherModeCheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/teacher_mode"
-                android:textSize="14sp"
-                android:textColor="#2C5F2D"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp" />
+                <!-- Spacer -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <CheckBox
+                    android:id="@+id/teacherModeCheckbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/teacher_mode"
+                    android:textSize="14sp"
+                    android:textColor="#2C5F2D" />
+            </LinearLayout>
 
             <!-- Control Buttons -->
             <LinearLayout

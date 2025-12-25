@@ -8,17 +8,22 @@
     <ApplicationId>com.kuttab.app</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-    <RuntimeIdentifiers>android-x86;android-x64;android-arm64</RuntimeIdentifiers>
+    <!-- Build only for arm64 to reduce APK size (most modern devices) -->
+    <RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-    <AndroidEnableAssemblyCompression>false</AndroidEnableAssemblyCompression>
+    <!-- Enable assembly compression to reduce APK size -->
+    <AndroidEnableAssemblyCompression>true</AndroidEnableAssemblyCompression>
     <AndroidUseFastDeployment>false</AndroidUseFastDeployment>
     <!-- Disable AOT compilation to avoid SDK resolution issues -->
     <RunAOTCompilation>false</RunAOTCompilation>
     <EnableLLVM>false</EnableLLVM>
-    <!-- Disable IL Linker trimming to prevent ReactiveUI issues -->
+    <!-- Keep linking disabled to prevent issues -->
     <PublishTrimmed>false</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <AndroidLinkMode>None</AndroidLinkMode>
+    <!-- Strip debug symbols in release -->
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
