@@ -34,6 +34,7 @@
     <string name="info_contact_note">يرجى تضمين \'Kuttab\' في موضوع البريد الإلكتروني للتوجيه الصحيح.</string>
     
     <string name="info_close_button">✓ إغلاق</string>
+    <string name="close_button">✓ إغلاق</string>
     
     <!-- UI Labels -->
     <string name="select_language">اختر اللغة</string>

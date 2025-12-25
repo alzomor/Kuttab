@@ -34,6 +34,7 @@
     <string name="info_contact_note">Please include \'Kuttab\' in the email subject for proper routing.</string>
     
     <string name="info_close_button">✓ Close</string>
+    <string name="close_button">✓ Close</string>
     
     <!-- UI Labels -->
     <string name="select_language">Select Language</string>

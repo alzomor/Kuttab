@@ -34,6 +34,7 @@
     <string name="info_contact_note">Bitte fügen Sie \'Kuttab\' in die E-Mail-Betreffzeile für richtige Weiterleitung ein.</string>
     
     <string name="info_close_button">✓ Schließen</string>
+    <string name="close_button">✓ Schließen</string>
     
     <!-- UI Labels -->
     <string name="select_language">Sprache wählen</string>

@@ -143,6 +143,7 @@
   "WindsurfDescription": "Windsurf AI-powered IDE was used for development and coding assistance.",
   "AcknowledgmentText": "All praise is due to Allah, Lord of the worlds. May this application be of benefit to those seeking to learn and understand the Holy Quran.",
   "CloseButton": "✓ Close",
+  "close_button": "✓ Close",
   "DisplaySettingsTitle": "🔤 Display Settings",
   "FontSizeLabel": "Font Size:",
   "QuranTextLabel": "Quran Text:",

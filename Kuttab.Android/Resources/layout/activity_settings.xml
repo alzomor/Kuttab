@@ -374,12 +374,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="@string/cancel"
+                android:text="@string/close_button"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:textColor="#FFFFFF"
                 android:background="#8B7355"
-                android:minHeight="48dp"
-                android:textStyle="bold" />
+                android:layout_marginStart="8dp"
+                android:minHeight="48dp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

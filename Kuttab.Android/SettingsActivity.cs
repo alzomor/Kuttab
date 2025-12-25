@@ -464,7 +464,7 @@ public class SettingsActivity : AppCompatActivity
         if (_saveButton != null)
             _saveButton.Text = _localizationService["SaveSettingsButton"];
         if (_cancelButton != null)
-            _cancelButton.Text = _localizationService["CancelButton"];
+            _cancelButton.Text = _localizationService["CloseButton"];
         
         // Update search domain spinner with new language
         if (_searchDomainSpinner != null)

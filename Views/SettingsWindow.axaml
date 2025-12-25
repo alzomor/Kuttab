@@ -272,7 +272,7 @@
                         Margin="0,0,15,0"/>
                 
                 <Button Classes="secondary"
-                        Content="{Binding Localization.CancelButton}"
+                        Content="{Binding Localization.CloseButton}"
                         Command="{Binding CancelCommand}"/>
             </StackPanel>
         </StackPanel>
