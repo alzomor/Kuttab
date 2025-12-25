@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kuttab", "Kuttab.csproj", "{D7C54323-8821-4F11-9AD2-16861FD087ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kuttab.Core", "Kuttab.Core\Kuttab.Core.csproj", "{F6916E15-CC1B-4EF8-9481-7EDC8E9A6944}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kuttab.Android", "Kuttab.Android\Kuttab.Android.csproj", "{C4537910-29CD-41C3-ADC3-382378ACA850}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7C54323-8821-4F11-9AD2-16861FD087ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7C54323-8821-4F11-9AD2-16861FD087ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7C54323-8821-4F11-9AD2-16861FD087ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7C54323-8821-4F11-9AD2-16861FD087ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6916E15-CC1B-4EF8-9481-7EDC8E9A6944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6916E15-CC1B-4EF8-9481-7EDC8E9A6944}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6916E15-CC1B-4EF8-9481-7EDC8E9A6944}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6916E15-CC1B-4EF8-9481-7EDC8E9A6944}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4537910-29CD-41C3-ADC3-382378ACA850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4537910-29CD-41C3-ADC3-382378ACA850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4537910-29CD-41C3-ADC3-382378ACA850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4537910-29CD-41C3-ADC3-382378ACA850}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

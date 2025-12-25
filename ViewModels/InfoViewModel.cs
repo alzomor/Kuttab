@@ -22,7 +22,7 @@ public class InfoViewModel : ViewModelBase
 
     public LocalizationService Localization => _localizationService;
 
-    public string AppVersion => "v0.3 TEST VERSION";
+    public string AppVersion => "v0.8 TEST VERSION";
 
     public ICommand CloseCommand { get; }
 
