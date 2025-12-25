@@ -26,17 +26,25 @@ public class QuranSearchService
 
     private List<QuranAya> _quranText = new();
     private List<TajweedRule> _rules = new();
+    private string _quranTextFile = "quran-uthmani-ver1.2.txt";
 
     public QuranSearchService(IFileService fileService)
     {
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
     }
 
+    public void SetQuranTextFile(string fileName)
+    {
+        _quranTextFile = fileName;
+        // Reload the Quran text with new file
+        _ = LoadQuranTextAsync();
+    }
+
     public async Task LoadQuranTextAsync()
     {
         try
         {
-            var content = await _fileService.ReadAllTextAsync("quran-uthmani.txt");
+            var content = await _fileService.ReadAllTextAsync(_quranTextFile);
             var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             _quranText.Clear();
 

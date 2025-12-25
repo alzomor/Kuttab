@@ -109,4 +109,5 @@
     <!-- Display Settings -->
     <string name="display_settings_title">🔤 Display Settings</string>
     <string name="font_size_label">Font Size:</string>
+    <string name="quran_text_label">Quran Text:</string>
 </resources>

@@ -85,5 +85,9 @@
   "BarakahMessage": "بارك الله فيكم على كرمكم وجزاكم خيراً في الدنيا والآخرة.",
   "CloseButton": "✓ إغلاق",
   "DisplaySettingsTitle": "🔤 إعدادات العرض",
-  "FontSizeLabel": "حجم الخط:"
+  "FontSizeLabel": "حجم الخط:",
+  "QuranTextLabel": "نص القرآن:",
+  "QuranTextUthmaniClean": "العثماني (نظيف - موصى به)",
+  "QuranTextUthmaniOriginal": "العثماني (الأصلي مع التعليقات)",
+  "QuranTextChanged": "تم تغيير مصدر نص القرآن. يرجى البحث مرة أخرى."
 }

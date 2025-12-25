@@ -85,5 +85,9 @@
   "BarakahMessage": "Möge Allah Sie für Ihre Großzügigkeit segnen und Sie reichlich belohnen in diesem Leben und im Jenseits.",
   "CloseButton": "✓ Schließen",
   "DisplaySettingsTitle": "🔤 Anzeigeeinstellungen",
-  "FontSizeLabel": "Schriftgröße:"
+  "FontSizeLabel": "Schriftgröße:",
+  "QuranTextLabel": "Korantext:",
+  "QuranTextUthmaniClean": "Uthmani (Bereinigt - Empfohlen)",
+  "QuranTextUthmaniOriginal": "Uthmani (Original mit Anmerkungen)",
+  "QuranTextChanged": "Korantext-Quelle geändert. Bitte erneut suchen."
 }

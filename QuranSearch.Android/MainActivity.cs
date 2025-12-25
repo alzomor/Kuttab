@@ -866,6 +866,13 @@ public class MainActivity : AppCompatActivity
         {
             _adapter.SetFontSize(fontSize);
         }
+        
+        // Load Quran text file setting
+        var quranTextFile = prefs?.GetString("QuranTextFile", "quran-uthmani-ver1.2.txt") ?? "quran-uthmani-ver1.2.txt";
+        if (_searchService != null)
+        {
+            _searchService.SetQuranTextFile(quranTextFile);
+        }
     }
 
     protected override void OnDestroy()

@@ -144,5 +144,9 @@
   "AcknowledgmentText": "Alles Lob gebührt Allah, dem Herrn der Welten. Möge diese Anwendung denjenigen von Nutzen sein, die den Heiligen Koran lernen und verstehen möchten.",
   "CloseButton": "✓ Schließen",
   "DisplaySettingsTitle": "🔤 Anzeigeeinstellungen",
-  "FontSizeLabel": "Schriftgröße:"
+  "FontSizeLabel": "Schriftgröße:",
+  "QuranTextLabel": "Korantext:",
+  "QuranTextUthmaniClean": "Uthmani (Bereinigt - Empfohlen)",
+  "QuranTextUthmaniOriginal": "Uthmani (Original mit Anmerkungen)",
+  "QuranTextChanged": "Korantext-Quelle geändert. Bitte erneut suchen."
 }

@@ -245,6 +245,20 @@
                                   MinWidth="100"/>
                         <TextBlock Text="pt" VerticalAlignment="Center" Margin="10,0,0,0"/>
                     </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Classes="label" Text="{Binding Localization[QuranTextLabel]}" Width="150"/>
+                        <ComboBox Classes="settings-combo"
+                                  ItemsSource="{Binding QuranTextOptions}"
+                                  SelectedItem="{Binding SelectedQuranText}"
+                                  MinWidth="280">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="vm:QuranTextOption" x:CompileBindings="False">
+                                    <TextBlock Text="{Binding $parent[Window].DataContext.Localization[DisplayKey]}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
                 </StackPanel>
             </Border>
 

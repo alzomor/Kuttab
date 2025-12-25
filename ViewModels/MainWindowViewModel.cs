@@ -50,6 +50,7 @@ public class MainWindowViewModel : ViewModelBase
     private int _searchEndSurah = 114;
     private string _selectedReciterFolder = "Husary_128kbps";
     private int _fontSize = 18;
+    private string _selectedQuranTextFile = "quran-uthmani-ver1.2.txt";
 
     // Map from display name (may be localized) to Arabic rule name used in rules.json
     private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
@@ -962,7 +963,8 @@ public class MainWindowViewModel : ViewModelBase
             _searchStartSurah,
             _searchEndSurah,
             _selectedReciterFolder,
-            _fontSize);
+            _fontSize,
+            _selectedQuranTextFile);
 
         var settingsWindow = new Views.SettingsWindow
         {
@@ -990,6 +992,16 @@ public class MainWindowViewModel : ViewModelBase
             if (_audioService is Services.AudioService audioService)
             {
                 audioService.SelectedReciter = _selectedReciterFolder;
+            }
+
+            // Check if Quran text file changed and reload data if needed
+            if (_selectedQuranTextFile != result.SelectedQuranTextFile)
+            {
+                _selectedQuranTextFile = result.SelectedQuranTextFile;
+                _searchService.SetQuranTextFile(_selectedQuranTextFile);
+                // Clear search results since data source changed
+                SearchResults.Clear();
+                StatusMessage = _localizationService.GetString("QuranTextChanged");
             }
 
             // Update status message

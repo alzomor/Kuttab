@@ -28,6 +28,8 @@ public class SettingsActivity : AppCompatActivity
     private TextView? _selectReciterLabel;
     private Spinner? _reciterSpinner;
     private Spinner? _fontSizeSpinner;
+    private Spinner? _quranTextSpinner;
+    private TextView? _quranTextLabel;
     private Button? _saveButton;
     private Button? _cancelButton;
     
@@ -50,6 +52,11 @@ public class SettingsActivity : AppCompatActivity
     private List<string> _surahDisplayNames = new();
     private List<ReciterOption> _reciterOptions = new();
     private List<int> _fontSizeOptions = new() { 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32 };
+    private List<QuranTextOption> _quranTextOptions = new()
+    {
+        new QuranTextOption { FileName = "quran-uthmani-ver1.2.txt", DisplayKey = "QuranTextUthmaniClean" },
+        new QuranTextOption { FileName = "quran-uthmani.txt", DisplayKey = "QuranTextUthmaniOriginal" }
+    };
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -134,6 +141,8 @@ public class SettingsActivity : AppCompatActivity
         _displaySettingsTitle = FindViewById<TextView>(Resource.Id.displaySettingsTitle);
         _fontSizeLabel = FindViewById<TextView>(Resource.Id.fontSizeLabel);
         _fontSizeSpinner = FindViewById<Spinner>(Resource.Id.fontSizeSpinner);
+        _quranTextLabel = FindViewById<TextView>(Resource.Id.quranTextLabel);
+        _quranTextSpinner = FindViewById<Spinner>(Resource.Id.quranTextSpinner);
 
         // Setup language spinner
         if (_languageSpinner != null)
@@ -161,6 +170,19 @@ public class SettingsActivity : AppCompatActivity
         
         // Setup font size spinner
         SetupFontSizeSpinner();
+        
+        // Setup Quran text spinner
+        SetupQuranTextSpinner();
+    }
+    
+    private void SetupQuranTextSpinner()
+    {
+        if (_quranTextSpinner == null || _localizationService == null) return;
+        
+        var quranTextNames = _quranTextOptions.Select(q => _localizationService[q.DisplayKey]).ToList();
+        var adapter = new ArrayAdapter<string>(this, global::Android.Resource.Layout.SimpleSpinnerItem, quranTextNames);
+        adapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
+        _quranTextSpinner.Adapter = adapter;
     }
     
     private void SetupFontSizeSpinner()
@@ -293,6 +315,17 @@ public class SettingsActivity : AppCompatActivity
             }
         }
         
+        // Load Quran text file setting
+        var quranTextFile = prefs?.GetString("QuranTextFile", "quran-uthmani-ver1.2.txt") ?? "quran-uthmani-ver1.2.txt";
+        if (_quranTextSpinner != null)
+        {
+            var quranTextIndex = _quranTextOptions.FindIndex(q => q.FileName == quranTextFile);
+            if (quranTextIndex >= 0)
+            {
+                _quranTextSpinner.SetSelection(quranTextIndex);
+            }
+        }
+        
         // Update reciter container visibility based on remote audio setting
         UpdateReciterVisibility(useRemoteAudio);
 
@@ -396,6 +429,11 @@ public class SettingsActivity : AppCompatActivity
             _displaySettingsTitle.Text = _localizationService["DisplaySettingsTitle"];
         if (_fontSizeLabel != null)
             _fontSizeLabel.Text = _localizationService["FontSizeLabel"];
+        if (_quranTextLabel != null)
+            _quranTextLabel.Text = _localizationService["QuranTextLabel"];
+        
+        // Update Quran text spinner with localized names
+        SetupQuranTextSpinner();
         
         // Update checkboxes
         if (_useRemoteAudioCheckBox != null)
@@ -515,6 +553,13 @@ public class SettingsActivity : AppCompatActivity
                 {
                     editor.PutInt("FontSize", _fontSizeOptions[selectedFontSizeIndex]);
                 }
+                
+                // Save Quran text file
+                var selectedQuranTextIndex = _quranTextSpinner?.SelectedItemPosition ?? 0; // Default to clean version
+                if (selectedQuranTextIndex >= 0 && selectedQuranTextIndex < _quranTextOptions.Count)
+                {
+                    editor.PutString("QuranTextFile", _quranTextOptions[selectedQuranTextIndex].FileName);
+                }
 
                 editor.Apply();
             }
@@ -564,4 +609,10 @@ public class ReciterOption
 {
     public string FolderName { get; set; } = string.Empty;
     public int DisplayNameResId { get; set; }
+}
+
+public class QuranTextOption
+{
+    public string FileName { get; set; } = string.Empty;
+    public string DisplayKey { get; set; } = string.Empty;
 }

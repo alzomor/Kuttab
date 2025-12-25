@@ -85,5 +85,9 @@
   "BarakahMessage": "May Allah bless you for your generosity and reward you abundantly in this life and the hereafter.",
   "CloseButton": "✓ Close",
   "DisplaySettingsTitle": "🔤 Display Settings",
-  "FontSizeLabel": "Font Size:"
+  "FontSizeLabel": "Font Size:",
+  "QuranTextLabel": "Quran Text:",
+  "QuranTextUthmaniClean": "Uthmani (Clean - Recommended)",
+  "QuranTextUthmaniOriginal": "Uthmani (Original with annotations)",
+  "QuranTextChanged": "Quran text source changed. Please search again."
 }

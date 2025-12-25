@@ -23,6 +23,12 @@ public class ReciterOption
     public string DisplayKey { get; set; } = string.Empty;
 }
 
+public class QuranTextOption
+{
+    public string FileName { get; set; } = string.Empty;
+    public string DisplayKey { get; set; } = string.Empty;
+}
+
 public class SettingsViewModel : ViewModelBase
 {
     private readonly LocalizationService _localizationService;
@@ -36,6 +42,7 @@ public class SettingsViewModel : ViewModelBase
     private SurahItem? _selectedEndSurah;
     private ReciterOption _selectedReciter;
     private int _fontSize = 18;
+    private QuranTextOption _selectedQuranText;
 
     public SettingsViewModel(LocalizationService localizationService, 
                             LanguageOption currentLanguage,
@@ -45,7 +52,8 @@ public class SettingsViewModel : ViewModelBase
                             int startSurah = 1,
                             int endSurah = 114,
                             string? selectedReciterFolder = null,
-                            int fontSize = 18)
+                            int fontSize = 18,
+                            string? selectedQuranTextFile = null)
     {
         _localizationService = localizationService;
         _selectedLanguage = currentLanguage;
@@ -57,6 +65,8 @@ public class SettingsViewModel : ViewModelBase
         _fontSize = fontSize;
         _selectedReciter = ReciterOptions.FirstOrDefault(r => r.FolderName == selectedReciterFolder) 
                           ?? ReciterOptions.First(r => r.FolderName == "Husary_128kbps");
+        _selectedQuranText = QuranTextOptions.FirstOrDefault(q => q.FileName == selectedQuranTextFile)
+                          ?? QuranTextOptions.First(q => q.FileName == "quran-uthmani-ver1.2.txt");
         
         // Initialize surah list
         InitializeSurahList();
@@ -132,6 +142,18 @@ public class SettingsViewModel : ViewModelBase
     {
         get => _selectedReciter;
         set => this.RaiseAndSetIfChanged(ref _selectedReciter, value);
+    }
+
+    public List<QuranTextOption> QuranTextOptions { get; } = new()
+    {
+        new QuranTextOption { FileName = "quran-uthmani-ver1.2.txt", DisplayKey = "QuranTextUthmaniClean" },
+        new QuranTextOption { FileName = "quran-uthmani.txt", DisplayKey = "QuranTextUthmaniOriginal" }
+    };
+
+    public QuranTextOption SelectedQuranText
+    {
+        get => _selectedQuranText;
+        set => this.RaiseAndSetIfChanged(ref _selectedQuranText, value);
     }
 
     public ObservableCollection<SurahItem> SurahList { get; } = new();
@@ -255,7 +277,8 @@ public class SettingsViewModel : ViewModelBase
             UseRemoteAudio = UseRemoteAudio,
             UseRemoteImages = UseRemoteImages,
             SelectedReciterFolder = SelectedReciter?.FolderName ?? "Husary_128kbps",
-            FontSize = FontSize
+            FontSize = FontSize,
+            SelectedQuranTextFile = SelectedQuranText?.FileName ?? "quran-uthmani-ver1.2.txt"
         };
         
         SettingsSaved?.Invoke(this, args);
@@ -295,4 +318,5 @@ public class SettingsSavedEventArgs : EventArgs
     public bool UseRemoteImages { get; set; }
     public string SelectedReciterFolder { get; set; } = "Husary_128kbps";
     public int FontSize { get; set; } = 18;
+    public string SelectedQuranTextFile { get; set; } = "quran-uthmani-ver1.2.txt";
 }

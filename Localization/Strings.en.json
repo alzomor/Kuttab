@@ -144,5 +144,9 @@
   "AcknowledgmentText": "All praise is due to Allah, Lord of the worlds. May this application be of benefit to those seeking to learn and understand the Holy Quran.",
   "CloseButton": "✓ Close",
   "DisplaySettingsTitle": "🔤 Display Settings",
-  "FontSizeLabel": "Font Size:"
+  "FontSizeLabel": "Font Size:",
+  "QuranTextLabel": "Quran Text:",
+  "QuranTextUthmaniClean": "Uthmani (Clean - Recommended)",
+  "QuranTextUthmaniOriginal": "Uthmani (Original with annotations)",
+  "QuranTextChanged": "Quran text source changed. Please search again."
 }
