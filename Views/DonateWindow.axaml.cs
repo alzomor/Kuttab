@@ -2,12 +2,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
-using QuranSearchApp.ViewModels;
+using Kuttab.ViewModels;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace QuranSearchApp.Views;
+namespace Kuttab.Views;
 
 public partial class DonateWindow : Window
 {

@@ -1,0 +1,86 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Use Exe for Debug (shows console), WinExe for Release (no console) -->
+    <OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>
+    <OutputType Condition="'$(Configuration)' == 'Release'">WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    
+    <!-- Multi-platform support -->
+    <RuntimeIdentifiers>linux-x64;win-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
+    
+    <!-- Organize output by platform when publishing -->
+    <PublishDir Condition="'$(RuntimeIdentifier)' != ''">$(MSBuildProjectDirectory)\publish\$(RuntimeIdentifier)\</PublishDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="ViewModels\" />
+    <Folder Include="Views\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference to shared Core library -->
+    <ProjectReference Include="Kuttab.Core\Kuttab.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Exclude platform-specific project files and Core source from desktop builds -->
+    <Compile Remove="Kuttab.Android\**" />
+    <Compile Remove="QuranSearch.MAUI\**" />
+    <Compile Remove="QuranSearch.Web\**" />
+    <Compile Remove="QuranSearchWebApi\**" />
+    <Compile Remove="Kuttab.Core\**" />
+    <Compile Remove="Alhusary\**" />
+    <Compile Remove="QuranText_jpg\**" />
+    <EmbeddedResource Remove="Kuttab.Android\**" />
+    <EmbeddedResource Remove="QuranSearch.MAUI\**" />
+    <EmbeddedResource Remove="QuranSearch.Web\**" />
+    <EmbeddedResource Remove="QuranSearchWebApi\**" />
+    <EmbeddedResource Remove="Kuttab.Core\**" />
+    <EmbeddedResource Remove="Alhusary\**" />
+    <EmbeddedResource Remove="QuranText_jpg\**" />
+    <None Remove="Kuttab.Android\**" />
+    <None Remove="QuranSearch.MAUI\**" />
+    <None Remove="QuranSearch.Web\**" />
+    <None Remove="QuranSearchWebApi\**" />
+    <None Remove="Kuttab.Core\**" />
+    <None Remove="Alhusary\**" />
+    <None Remove="QuranText_jpg\**" />
+    <Content Remove="Alhusary\**" />
+    <Content Remove="QuranText_jpg\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.0.10" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.10" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="quran-uthmani.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="rules.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Localization\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Fonts\*.ttf" />
+  </ItemGroup>
+
+</Project>

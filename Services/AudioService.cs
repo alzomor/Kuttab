@@ -6,9 +6,9 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Text;
-using QuranSearch.Core.Interfaces;
+using Kuttab.Core.Interfaces;
 
-namespace QuranSearchApp.Services
+namespace Kuttab.Services
 {
     public class AudioService : IAudioService
     {

@@ -4,11 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using ReactiveUI;
-using QuranSearch.Core.Services;
-using QuranSearch.Core.ViewModels;
-using QuranSearch.Core.Models;
+using Kuttab.Core.Services;
+using Kuttab.Core.ViewModels;
+using Kuttab.Core.Models;
 
-namespace QuranSearchApp.ViewModels;
+namespace Kuttab.ViewModels;
 
 public class SurahItem
 {

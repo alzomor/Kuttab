@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace QuranSearchApp.Views;
+namespace Kuttab.Views;
 
 public partial class MainWindow : Window
 {

@@ -1,0 +1,116 @@
+<resources>
+    <string name="app_name">كُتّاب</string>
+    <string name="info_title">معلومات &amp; الإشادات</string>
+    
+    <!-- Info Page Content -->
+    <string name="info_app_title">كُتّاب</string>
+    <string name="info_app_subtitle">مدرب التجويد</string>
+    <string name="info_app_version">v0.3 نسخة اختبارية</string>
+    
+    <string name="info_citations_title">📖 الإحالات &amp; المصادر</string>
+    <string name="info_quran_text_title">نص القرآن العثماني</string>
+    <string name="info_quran_text_content">يستخدم هذا التطبيق نسخة معدلة من نص القرآن العثماني. النص الأصلي مأخوذ من Tanzil.net، الذي يوفر نسخة موثوقة ومعيارية من القرآن الكريم بالخط العثماني.</string>
+    <string name="info_quran_text_url">https://tanzil.net/</string>
+    
+    <string name="info_audio_files_title">التلاوات الصوتية</string>
+    <string name="info_audio_files_content">ملفات الصوت مأخوذة من EveryAyah.com، الذي يوفر تلاوات عالية الجودة للقرآن الكريم من قبل قراء مشهورين متنوعين.</string>
+    <string name="info_audio_files_url">https://www.everyayah.com/</string>
+    
+    <string name="info_picture_files_title">صور الآيات</string>
+    <string name="info_picture_files_content">صور الآيات القرآنية مولدة من مصحف المدينة المنورة القياسي، محسنة للعرض الرقمي. يتم تنزيل صور الآيات من EveryAyah.com، الذي يوفر نسخة عالية الجودة من المصحف الشريف.</string>
+    
+    <string name="info_usul_ai_title">التحقق من قواعد التجويد</string>
+    <string name="info_usul_ai_content">تم استخدام Usul.ai للتحقق والمساعدة في التطوير لإنشاء واختبار قواعد البحث بالتجويد، مما يضمن الدقة في اكتشاف الأنماط.</string>
+    <string name="info_usul_ai_url">https://usul.ai/</string>
+    
+    <string name="info_disclaimer_title">⚠️ تنبيه مهم</string>
+    <string name="info_training_disclaimer_title">لأغراض تعليمية فقط</string>
+    <string name="info_training_disclaimer_content">هذا التطبيق مصمم لأغراض التدريب والتعليم. لا يمكن ولا ينبغي استخدامه كبديل لتعلم التجويد مع شيخ مؤهل. يتطلب التجويد الصحيح إرشاداً مباشراً من المعلمين المعتمدين.</string>
+    <string name="info_general_disclaimer_content">ما كان من انجاز فهو بعون الله و توفيقه و ما قد يكون من خظأ أو نقصان نستغفر الله منه و نرجوا منك التواصل معنا لتصحيحة أو أذا كان لديك أي اقتراحات.</string>
+    
+    <string name="info_contact_email_title">البريد الإلكتروني للاتصال:</string>
+    <string name="info_contact_email">almanar.backup@gmail.com</string>
+    <string name="info_contact_subject">الموضوع: Kuttab</string>
+    <string name="info_contact_note">يرجى تضمين \'Kuttab\' في موضوع البريد الإلكتروني للتوجيه الصحيح.</string>
+    
+    <string name="info_close_button">✓ إغلاق</string>
+    
+    <!-- UI Labels -->
+    <string name="select_language">اختر اللغة</string>
+    <string name="select_rule">اختر قاعدة التجويد</string>
+    <string name="search">بحث</string>
+    <string name="play">تشغيل</string>
+    <string name="play_repeat">إعادة التشغيل</string>
+    <string name="play_all">تشغيل الكل</string>
+    <string name="stop">إيقاف</string>
+    <string name="use_remote_audio">استخدام الصوت عن بُعد</string>
+    <string name="ready">جاهز</string>
+    
+    <!-- Status Messages -->
+    <string name="loading">جاري تحميل بيانات القرآن...</string>
+    <string name="searching">جاري البحث...</string>
+    <string name="found_matches">تم العثور على %d نتيجة</string>
+    <string name="no_matches">لا توجد نتائج</string>
+    <string name="playing">جاري التشغيل...</string>
+    <string name="stopped">تم الإيقاف</string>
+    <string name="error_loading">خطأ في تحميل البيانات</string>
+    
+    <!-- Error Messages -->
+    <string name="SelectSpecificRule">الرجاء اختيار قاعدة محددة، وليس مجموعة</string>
+    <string name="SelectRuleFirst">الرجاء اختيار قاعدة تجويد أولاً</string>
+    
+    <!-- Languages -->
+    <string name="arabic">العربية</string>
+    <string name="english">English</string>
+    <string name="german">Deutsch</string>
+    
+    <!-- Matched Text -->
+    <string name="matched_text">المطابقة: %s</string>
+    
+    <!-- Settings Page -->
+    <string name="language_settings_title">🗣️ إعدادات اللغة</string>
+    <string name="select_language_label">اختر اللغة:</string>
+    <string name="search_domain_title">🔍 نطاق البحث</string>
+    <string name="search_in_label">البحث في:</string>
+    <string name="surah_number_label">السورة:</string>
+    <string name="from_surah_label">من السورة:</string>
+    <string name="to_surah_label">إلى السورة:</string>
+    <string name="online_resources_title">🌐 الموارد المتصلة</string>
+    <string name="get_audio_from_internet">🔊 الحصول على ملفات الصوت من الإنترنت</string>
+    <string name="get_images_from_internet">📷 الحصول على صور الآيات من الإنترنت</string>
+    <string name="online_resources_note">ملاحظة: فعّل هذه الخيارات إذا لم تكن الملفات المحلية متاحة</string>
+    <string name="select_reciter_label">القارئ:</string>
+    
+    <!-- Reciters -->
+    <string name="reciter_abdul_basit">عبد الباسط عبد الصمد (مرتل)</string>
+    <string name="reciter_ayman_sowaid">أيمن سويد</string>
+    <string name="reciter_husary">محمود خليل الحصري</string>
+    <string name="reciter_husary_muallim">الحصري (المعلم)</string>
+    <string name="reciter_menshawi">محمد صديق المنشاوي</string>
+    <string name="reciter_tablaway">محمد الطبلاوي</string>
+    <string name="reciter_mustafa_ismail">مصطفى إسماعيل</string>
+    <string name="reciter_ayyoub">محمد أيوب</string>
+    <string name="reciter_banna">محمود علي البنا</string>
+    <string name="save_settings">💾 حفظ الإعدادات</string>
+    <string name="cancel">❌ إلغاء</string>
+    <string name="whole_quran">القرآن الكريم كاملاً (114 سورة)</string>
+    <string name="single_surah">سورة واحدة</string>
+    <string name="surah_range">نطاق من السور</string>
+    
+    <!-- Donation Page -->
+    <string name="donate">🕌 تبرع</string>
+    <string name="donate_title">🕌 ادعم مشروع بناء مركز الجمعية</string>
+    <string name="donate_subtitle">ساعدنا في بناء مركز جمعية الثقافة والتواصل في فرايبورغ! تكلفة الأرض (1,307 م²) مليون يورو - تم جمع 700,000 يورو ولا يزال مطلوباً 300,000 يورو.</string>
+    <string name="donate_via_paypal">💳 التبرع عبر PayPal</string>
+    <string name="paypal_description">تبرع سريع وآمن عبر الإنترنت من خلال PayPal.</string>
+    <string name="donate_via_bank">🏦 التبرع عبر التحويل البنكي</string>
+    <string name="account_holder">صاحب الحساب:</string>
+    <string name="payment_reference">الغرض من التحويل:</string>
+    <string name="copy_button">📋 نسخ</string>
+    <string name="bank_transfer_note">يرجى كتابة الغرض من التحويل لضمان وصول تبرعك لمشروع بناء مركز الجمعية.</string>
+    <string name="about_association">🏛️ عن الجمعية</string>
+    <string name="association_description">جمعية الثقافة والتواصل في فرايبورغ (BBF) هي جمعية خيرية مسجلة في ألمانيا مكرسة للتعليم وبناء المجتمع. نحن نبني مركزاً مجتمعياً على أرض مساحتها 1,307 م².</string>
+    <string name="tax_deduction_note">✅ جمعية BBF معترف بها كجمعية ذات نفع عام في ألمانيا. تبرعاتكم قابلة للخصم من الضرائب.</string>
+    <string name="barakah_message">بارك الله فيكم على كرمكم وجزاكم خيراً في الدنيا والآخرة.</string>
+    <string name="copied_to_clipboard">تم النسخ إلى الحافظة</string>
+</resources>

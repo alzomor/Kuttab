@@ -4,14 +4,14 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
-using QuranSearch.Core.Models;
-using QuranSearch.Core.Services;
-using QuranSearch.Core.Interfaces;
-using QuranSearch.Core.ViewModels;
-using QuranSearchApp.Services;
+using Kuttab.Core.Models;
+using Kuttab.Core.Services;
+using Kuttab.Core.Interfaces;
+using Kuttab.Core.ViewModels;
+using Kuttab.Services;
 using FlowDirection = Avalonia.Media.FlowDirection;
 
-namespace QuranSearchApp.ViewModels;
+namespace Kuttab.ViewModels;
 
 public class RecitationViewModel : ViewModelBase
 {

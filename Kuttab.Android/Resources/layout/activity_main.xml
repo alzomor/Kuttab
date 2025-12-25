@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Green Header Bar with App Name and Settings Button -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#4CAF50"
+        android:padding="8dp"
+        android:elevation="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="8dp" />
+
+        <Button
+            android:id="@+id/donateButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="🕌"
+            android:textSize="24sp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:textColor="#FFFFFF"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/recitationButton"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/recitationButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="🎧"
+            android:textSize="24sp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:textColor="#FFFFFF"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/infoButton"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/infoButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="ℹ️"
+            android:textSize="24sp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:textColor="#FFFFFF"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/settingsButton"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="⚙️"
+            android:textSize="24sp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:textColor="#FFFFFF"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+
+    <!-- Main Content Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+    <!-- Rule Selector with Icon -->
+    <LinearLayout
+        android:id="@+id/ruleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp"
+        android:gravity="center_vertical">
+        
+        <TextView
+            android:id="@+id/ruleIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📖"
+            android:textSize="24sp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp" />
+        
+        <Spinner
+            android:id="@+id/ruleSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <!-- Search Button -->
+    <Button
+        android:id="@+id/searchButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/search"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Audio Controls Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <Button
+            android:id="@+id/playButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/play"
+            android:layout_marginEnd="4dp"
+            android:enabled="false" />
+
+        <Button
+            android:id="@+id/playRepeatButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/play_repeat"
+            android:layout_marginEnd="4dp"
+            android:enabled="false" />
+
+        <Button
+            android:id="@+id/playAllButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/play_all"
+            android:enabled="false" />
+
+    </LinearLayout>
+
+    <!-- Stop Button -->
+    <Button
+        android:id="@+id/stopButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/stop"
+        android:layout_marginBottom="8dp"
+        android:enabled="false" />
+
+    <!-- Status Text -->
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ready"
+        android:layout_marginBottom="8dp"
+        android:textStyle="bold" />
+
+    <!-- Results RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Aya Image Preview (below the list) -->
+    <ImageView
+        android:id="@+id/ayaImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:layout_marginTop="8dp"
+        android:visibility="gone" />
+
+    </LinearLayout>
+</LinearLayout>

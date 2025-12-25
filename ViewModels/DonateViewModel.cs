@@ -5,10 +5,10 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using ReactiveUI;
-using QuranSearch.Core.Services;
-using QuranSearch.Core.ViewModels;
+using Kuttab.Core.Services;
+using Kuttab.Core.ViewModels;
 
-namespace QuranSearchApp.ViewModels;
+namespace Kuttab.ViewModels;
 
 public class DonateViewModel : ViewModelBase
 {
@@ -18,7 +18,7 @@ public class DonateViewModel : ViewModelBase
     private const string Iban = "DE11 6805 0101 0014 3501 24";
     private const string PaymentReference = "Spende BBF-Bauprojekt | über die App Kuttab";
 
-    public DonateViewModel() : this(new LocalizationService(new QuranSearchApp.Services.DesktopFileService()))
+    public DonateViewModel() : this(new LocalizationService(new Kuttab.Services.DesktopFileService()))
     {
     }
 

@@ -1,0 +1,147 @@
+<resources>
+    <string name="app_name">Kuttab</string>
+    <string name="info_title">Info &amp; Credits</string>
+    
+    <!-- Info Page Content -->
+    <string name="info_app_title">Kuttab</string>
+    <string name="info_app_subtitle">Tajweed Trainer</string>
+    <string name="info_app_version">v0.3 TEST VERSION</string>
+    
+    <string name="info_citations_title">📖 Citations &amp; Sources</string>
+    <string name="info_quran_text_title">Quran Uthmani Text</string>
+    <string name="info_quran_text_content">This application uses a modified version of the Quran Uthmani text. The original text is sourced from Tanzil.net, which provides a reliable and standardized version of the Holy Quran in Uthmani script.</string>
+    <string name="info_quran_text_url">https://tanzil.net/</string>
+    
+    <string name="info_audio_files_title">Audio Recitations</string>
+    <string name="info_audio_files_content">Audio files are sourced from EveryAyah.com, which provides high-quality Quran recitations by various renowned reciters.</string>
+    <string name="info_audio_files_url">https://www.everyayah.com/</string>
+    
+    <string name="info_picture_files_title">Aya Images</string>
+    <string name="info_picture_files_content">Quranic Aya images are generated from the standard Madani Mushaf format, optimized for digital display. Aya images are downloaded from EveryAyah.com, which provides high-quality versions of the Holy Mushaf.</string>
+    
+    <string name="info_usul_ai_title">Tajweed Rules Validation</string>
+    <string name="info_usul_ai_content">Usul.ai was utilized for validation and development assistance in creating and testing the Tajweed search rules, ensuring accuracy in pattern detection.</string>
+    <string name="info_usul_ai_url">https://usul.ai/</string>
+    
+    <string name="info_disclaimer_title">⚠️ Important Notice</string>
+    <string name="info_training_disclaimer_title">Educational Purpose Only</string>
+    <string name="info_training_disclaimer_content">This application is designed for training and educational purposes. It cannot and should not be used as a substitute for learning Tajweed with a qualified Sheikh. Proper Tajweed requires direct guidance from certified teachers.</string>
+    <string name="info_general_disclaimer_content">All accomplishments are by the help of Allah SWT. Any errors or mistakes are from us alone. If you find any inaccuracies or have suggestions for improvement, please contact us.</string>
+    
+    <string name="info_contact_email_title">Contact Email:</string>
+    <string name="info_contact_email">almanar.backup@gmail.com</string>
+    <string name="info_contact_subject">Subject: Kuttab</string>
+    <string name="info_contact_note">Please include \'Kuttab\' in the email subject for proper routing.</string>
+    
+    <string name="info_close_button">✓ Close</string>
+    
+    <!-- UI Labels -->
+    <string name="select_language">Select Language</string>
+    <string name="select_rule">Select Tajweed Rule</string>
+    <string name="search">Search</string>
+    <string name="play">Play</string>
+    <string name="play_repeat">Play Repeat</string>
+    <string name="play_all">Play All</string>
+    <string name="stop">Stop</string>
+    <string name="use_remote_audio">Use Remote Audio</string>
+    <string name="ready">Ready</string>
+    
+    <!-- Status Messages -->
+    <string name="loading">Loading Quran data...</string>
+    <string name="searching">Searching...</string>
+    <string name="found_matches">Found %d matches</string>
+    <string name="no_matches">No matches found</string>
+    <string name="playing">Playing...</string>
+    <string name="stopped">Stopped</string>
+    <string name="error_loading">Error loading data</string>
+    
+    <!-- Error Messages -->
+    <string name="SelectSpecificRule">Please select a specific rule, not a group</string>
+    <string name="SelectRuleFirst">Please select a Tajweed rule first</string>
+    
+    <!-- Languages -->
+    <string name="arabic">العربية</string>
+    <string name="english">English</string>
+    <string name="german">Deutsch</string>
+    
+    <!-- Matched Text -->
+    <string name="matched_text">Matched: %s</string>
+    
+    <!-- Settings Page -->
+    <string name="language_settings_title">🗣️ Language Settings</string>
+    <string name="select_language_label">Select Language:</string>
+    <string name="search_domain_title">🔍 Search Domain</string>
+    <string name="search_in_label">Search In:</string>
+    <string name="surah_number_label">Surah:</string>
+    <string name="from_surah_label">From Surah:</string>
+    <string name="to_surah_label">To Surah:</string>
+    <string name="online_resources_title">🌐 Online Resources</string>
+    <string name="get_audio_from_internet">🔊 Get Audio Files from Internet</string>
+    <string name="get_images_from_internet">📷 Get Aya Images from Internet</string>
+    <string name="online_resources_note">Note: Enable these options if local files are not available</string>
+    <string name="select_reciter_label">Reciter:</string>
+    
+    <!-- Reciters -->
+    <string name="reciter_abdul_basit">Abdul Basit (Murattal)</string>
+    <string name="reciter_ayman_sowaid">Ayman Sowaid</string>
+    <string name="reciter_husary">Mahmoud Khalil Al-Husary</string>
+    <string name="reciter_husary_muallim">Al-Husary (Muallim)</string>
+    <string name="reciter_menshawi">Mohamed Siddiq Al-Menshawi</string>
+    <string name="reciter_tablaway">Mohammad Al-Tablaway</string>
+    <string name="reciter_mustafa_ismail">Mustafa Ismail</string>
+    <string name="reciter_ayyoub">Muhammad Ayyoub</string>
+    <string name="reciter_banna">Mahmoud Ali Al-Banna</string>
+    <string name="save_settings">💾 Save Settings</string>
+    <string name="cancel">❌ Cancel</string>
+    <string name="whole_quran">Whole Quran (All 114 Surahs)</string>
+    <string name="single_surah">Single Surah</string>
+    <string name="surah_range">Surah Range</string>
+    
+    <!-- Recitation Tab -->
+    <string name="recitation">Recitation</string>
+    <string name="recitation_mode">🎧 Recitation Mode</string>
+    <string name="select_surah">Select Surah:</string>
+    <string name="from_aya">From Aya:</string>
+    <string name="to_aya">To Aya:</string>
+    <string name="repeat_count">Repeat Count:</string>
+    <string name="times">times</string>
+    <string name="repeat_each_aya">Repeat Each Aya</string>
+    <string name="repeat_whole_range">Repeat Whole Range</string>
+    <string name="repeat_mode">Repeat Mode:</string>
+    <string name="current_repeat">Repeat %1$d of %2$d</string>
+    <string name="aya_repeat">Aya %1$d - Repeat %2$d of %3$d</string>
+    <string name="teacher_mode">المُعلم</string>
+    <string name="start_recitation">▶️ Start Recitation</string>
+    <string name="pause_recitation">⏸️ Pause</string>
+    <string name="resume_recitation">▶️ Resume</string>
+    <string name="stop_recitation">⏹️ Stop</string>
+    <string name="now_playing">Now Playing:</string>
+    <string name="surah_aya_format">Surah %1$s - Aya %2$d</string>
+    <string name="recitation_complete">Recitation Complete</string>
+    <string name="basmalah">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</string>
+    <string name="playing_basmalah">Playing Basmalah...</string>
+    <string name="aya_range">Aya Range</string>
+    <string name="full_surah">Full Surah</string>
+    
+    <!-- Donation Page -->
+    <string name="donate">🕌 Donate</string>
+    <string name="donate_title">🕌 Support BBF Center Project</string>
+    <string name="donate_subtitle">Help us build the BBF Community Center in Freiburg! The land (1,307 m²) costs €1,000,000 - we have raised €700,000 and still need €300,000.</string>
+    <string name="donate_via_paypal">💳 Donate via PayPal</string>
+    <string name="paypal_description">Quick and secure online donation through PayPal.</string>
+    <string name="donate_via_bank">🏦 Donate via Bank Transfer</string>
+    <string name="account_holder">Account Holder:</string>
+    <string name="payment_reference">Payment Reference:</string>
+    <string name="copy_button">📋 Copy</string>
+    <string name="bank_transfer_note">Please include the payment reference to ensure your donation supports the BBF Center building project.</string>
+    <string name="about_association">🏛️ About the Association</string>
+    <string name="association_description">Bildungs- und Begegnungsverein Freiburg e.V. (BBF) is a registered charity in Germany dedicated to education and community building. We are building a community center on 1,307 m² of land.</string>
+    <string name="tax_deduction_note">✅ BBF is a registered public benefit association (gemeinnütziger Verein) in Germany. Your donation is tax-deductible.</string>
+    <string name="barakah_message">May Allah bless you for your generosity and reward you abundantly in this life and the hereafter.</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    
+    <!-- Display Settings -->
+    <string name="display_settings_title">🔤 Display Settings</string>
+    <string name="font_size_label">Font Size:</string>
+    <string name="quran_text_label">Quran Text:</string>
+</resources>

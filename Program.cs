@@ -2,12 +2,12 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using QuranSearchApp.ViewModels;
-using QuranSearchApp.Views;
+using Kuttab.ViewModels;
+using Kuttab.Views;
 using System;
 using System.Text;
 
-namespace QuranSearchApp;
+namespace Kuttab;
 
 public partial class App : Application
 {

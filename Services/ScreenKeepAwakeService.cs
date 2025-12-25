@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace QuranSearchApp.Services
+namespace Kuttab.Services
 {
     /// <summary>
     /// Cross-platform service to prevent screen dimming and system sleep during audio playback

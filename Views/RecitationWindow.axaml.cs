@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace QuranSearchApp.Views;
+namespace Kuttab.Views;
 
 public partial class RecitationWindow : Window
 {

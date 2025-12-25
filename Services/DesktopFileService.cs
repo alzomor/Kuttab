@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using QuranSearch.Core.Interfaces;
+using Kuttab.Core.Interfaces;
 
-namespace QuranSearchApp.Services;
+namespace Kuttab.Services;
 
 /// <summary>
 /// Desktop implementation of IFileService

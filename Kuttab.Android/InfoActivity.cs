@@ -1,0 +1,84 @@
+using Android.App;
+using Android.Content;
+using Android.Content.Res;
+using Android.OS;
+using Android.Views;
+using Android.Widget;
+using AndroidX.AppCompat.App;
+using Kuttab.Core.Services;
+using Kuttab.Android.Services;
+
+namespace Kuttab.Android;
+
+[Activity(Label = "@string/info_title", Theme = "@style/AppTheme")]
+public class InfoActivity : AppCompatActivity
+{
+    private LocalizationService? _localizationService;
+    
+    protected override void OnCreate(Bundle savedInstanceState)
+    {
+        base.OnCreate(savedInstanceState);
+        
+        // Initialize localization service and apply language setting
+        var fileService = new AndroidFileService(this);
+        _localizationService = new LocalizationService(fileService);
+        LoadSettings();
+        ApplyLanguageSettings();
+        
+        SetContentView(Resource.Layout.activity_info);
+        
+        // Set up close button
+        var closeButton = FindViewById<Button>(Resource.Id.closeButton);
+        if (closeButton != null)
+        {
+            closeButton.Click += (sender, e) => Finish();
+        }
+        
+        // Set up action bar
+        if (SupportActionBar != null)
+        {
+            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+            SupportActionBar.SetHomeButtonEnabled(true);
+        }
+    }
+    
+    private void LoadSettings()
+    {
+        var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
+        
+        // Load language
+        var language = prefs?.GetString("Language", "en") ?? "en";
+        if (_localizationService != null)
+        {
+            _localizationService.CurrentLanguage = language;
+        }
+    }
+    
+    private void ApplyLanguageSettings()
+    {
+        if (_localizationService == null) return;
+        
+        try
+        {
+            var languageCode = _localizationService.CurrentLanguage;
+            
+            // Set locale for the activity
+            var locale = new Java.Util.Locale(languageCode);
+            Java.Util.Locale.Default = locale;
+            
+            var config = new Configuration();
+            config.SetLocale(locale);
+            
+            // Apply configuration to resources
+            BaseContext.Resources.UpdateConfiguration(config, BaseContext.Resources.DisplayMetrics);
+            
+            // Update layout direction
+            var layoutDirection = languageCode == "ar" ? LayoutDirection.Rtl : LayoutDirection.Ltr;
+            Window.DecorView.LayoutDirection = layoutDirection;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error applying language settings: {ex.Message}");
+        }
+    }
+}

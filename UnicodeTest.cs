@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace QuranSearchApp
+namespace KuttabApp
 {
     public class UnicodeTest
     {

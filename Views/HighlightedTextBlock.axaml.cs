@@ -5,9 +5,9 @@ using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QuranSearch.Core.Models;
+using Kuttab.Core.Models;
 
-namespace QuranSearchApp.Views;
+namespace Kuttab.Views;
 
 public partial class HighlightedTextBlock : UserControl
 {

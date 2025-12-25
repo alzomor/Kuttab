@@ -148,5 +148,24 @@
   "QuranTextLabel": "Korantext:",
   "QuranTextUthmaniClean": "Uthmani (Bereinigt - Empfohlen)",
   "QuranTextUthmaniOriginal": "Uthmani (Original mit Anmerkungen)",
-  "QuranTextChanged": "Korantext-Quelle geändert. Bitte erneut suchen."
+  "QuranTextChanged": "Korantext-Quelle geändert. Bitte erneut suchen.",
+  
+  "CitationsTitle": "📖 Zitate & Quellen",
+  "QuranTextCitation": "Koran Uthmani Text",
+  "QuranTextCitationText": "Diese Anwendung verwendet eine modifizierte Version des Koran Uthmani-Textes. Der Originaltext stammt von Tanzil.net, das eine zuverlässige und standardisierte Version des Heiligen Korans in Uthmani-Schrift bereitstellt.",
+  "AudioFilesCitation": "Audio-Rezitationen",
+  "AudioFilesCitationText": "Audiodateien stammen von EveryAyah.com, das hochwertige Koran-Rezitationen verschiedener berühmter Rezitatoren bietet.",
+  "PictureFilesCitation": "Aya-Bilder",
+  "PictureFilesCitationText": "Koranische Aya-Bilder werden im Standard Madani Mushaf-Format generiert, für die digitale Anzeige optimiert. Aya-Bilder werden von EveryAyah.com heruntergeladen, das hochwertige Versionen des Heiligen Mushafs bereitstellt.",
+  "UsulAiCitation": "Tadschuid-Regeln Validierung",
+  "UsulAiCitationText": "Usul.ai wurde für Validierung und Entwicklungshilfe bei der Erstellung und Testung der Tadschuid-Suchregeln genutzt, um Genauigkeit bei der Mustererkennung sicherzustellen.",
+  
+  "DisclaimerTitle": "⚠️ Wichtiger Hinweis",
+  "TrainingDisclaimer": "Nur zu Bildungszwecken",
+  "TrainingDisclaimerText": "Diese Anwendung ist für Schulungs- und Bildungszwecke konzipiert. Sie kann und sollte nicht als Ersatz für das Erlernen von Tadschwid mit einem qualifizierten Scheich dienen. Korrektes Tadschwid erfordert direkte Anleitung durch zertifizierte Lehrer.",
+  "DisclaimerText": "Alle Erfolge geschehen mit der Hilfe Allah SWT. Alle Fehler oder Irrtümer liegen allein bei uns. Wenn Sie Ungenauigkeiten finden oder Vorschläge zur Verbesserung haben, kontaktieren Sie uns bitte.",
+  "ContactEmail": "Kontakt E-Mail:",
+  "ContactEmailText": "almanar.backup@gmail.com",
+  "ContactSubject": "Betreff: Kuttab",
+  "ContactNote": "Bitte fügen Sie 'Kuttab' in die E-Mail-Betreffzeile für richtige Weiterleitung ein."
 }

@@ -4,9 +4,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using System.Net;
-using QuranSearch.Core.Interfaces;
+using Kuttab.Core.Interfaces;
 
-namespace QuranSearchApp.Services
+namespace Kuttab.Services
 {
     public class PictureService : IPictureService
     {

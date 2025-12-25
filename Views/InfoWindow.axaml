@@ -1,10 +1,10 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:QuranSearchApp.ViewModels"
+        xmlns:vm="using:Kuttab.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="650" d:DesignHeight="600"
-        x:Class="QuranSearchApp.Views.InfoWindow"
+        x:Class="Kuttab.Views.InfoWindow"
         x:DataType="vm:InfoViewModel"
         Title="{Binding Localization.InfoTitle}"
         Width="650" Height="600"
@@ -103,19 +103,34 @@
                 </StackPanel>
             </Border>
 
-            <!-- Resources & Credits -->
+            <!-- Citations & Sources -->
             <Border Classes="info-card">
                 <StackPanel>
-                    <TextBlock Classes="section-title" Text="{Binding Localization.ResourcesCreditsTitle}"/>
+                    <TextBlock Classes="section-title" Text="📖 Citations &amp; Sources"/>
                     
-                    <!-- EveryAyah.com -->
+                    <!-- Quran Text Citation -->
+                    <Border Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="📜 " FontSize="16"/>
+                                <TextBlock Classes="resource-title" Text="Quran Uthmani Text"/>
+                            </StackPanel>
+                            <TextBlock Classes="resource-description" Text="This application uses a modified version of the Quran Uthmani text. The original text is sourced from Tanzil.net, which provides a reliable and standardized version of the Holy Quran in Uthmani script."/>
+                            <TextBlock Classes="link" 
+                                       Text="https://tanzil.net/"
+                                       PointerPressed="OnLinkClicked"
+                                       Tag="https://tanzil.net/"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Audio Files Citation -->
                     <Border Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,12">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                 <TextBlock Text="🔊 " FontSize="16"/>
-                                <TextBlock Classes="resource-title" Text="{Binding Localization.AudioImagesSource}"/>
+                                <TextBlock Classes="resource-title" Text="Audio Recitations"/>
                             </StackPanel>
-                            <TextBlock Classes="resource-description" Text="{Binding Localization.EveryAyahDescription}"/>
+                            <TextBlock Classes="resource-description" Text="Audio files are sourced from EveryAyah.com, which provides high-quality Quran recitations by various renowned reciters."/>
                             <TextBlock Classes="link" 
                                        Text="https://www.everyayah.com/"
                                        PointerPressed="OnLinkClicked"
@@ -123,55 +138,67 @@
                         </StackPanel>
                     </Border>
                     
-                    <!-- Tanzil.net -->
+                    <!-- Picture Files Citation -->
                     <Border Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,12">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                <TextBlock Text="📜 " FontSize="16"/>
-                                <TextBlock Classes="resource-title" Text="{Binding Localization.QuranTextSource}"/>
+                                <TextBlock Text="🖼️ " FontSize="16"/>
+                                <TextBlock Classes="resource-title" Text="Aya Images"/>
                             </StackPanel>
-                            <TextBlock Classes="resource-description" Text="{Binding Localization.TanzilDescription}"/>
-                            <TextBlock Classes="link" 
-                                       Text="https://tanzil.net/"
-                                       PointerPressed="OnLinkClicked"
-                                       Tag="https://tanzil.net/"/>
+                            <TextBlock Classes="resource-description" Text="Quranic Aya images are generated from the standard Madani Mushaf format, optimized for digital display."/>
                         </StackPanel>
                     </Border>
-                </StackPanel>
-            </Border>
-
-            <!-- Development Tools -->
-            <Border Classes="info-card">
-                <StackPanel>
-                    <TextBlock Classes="section-title" Text="{Binding Localization.DevelopmentToolsTitle}"/>
                     
-                    <!-- Usul.ai -->
-                    <Border Background="#FFF8E1" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                    <!-- Usul.ai Citation -->
+                    <Border Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,12">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                <TextBlock Text="📚 " FontSize="16"/>
-                                <TextBlock Classes="resource-title" Text="{Binding Localization.TajweedReviewTitle}"/>
+                                <TextBlock Text="🔍 " FontSize="16"/>
+                                <TextBlock Classes="resource-title" Text="Tajweed Rules Validation"/>
                             </StackPanel>
-                            <TextBlock Classes="resource-description" Text="{Binding Localization.UsulAiDescription}"/>
+                            <TextBlock Classes="resource-description" Text="Usul.ai was utilized for validation and development assistance in creating and testing the Tajweed search rules, ensuring accuracy in pattern detection."/>
                             <TextBlock Classes="link" 
                                        Text="https://usul.ai/"
                                        PointerPressed="OnLinkClicked"
                                        Tag="https://usul.ai/"/>
                         </StackPanel>
                     </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Disclaimer -->
+            <Border Classes="info-card">
+                <StackPanel>
+                    <TextBlock Classes="section-title" Text="⚠️ Important Notice" Foreground="#D32F2F"/>
                     
-                    <!-- Windsurf -->
-                    <Border Background="#E3F2FD" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                    <!-- Training Disclaimer -->
+                    <Border Background="#FFF3E0" CornerRadius="8" Padding="12" Margin="0,0,0,12">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                <TextBlock Text="💻 " FontSize="16"/>
-                                <TextBlock Classes="resource-title" Text="{Binding Localization.CodingAssistantTitle}"/>
+                                <TextBlock Text="⚠️ " FontSize="16"/>
+                                <TextBlock Classes="resource-title" Text="Educational Purpose Only" Foreground="#E65100"/>
                             </StackPanel>
-                            <TextBlock Classes="resource-description" Text="{Binding Localization.WindsurfDescription}"/>
-                            <TextBlock Classes="link" 
-                                       Text="https://codeium.com/windsurf"
-                                       PointerPressed="OnLinkClicked"
-                                       Tag="https://codeium.com/windsurf"/>
+                            <TextBlock Classes="resource-description" Text="This application is designed for training and educational purposes. It cannot and should not be used as a substitute for learning Tajweed with a qualified Sheikh. Proper Tajweed requires direct guidance from certified teachers." FontSize="13"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- General Disclaimer -->
+                    <Border Background="#FFF3E0" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Classes="resource-description" Text="All accomplishments are by the help of Allah SWT. Any errors or mistakes are from us alone. If you find any inaccuracies or have suggestions for improvement, please contact us." FontSize="13" FontStyle="Italic"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Contact Information -->
+                    <Border Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="📧 " FontSize="16"/>
+                                <TextBlock Classes="resource-title" Text="Contact Email:"/>
+                            </StackPanel>
+                            <TextBlock Classes="resource-description" Text="almanar.backup@gmail.com" FontSize="13"/>
+                            <TextBlock Classes="resource-description" Text="Subject: Kuttab" FontSize="13" FontWeight="SemiBold"/>
+                            <TextBlock Classes="resource-description" Text="Please include 'Kuttab' in the email subject for proper routing." FontSize="12" Foreground="#666666"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>

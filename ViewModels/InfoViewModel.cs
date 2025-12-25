@@ -1,16 +1,16 @@
 using System;
 using System.Windows.Input;
 using ReactiveUI;
-using QuranSearch.Core.Services;
-using QuranSearch.Core.ViewModels;
+using Kuttab.Core.Services;
+using Kuttab.Core.ViewModels;
 
-namespace QuranSearchApp.ViewModels;
+namespace Kuttab.ViewModels;
 
 public class InfoViewModel : ViewModelBase
 {
     private readonly LocalizationService _localizationService;
 
-    public InfoViewModel() : this(new LocalizationService(new QuranSearchApp.Services.DesktopFileService()))
+    public InfoViewModel() : this(new LocalizationService(new Kuttab.Services.DesktopFileService()))
     {
     }
 

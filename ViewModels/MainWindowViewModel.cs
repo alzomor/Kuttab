@@ -6,15 +6,15 @@ using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
-using QuranSearch.Core.Models;
-using QuranSearch.Core.Services;
-using QuranSearch.Core.ViewModels;
-using QuranSearch.Core.Interfaces;
-using QuranSearchApp.Services;
+using Kuttab.Core.Models;
+using Kuttab.Core.Services;
+using Kuttab.Core.ViewModels;
+using Kuttab.Core.Interfaces;
+using Kuttab.Services;
 using Avalonia.Media.Imaging;
 using FlowDirection = Avalonia.Media.FlowDirection;
 
-namespace QuranSearchApp.ViewModels;
+namespace Kuttab.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {

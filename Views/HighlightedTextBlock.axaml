@@ -1,6 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="QuranSearchApp.Views.HighlightedTextBlock">
+             x:Class="Kuttab.Views.HighlightedTextBlock">
     <TextBlock Name="MainTextBlock" 
                FontSize="20" 
                FontFamily="Scheherazade New"
