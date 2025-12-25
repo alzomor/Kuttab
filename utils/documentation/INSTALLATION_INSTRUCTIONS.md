@@ -1,16 +1,17 @@
-# Quraan App - Installation Instructions
+# Kuttab - Installation Instructions
 
-Version: 0.6.0
+Version: 0.8
 
 ## 📦 Distribution Packages
 
 This release includes builds for multiple platforms:
 
-- **Windows (x64)**: `Quraan-win-x64-0.6.0.zip`
-- **Linux (x64)**: `Quraan-linux-x64-0.6.0.tar.gz`
-- **macOS (Intel)**: `Quraan-macOS-x64-0.6.0.tar.gz`
-- **macOS (Apple Silicon)**: `Quraan-macOS-arm64-0.6.0.tar.gz`
-- **Android**: `Quraan-android-0.6.0.apk`
+- **Windows (x64)**: `Kuttab-win-x64-0.8.zip`
+- **Linux (x64)**: `Kuttab-linux-x64-0.8.tar.gz`
+- **macOS (Intel)**: `Kuttab-macOS-x64-0.8.tar.gz`
+- **macOS (Apple Silicon)**: `Kuttab-macOS-arm64-0.8.tar.gz`
+- **Android**: `Kuttab-android-0.8.apk` (for direct installation)
+- **Android Bundle**: `Kuttab-android-0.8.aab` (for Google Play Store)
 
 ---
 
@@ -21,19 +22,19 @@ This release includes builds for multiple platforms:
 
 ### Installation Steps
 
-1. **Download** the file: `Quraan-win-x64-0.6.0.zip`
+1. **Download** the file: `Kuttab-win-x64-0.8.zip`
 
 2. **Extract** the ZIP file:
    - Right-click on the ZIP file
    - Select "Extract All..."
-   - Choose a destination folder (e.g., `C:\Program Files\Quraan`)
+   - Choose a destination folder (e.g., `C:\Program Files\Kuttab`)
 
 3. **Run** the application:
    - Navigate to the extracted folder
-   - Double-click `QuranSearchApp.exe`
+   - Double-click `Kuttab.exe`
 
 4. **Optional - Create Desktop Shortcut**:
-   - Right-click on `QuranSearchApp.exe`
+   - Right-click on `Kuttab.exe`
    - Select "Send to" → "Desktop (create shortcut)"
 
 ### First Run
@@ -51,52 +52,52 @@ This release includes builds for multiple platforms:
 
 ### Installation Steps
 
-1. **Download** the file: `Quraan-linux-x64-0.6.0.tar.gz`
+1. **Download** the file: `Kuttab-linux-x64-0.8.tar.gz`
 
 2. **Extract** the archive:
    ```bash
-   tar -xzf Quraan-linux-x64-0.6.0.tar.gz
+   tar -xzf Kuttab-linux-x64-0.8.tar.gz
    ```
 
 3. **Move** to installation directory (optional):
    ```bash
-   sudo mv Quraan-linux-x64-0.6.0 /opt/quraan
+   sudo mv Kuttab-linux-x64-0.8 /opt/kuttab
    ```
    Or keep it in your home directory:
    ```bash
-   mv Quraan-linux-x64-0.6.0 ~/quraan
+   mv Kuttab-linux-x64-0.8 ~/kuttab
    ```
 
 4. **Make executable** (if not already):
    ```bash
-   chmod +x ~/quraan/QuranSearchApp
+   chmod +x ~/kuttab/Kuttab
    # or
-   chmod +x /opt/quraan/QuranSearchApp
+   chmod +x /opt/kuttab/Kuttab
    ```
 
 5. **Run** the application:
    ```bash
-   ~/quraan/QuranSearchApp
+   ~/kuttab/Kuttab
    # or
-   /opt/quraan/QuranSearchApp
+   /opt/kuttab/Kuttab
    ```
 
 ### Optional - Create Desktop Entry
 
-Create file `~/.local/share/applications/quraan.desktop`:
+Create file `~/.local/share/applications/kuttab.desktop`:
 
 ```desktop
 [Desktop Entry]
-Name=Quraan Search
+Name=Kuttab
 Comment=Quran Search and Tajweed Application
-Exec=/path/to/quraan/QuranSearchApp
-Icon=/path/to/quraan/icon.png
+Exec=/path/to/kuttab/Kuttab
+Icon=/path/to/kuttab/icon.png
 Terminal=false
 Type=Application
 Categories=Education;Literature;
 ```
 
-Replace `/path/to/quraan/` with your actual installation path.
+Replace `/path/to/kuttab/` with your actual installation path.
 
 ---
 
@@ -106,8 +107,8 @@ Replace `/path/to/quraan/` with your actual installation path.
 - macOS 10.15 (Catalina) or later
 
 ### Choose Your Version
-- **Intel Macs**: Use `Quraan-macOS-x64-0.6.0.tar.gz`
-- **Apple Silicon (M1/M2/M3)**: Use `Quraan-macOS-arm64-0.6.0.tar.gz`
+- **Intel Macs**: Use `Kuttab-macOS-x64-0.8.tar.gz`
+- **Apple Silicon (M1/M2/M3)**: Use `Kuttab-macOS-arm64-0.8.tar.gz`
 
 ### Installation Steps
 
@@ -117,26 +118,26 @@ Replace `/path/to/quraan/` with your actual installation path.
    - Double-click the `.tar.gz` file in Finder
    - Or use Terminal:
      ```bash
-     tar -xzf Quraan-macOS-x64-0.6.0.tar.gz
+     tar -xzf Kuttab-macOS-x64-0.8.tar.gz
      # or for Apple Silicon:
-     tar -xzf Quraan-macOS-arm64-0.6.0.tar.gz
+     tar -xzf Kuttab-macOS-arm64-0.8.tar.gz
      ```
 
 3. **Move** to Applications folder (optional):
    ```bash
-   mv QuranSearchApp /Applications/
+   mv Kuttab /Applications/
    ```
    Or keep it anywhere you prefer
 
 4. **First Run**:
    - Navigate to the application in Finder
-   - Right-click on `QuranSearchApp`
+   - Right-click on `Kuttab`
    - Select "Open"
    - Click "Open" in the security dialog
 
 ### Troubleshooting macOS
 
-If you see **"QuranSearchApp cannot be opened because the developer cannot be verified"**:
+If you see **"Kuttab cannot be opened because the developer cannot be verified"**:
 
 **Option 1 - Using Finder:**
 1. Right-click (or Control+click) on the app
@@ -145,13 +146,13 @@ If you see **"QuranSearchApp cannot be opened because the developer cannot be ve
 
 **Option 2 - Using Terminal:**
 ```bash
-xattr -cr /path/to/QuranSearchApp
+xattr -cr /path/to/Kuttab
 ```
 
 **Option 3 - System Settings:**
 1. Go to System Settings → Privacy & Security
 2. Scroll down to the Security section
-3. Click "Open Anyway" next to the QuranSearchApp message
+3. Click "Open Anyway" next to the Kuttab message
 
 ---
 
@@ -168,8 +169,9 @@ xattr -cr /path/to/QuranSearchApp
    - Enable "Install unknown apps" or "Unknown sources"
    - Allow installation from your browser/file manager
 
-2. **Download** the file: `Quraan-android-0.6.0.apk`
+2. **Download** the file: `Kuttab-android-0.8.apk`
    - Transfer to your device if downloaded on computer
+   - Note: For Google Play Store distribution, use `Kuttab-android-0.8.aab`
 
 3. **Install** the APK:
    - Tap on the downloaded APK file
@@ -190,7 +192,7 @@ The app may request the following permissions:
 
 After installation, the application includes:
 
-- **QuranSearchApp** - Main executable
+- **Kuttab** - Main executable
 - **quran-uthmani.txt** - Quranic text (Uthmani script)
 - **rules.json** - Tajweed rules definitions
 - **Localization/** - Language files (Arabic, English, German)
@@ -237,12 +239,12 @@ Change language from the dropdown menu in the top-right corner of the applicatio
 - Check Windows Defender didn't quarantine any files
 
 **Linux:**
-- Ensure the file is executable: `chmod +x QuranSearchApp`
+- Ensure the file is executable: `chmod +x Kuttab`
 - Check you have required display server (X11/Wayland)
 - Try running from terminal to see error messages
 
 **macOS:**
-- Remove quarantine attribute: `xattr -cr /path/to/QuranSearchApp`
+- Remove quarantine attribute: `xattr -cr /path/to/Kuttab`
 - Make sure you're using the correct version for your Mac (Intel vs Apple Silicon)
 
 **Android:**
@@ -281,6 +283,6 @@ This application is provided as-is for educational and religious purposes.
 
 ## ✨ Thank You
 
-Thank you for using the Quraan Search Application. May it be beneficial in your study of the Holy Quran.
+Thank you for using the Kuttab Application. May it be beneficial in your study of the Holy Quran.
 
 جزاكم الله خيراً

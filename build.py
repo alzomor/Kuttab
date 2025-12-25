@@ -65,7 +65,7 @@ def build_for_platform(target):
         "-p:DebugSymbols=false",
         "-p:EnableCompressionInSingleFile=true",
         "-o", output_dir,
-        "QuranSearchApp.csproj"
+        "Kuttab.csproj"
     ]
     
     if not run_command(cmd):
@@ -81,7 +81,7 @@ def build_android_apk():
     print(f"🤖 Building Android APK")
     print(f"{'='*80}")
     
-    android_project_dir = "./QuranSearch.Android"
+    android_project_dir = "./Kuttab.Android"
     if not os.path.exists(android_project_dir):
         print("⚠️  Android project not found, skipping Android build")
         return False
@@ -92,7 +92,7 @@ def build_android_apk():
         "-c", "Release",
         "-f", "net8.0-android",
         "-r", "android-arm64",
-        "QuranSearch.Android.csproj"
+        "Kuttab.Android.csproj"
     ]
     
     if not run_command(cmd, cwd=android_project_dir):
@@ -167,7 +167,7 @@ def create_archive(rid, ext):
 
 def copy_installation_instructions():
     """Copy installation instructions to dist folder."""
-    src_file = "INSTALLATION_INSTRUCTIONS.md"
+    src_file = "utils/documentation/INSTALLATION_INSTRUCTIONS.md"
     dest_file = os.path.join("dist", "INSTALLATION_INSTRUCTIONS.md")
     
     if os.path.exists(src_file):
