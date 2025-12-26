@@ -15,13 +15,14 @@ TARGETS = [
     {"rid": "osx-arm64", "ext": "tar.gz"},
 ]
 
-def run_command(cmd, cwd=None):
+def run_command(cmd, cwd=None, env=None):
     """Run a shell command and return its output."""
     print(f"\n🚀 Running: {' '.join(cmd)}")
     try:
         result = subprocess.run(
             cmd,
             cwd=cwd or os.getcwd(),
+            env=env or os.environ,
             check=True,
             text=True,
             capture_output=True
@@ -86,16 +87,38 @@ def build_android_apk():
         print("⚠️  Android project not found, skipping Android build")
         return False
     
+    # Try to find Android .NET SDK (check for dotnet-android alias first, then direct path)
+    android_dotnet_cmd = None
+    
+    # Check if dotnet-android command exists (alias or in PATH)
+    result = subprocess.run(["which", "dotnet-android"], capture_output=True, text=True)
+    if result.returncode == 0:
+        android_dotnet_cmd = "dotnet-android"
+        print("✅ Using dotnet-android command")
+    else:
+        # Fallback to direct path
+        direct_path = "/home/hossam-alzomor/.dotnet-android/dotnet"
+        if os.path.exists(direct_path):
+            android_dotnet_cmd = direct_path
+            print("✅ Using Android .NET SDK at /home/hossam-alzomor/.dotnet-android/dotnet")
+        else:
+            print("❌ Android .NET SDK not found. Please ensure dotnet-android alias is set up or SDK is installed at /home/hossam-alzomor/.dotnet-android/")
+            return False
+    
+    # Set ANDROID_HOME environment variable
+    env = os.environ.copy()
+    env["ANDROID_HOME"] = "/home/hossam-alzomor/Android/Sdk"
+    
     # Publish command for Android (creates signed APK)
     cmd = [
-        "dotnet", "publish",
+        android_dotnet_cmd, "publish",
         "-c", "Release",
         "-f", "net8.0-android",
         "-r", "android-arm64",
         "Kuttab.Android.csproj"
     ]
     
-    if not run_command(cmd, cwd=android_project_dir):
+    if not run_command(cmd, cwd=android_project_dir, env=env):
         print("❌ Failed to build Android APK")
         return False
     
