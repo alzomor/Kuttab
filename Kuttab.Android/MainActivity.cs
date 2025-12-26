@@ -307,6 +307,42 @@ public class MainActivity : AppCompatActivity
         }
         catch { /* no-op */ }
     }
+    
+    private void ClearSearchResults()
+    {
+        try
+        {
+            // Clear search results list
+            _searchResults.Clear();
+            
+            // Reset UI state
+            _currentPlayingIndex = -1;
+            _isPlayingSequence = false;
+            
+            // Stop any playing audio
+            _audioService?.StopPlayback();
+            
+            // Clear the adapter data
+            _adapter?.UpdateData(new List<QuranAya>());
+            
+            // Hide the ayah image
+            HideAyaImage();
+            
+            // Disable audio buttons
+            UpdateAudioButtonsState(false);
+            
+            // Update status to show ready state
+            if (_localizationService != null)
+                UpdateStatus(_localizationService.GetString("Ready"));
+            else
+                UpdateStatus("Ready");
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't show to user as this is a cleanup operation
+            System.Diagnostics.Debug.WriteLine($"Error clearing search results: {ex.Message}");
+        }
+    }
 
     private void OnRuleSpinnerItemSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
     {
@@ -868,6 +904,9 @@ public class MainActivity : AppCompatActivity
 
         if (requestCode == SETTINGS_REQUEST_CODE && resultCode == Result.Ok)
         {
+            // Clear search results when settings are changed
+            ClearSearchResults();
+            
             // Reload settings from SharedPreferences
             LoadSettings();
             

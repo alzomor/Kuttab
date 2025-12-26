@@ -82,7 +82,7 @@ public class MainWindowViewModel : ViewModelBase
         StopCommand = new SimpleCommand(StopPlayback);
         PauseSequenceCommand = new SimpleCommand(PauseSequence);
         ResumeSequenceCommand = new SimpleCommand(ResumeSequence);
-        OpenSettingsCommand = new SimpleCommand(OpenSettings);
+        OpenSettingsCommand = new AsyncCommand(OpenSettings);
         OpenRecitationCommand = new SimpleCommand(OpenRecitation);
         OpenInfoCommand = new SimpleCommand(OpenInfo);
         OpenDonateCommand = new SimpleCommand(OpenDonate);
@@ -940,7 +940,7 @@ public class MainWindowViewModel : ViewModelBase
                 : null);
     }
 
-    private async void OpenSettings()
+    private async Task OpenSettings()
     {
         var currentSearchDomain = new SearchDomainOption
         {
@@ -994,13 +994,18 @@ public class MainWindowViewModel : ViewModelBase
                 audioService.SelectedReciter = _selectedReciterFolder;
             }
 
+            // Clear search results when settings change
+            SearchResults.Clear();
+            _currentPlayingAyaIndex = -1;
+            IsPlayingSequence = false;
+            await _audioService?.StopAsync();
+            StatusMessage = _localizationService.GetString("Ready");
+
             // Check if Quran text file changed and reload data if needed
             if (_selectedQuranTextFile != result.SelectedQuranTextFile)
             {
                 _selectedQuranTextFile = result.SelectedQuranTextFile;
                 _searchService.SetQuranTextFile(_selectedQuranTextFile);
-                // Clear search results since data source changed
-                SearchResults.Clear();
                 StatusMessage = _localizationService.GetString("QuranTextChanged");
             }
 
