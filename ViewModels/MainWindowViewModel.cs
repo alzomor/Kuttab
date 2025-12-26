@@ -12,6 +12,7 @@ using Kuttab.Core.ViewModels;
 using Kuttab.Core.Interfaces;
 using Kuttab.Services;
 using Avalonia.Media.Imaging;
+using Avalonia.Controls;
 using FlowDirection = Avalonia.Media.FlowDirection;
 
 namespace Kuttab.ViewModels;
@@ -458,6 +459,9 @@ public class MainWindowViewModel : ViewModelBase
             
             // Reset selected Aya when new search results are loaded
             SelectedAya = null;
+            
+            // Scroll to top to show first result
+            ScrollToTop();
             
             StatusMessage = _localizationService.GetString("FoundMatches", results.Count);
             
@@ -1060,6 +1064,38 @@ public class MainWindowViewModel : ViewModelBase
             return surahNumber != 108;
         
         return false;
+    }
+    
+    /// <summary>
+    /// Scrolls the search results ListBox to the top
+    /// </summary>
+    private void ScrollToTop()
+    {
+        try
+        {
+            // Find the main window
+            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var mainWindow = desktop.MainWindow;
+                if (mainWindow != null)
+                {
+                    // Find the ListBox by name
+                    var listBox = mainWindow.GetControl<Avalonia.Controls.ListBox>("ResultsListBox");
+                    if (listBox != null)
+                    {
+                        // Scroll to the first item
+                        if (listBox.ItemCount > 0)
+                        {
+                            listBox.ScrollIntoView(0);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error scrolling to top: {ex.Message}");
+        }
     }
 }
 

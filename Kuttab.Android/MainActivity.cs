@@ -281,6 +281,9 @@ public class MainActivity : AppCompatActivity
             _currentPlayingIndex = -1;
             _adapter?.UpdateData(_searchResults);
             
+            // Scroll to top to show first result
+            ScrollToTop();
+            
             var matchCount = _searchResults.Count;
             // Use Android formatting (resource uses %d)
             UpdateStatus(GetString(Resource.String.found_matches, matchCount));
@@ -341,6 +344,24 @@ public class MainActivity : AppCompatActivity
         {
             // Log error but don't show to user as this is a cleanup operation
             System.Diagnostics.Debug.WriteLine($"Error clearing search results: {ex.Message}");
+        }
+    }
+    
+    private void ScrollToTop()
+    {
+        try
+        {
+            if (_recyclerView != null)
+            {
+                RunOnUiThread(() =>
+                {
+                    _recyclerView.ScrollToPosition(0);
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error scrolling to top: {ex.Message}");
         }
     }
 
