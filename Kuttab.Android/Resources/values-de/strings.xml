@@ -38,6 +38,7 @@
     
     <!-- UI Labels -->
     <string name="select_language">Sprache wählen</string>
+    <string name="select_category">Kategorie wählen</string>
     <string name="select_rule">Wählen Sie die Tajweed-Regel</string>
     <string name="search">Suchen</string>
     <string name="play">Abspielen</string>

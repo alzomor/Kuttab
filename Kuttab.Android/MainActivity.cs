@@ -25,11 +25,16 @@ public class MainActivity : AppCompatActivity
     private AndroidPictureService? _pictureService;
     private LocalizationService? _localizationService;
     
+    private LinearLayout? _categoryContainer;
+    private TextView? _categoryIcon;
+    private Spinner? _categorySpinner;
     private LinearLayout? _ruleContainer;
     private TextView? _ruleIcon;
     private Spinner? _ruleSpinner;
     private string? _selectedRuleName;
+    private string? _selectedCategoryId;
     private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
+    private readonly Dictionary<string, string> _categoryDisplayToId = new();
     private readonly HashSet<string> _groupHeaders = new();
     private Button? _settingsButton;
     private Button? _infoButton;
@@ -134,6 +139,9 @@ public class MainActivity : AppCompatActivity
     
     private void InitializeViews()
     {
+        _categoryContainer = FindViewById<LinearLayout>(Resource.Id.categoryContainer);
+        _categoryIcon = FindViewById<TextView>(Resource.Id.categoryIcon);
+        _categorySpinner = FindViewById<Spinner>(Resource.Id.categorySpinner);
         _ruleContainer = FindViewById<LinearLayout>(Resource.Id.ruleContainer);
         _ruleIcon = FindViewById<TextView>(Resource.Id.ruleIcon);
         _ruleSpinner = FindViewById<Spinner>(Resource.Id.ruleSpinner);
@@ -169,6 +177,10 @@ public class MainActivity : AppCompatActivity
             _playAllButton.Click += OnPlayAllClick;
         if (_stopButton != null)
             _stopButton.Click += OnStopClick;
+        
+        // Category spinner selection handler
+        if (_categorySpinner != null)
+            _categorySpinner.ItemSelected += OnCategorySpinnerItemSelected;
         
         // Hide currently displayed Aya when user picks a new rule (actual rule, not a group header)
         if (_ruleSpinner != null)
@@ -447,63 +459,92 @@ public class MainActivity : AppCompatActivity
 
     private void UpdateRuleDisplayNames()
     {
-        if (_searchService == null || _ruleSpinner == null || _localizationService == null)
+        if (_searchService == null || _localizationService == null)
+            return;
+
+        var languageCode = _localizationService.CurrentLanguage;
+        
+        // Update category spinner
+        UpdateCategorySpinner(languageCode);
+        
+        // Update rule spinner based on selected category
+        UpdateRuleSpinnerForCategory(languageCode);
+    }
+
+    private void UpdateCategorySpinner(string languageCode)
+    {
+        if (_categorySpinner == null) return;
+
+        var categories = RuleGroupTranslator.GetAllGroups(languageCode);
+        var displayNames = new List<string>();
+        _categoryDisplayToId.Clear();
+
+        foreach (var (groupId, title) in categories)
+        {
+            displayNames.Add(title);
+            _categoryDisplayToId[title] = groupId;
+        }
+
+        var categoryAdapter = new ArrayAdapter<string>(this,
+            Resource.Layout.item_rule, displayNames);
+        categoryAdapter.SetDropDownViewResource(Resource.Layout.item_rule);
+        _categorySpinner.Adapter = categoryAdapter;
+
+        // Select first category by default if none selected
+        if (_selectedCategoryId == null && categories.Count > 0)
+        {
+            _selectedCategoryId = categories[0].GroupId;
+        }
+    }
+
+    private void UpdateRuleSpinnerForCategory(string languageCode)
+    {
+        if (_ruleSpinner == null || _searchService == null || string.IsNullOrEmpty(_selectedCategoryId))
             return;
 
         var rules = _searchService.GetRules();
         var displayNames = new List<string>();
         _ruleDisplayToArabic.Clear();
-        var languageCode = _localizationService.CurrentLanguage;
+        _groupHeaders.Clear();
 
-        // Group rules by category
-        var groupMap = new Dictionary<string, List<TajweedRule>>();
-        foreach (var rule in rules)
+        // Filter rules by selected category
+        var filteredRules = rules.Where(r => r?.Group == _selectedCategoryId).ToList();
+
+        foreach (var rule in filteredRules)
         {
             if (rule == null) continue;
-
-            var groupTitle = string.Empty;
-            if (!string.IsNullOrWhiteSpace(rule.Group))
-            {
-                groupTitle = RuleGroupTranslator.GetGroupTitle(rule.Group, languageCode);
-            }
-            
-            if (string.IsNullOrWhiteSpace(groupTitle))
-            {
-                groupTitle = languageCode == "ar" ? "قواعد أخرى" : 
-                             languageCode == "de" ? "Andere Regeln" : "Other Rules";
-            }
-
-            if (!groupMap.ContainsKey(groupTitle))
-            {
-                groupMap[groupTitle] = new List<TajweedRule>();
-            }
-            
-            groupMap[groupTitle].Add(rule);
+            var localizedName = RuleNameTranslator.GetLocalizedName(rule.Name, languageCode);
+            displayNames.Add(localizedName);
+            _ruleDisplayToArabic[localizedName] = rule.Name;
         }
 
-        // Build hierarchical display list
-        _groupHeaders.Clear();
-        foreach (var kvp in groupMap)
-        {
-            // Add group header (non-selectable, will be displayed in bold)
-            var groupHeader = kvp.Key; // Just the group name, no decorators
-            displayNames.Add(groupHeader);
-            _ruleDisplayToArabic[groupHeader] = ""; // Empty mapping for headers
-            _groupHeaders.Add(groupHeader); // Track as group header
-
-            // Add rules in this group with indentation
-            foreach (var rule in kvp.Value)
-            {
-                var localizedName = RuleNameTranslator.GetLocalizedName(rule.Name, languageCode);
-                var indentedName = $"    {localizedName}";
-                displayNames.Add(indentedName);
-                _ruleDisplayToArabic[indentedName] = rule.Name;
-            }
-        }
-
-        var ruleAdapter = new RuleSpinnerAdapter(this,
-            Resource.Layout.item_rule, displayNames, _groupHeaders);
+        var ruleAdapter = new ArrayAdapter<string>(this,
+            Resource.Layout.item_rule, displayNames);
+        ruleAdapter.SetDropDownViewResource(Resource.Layout.item_rule);
         _ruleSpinner.Adapter = ruleAdapter;
+    }
+
+    private void OnCategorySpinnerItemSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
+    {
+        try
+        {
+            if (_categorySpinner == null || _localizationService == null) return;
+            var selected = _categorySpinner.GetItemAtPosition(e.Position)?.ToString();
+            if (string.IsNullOrEmpty(selected)) return;
+
+            // Get the category ID from the display name
+            if (_categoryDisplayToId.TryGetValue(selected, out var categoryId))
+            {
+                _selectedCategoryId = categoryId;
+                // Update the rule spinner with rules from this category
+                UpdateRuleSpinnerForCategory(_localizationService.CurrentLanguage);
+            }
+
+            // Hide aya image when category changes
+            if (_ayaImage != null)
+                _ayaImage.Visibility = global::Android.Views.ViewStates.Gone;
+        }
+        catch { /* no-op */ }
     }
 
     private void ShowRuleSelectionDialog()

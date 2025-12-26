@@ -73,4 +73,31 @@ public static class RuleGroupTranslator
             _ => value.Ar
         };
     }
+
+    /// <summary>
+    /// Returns all group IDs in display order
+    /// </summary>
+    public static List<string> GetAllGroupIds()
+    {
+        return new List<string>(Groups.Keys);
+    }
+
+    /// <summary>
+    /// Returns all groups as (groupId, localizedTitle) pairs for the given language
+    /// </summary>
+    public static List<(string GroupId, string Title)> GetAllGroups(string languageCode)
+    {
+        var result = new List<(string, string)>();
+        foreach (var kvp in Groups)
+        {
+            var title = languageCode switch
+            {
+                "en" => kvp.Value.En,
+                "de" => kvp.Value.De,
+                _ => kvp.Value.Ar
+            };
+            result.Add((kvp.Key, title));
+        }
+        return result;
+    }
 }

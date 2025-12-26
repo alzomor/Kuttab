@@ -388,12 +388,26 @@ public class AyaViewHolder : RecyclerView.ViewHolder
                     matchLength = extended.length;
                 }
                 
-                // Count ALL ZWJs that appear BEFORE this match's original position
+                // Count ALL ZWJs that appear BEFORE or AT this match's original position
                 // This gives us the correct offset in the adjusted text
+                // We need to find the position in adjustedText that corresponds to matchStart
                 int zwjsBefore = 0;
                 int originalPos = 0;
-                for (int i = 0; i < adjustedText.Length && originalPos < matchStart; i++)
+                int adjustedStart = 0;
+                for (int i = 0; i < adjustedText.Length; i++)
                 {
+                    if (originalPos == matchStart)
+                    {
+                        // Found the position, but we need to skip any ZWJs at this exact position
+                        // to find where the actual match content starts
+                        adjustedStart = i;
+                        // Skip leading ZWJs that were inserted at the match boundary
+                        while (adjustedStart < adjustedText.Length && adjustedText[adjustedStart] == ZWJ)
+                        {
+                            adjustedStart++;
+                        }
+                        break;
+                    }
                     if (adjustedText[i] == ZWJ)
                     {
                         zwjsBefore++;
@@ -403,8 +417,6 @@ public class AyaViewHolder : RecyclerView.ViewHolder
                         originalPos++;
                     }
                 }
-
-                var adjustedStart = matchStart + zwjsBefore;
                 var beforeIndex = adjustedStart - 1;
                 var afterIndex = adjustedStart + matchLength;
                 

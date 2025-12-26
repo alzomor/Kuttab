@@ -38,6 +38,7 @@
     
     <!-- UI Labels -->
     <string name="select_language">اختر اللغة</string>
+    <string name="select_category">اختر الباب</string>
     <string name="select_rule">اختر قاعدة التجويد</string>
     <string name="search">بحث</string>
     <string name="play">تشغيل</string>
