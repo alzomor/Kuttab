@@ -5,7 +5,7 @@
     <!-- Info Page Content -->
     <string name="info_app_title">كُتّاب</string>
     <string name="info_app_subtitle">مدرب التجويد</string>
-    <string name="info_app_version">v0.8 نسخة اختبارية</string>
+    <string name="info_app_version">v0.81 نسخة اختبارية</string>
     
     <string name="info_citations_title">📖 الإحالات &amp; المصادر</string>
     <string name="info_quran_text_title">نص القرآن العثماني</string>

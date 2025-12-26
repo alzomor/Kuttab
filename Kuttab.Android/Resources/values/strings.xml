@@ -5,7 +5,7 @@
     <!-- Info Page Content -->
     <string name="info_app_title">Kuttab</string>
     <string name="info_app_subtitle">Tajweed Trainer</string>
-    <string name="info_app_version">v0.8 TEST VERSION</string>
+    <string name="info_app_version">v0.81 TEST VERSION</string>
     
     <string name="info_citations_title">📖 Citations &amp; Sources</string>
     <string name="info_quran_text_title">Quran Uthmani Text</string>
