@@ -8,8 +8,7 @@
     <ApplicationId>com.kuttab.app</ApplicationId>
     <ApplicationVersion>81</ApplicationVersion>
     <ApplicationDisplayVersion>0.81</ApplicationDisplayVersion>
-    <!-- Build only for arm64 to reduce APK size (most modern devices) -->
-    <RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>
+    <!-- RuntimeIdentifiers removed to build universal APK -->
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <!-- Enable assembly compression to reduce APK size -->
     <AndroidEnableAssemblyCompression>true</AndroidEnableAssemblyCompression>

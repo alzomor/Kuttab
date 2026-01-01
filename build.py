@@ -87,34 +87,34 @@ def build_android_apk():
         print("⚠️  Android project not found, skipping Android build")
         return False
     
-    # Try to find Android .NET SDK (check for dotnet-android alias first, then direct path)
-    android_dotnet_cmd = None
-    
-    # Check if dotnet-android command exists (alias or in PATH)
+    # Try to find a dotnet command capable of building Android.
+    # Prefer dotnet-android if it's available, otherwise use dotnet.
+    android_dotnet_cmd = "dotnet"
     result = subprocess.run(["which", "dotnet-android"], capture_output=True, text=True)
     if result.returncode == 0:
         android_dotnet_cmd = "dotnet-android"
         print("✅ Using dotnet-android command")
     else:
-        # Fallback to direct path
-        direct_path = "/home/hossam-alzomor/.dotnet-android/dotnet"
-        if os.path.exists(direct_path):
-            android_dotnet_cmd = direct_path
-            print("✅ Using Android .NET SDK at /home/hossam-alzomor/.dotnet-android/dotnet")
-        else:
-            print("❌ Android .NET SDK not found. Please ensure dotnet-android alias is set up or SDK is installed at /home/hossam-alzomor/.dotnet-android/")
-            return False
-    
-    # Set ANDROID_HOME environment variable
+        print("ℹ️  Using dotnet (ensure Android workload is installed)")
+
+    # Set ANDROID_HOME environment variable (prefer existing env, fallback to ~/Android/Sdk)
     env = os.environ.copy()
-    env["ANDROID_HOME"] = "/home/hossam-alzomor/Android/Sdk"
+    android_home = env.get("ANDROID_HOME") or env.get("ANDROID_SDK_ROOT")
+    if not android_home:
+        android_home = str(Path.home() / "Android" / "Sdk")
+    env["ANDROID_HOME"] = android_home
+    if "ANDROID_SDK_ROOT" not in env:
+        env["ANDROID_SDK_ROOT"] = android_home
+    if not os.path.exists(android_home):
+        print(f"❌ Android SDK not found at: {android_home}")
+        print("   Set ANDROID_HOME or ANDROID_SDK_ROOT to your SDK path and retry.")
+        return False
     
-    # Publish command for Android (creates signed APK)
+    # Publish command for Android (creates universal APK with all ABIs)
     cmd = [
         android_dotnet_cmd, "publish",
         "-c", "Release",
         "-f", "net8.0-android",
-        "-r", "android-arm64",
         "Kuttab.Android.csproj"
     ]
     
@@ -122,10 +122,10 @@ def build_android_apk():
         print("❌ Failed to build Android APK")
         return False
     
-    # Find the generated APK (publish outputs to android-arm64 subfolder)
-    apk_search_dir = os.path.join(android_project_dir, "bin/Release/net8.0-android/android-arm64")
+    # Find the generated APK (universal APK goes to publish subfolder)
+    apk_search_dir = os.path.join(android_project_dir, "bin/Release/net8.0-android/publish")
     if not os.path.exists(apk_search_dir):
-        # Fallback to non-RID path
+        # Fallback to non-publish path
         apk_search_dir = os.path.join(android_project_dir, "bin/Release/net8.0-android")
     
     if not os.path.exists(apk_search_dir):
