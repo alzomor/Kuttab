@@ -19,6 +19,8 @@ public class AndroidAudioRecordingService : IAudioRecordingService
     private bool _isRecording;
     private Timer? _durationTimer;
     private DateTime _recordingStartTime;
+    private int? _currentSurahNumber;
+    private int? _currentAyaNumber;
     
     public AndroidAudioRecordingService(Context context)
     {
@@ -26,8 +28,10 @@ public class AndroidAudioRecordingService : IAudioRecordingService
     }
     
     public bool IsRecording => _isRecording;
-    public bool HasRecording => !string.IsNullOrEmpty(_recordingPath) && File.Exists(_recordingPath);
+    public bool HasRecording => _currentSurahNumber.HasValue && _currentAyaNumber.HasValue && HasRecordingForAya(_currentSurahNumber.Value, _currentAyaNumber.Value);
     public string? RecordingPath => _recordingPath;
+    public int? CurrentSurahNumber => _currentSurahNumber;
+    public int? CurrentAyaNumber => _currentAyaNumber;
     
     public event EventHandler<bool>? RecordingStateChanged;
     public event EventHandler<string>? RecordingError;
@@ -54,7 +58,7 @@ public class AndroidAudioRecordingService : IAudioRecordingService
         return true;
     }
     
-    public async Task<bool> StartRecordingAsync(string filePath)
+    public async Task<bool> StartRecordingAsync(int surahNumber, int ayaNumber)
     {
         try
         {
@@ -64,6 +68,9 @@ public class AndroidAudioRecordingService : IAudioRecordingService
                 return false;
             }
             
+            _currentSurahNumber = surahNumber;
+            _currentAyaNumber = ayaNumber;
+            
             var filesDir = global::Android.App.Application.Context.FilesDir?.AbsolutePath;
             if (string.IsNullOrEmpty(filesDir))
             {
@@ -71,14 +78,13 @@ public class AndroidAudioRecordingService : IAudioRecordingService
                 return false;
             }
             
-            var recordingsDir = Path.Combine(filesDir, "recordings");
+            var recordingsDir = Path.Combine(filesDir, "audio", "user");
             if (!Directory.Exists(recordingsDir))
             {
                 Directory.CreateDirectory(recordingsDir);
             }
             
-            var fileName = string.Format("recitation_{0:yyyyMMdd_HHmmss}.m4a", DateTime.Now);
-            _recordingPath = Path.Combine(recordingsDir, fileName);
+            _recordingPath = GetRecordingPath(surahNumber, ayaNumber);
             
             if (_isRecording)
             {
@@ -155,21 +161,21 @@ public class AndroidAudioRecordingService : IAudioRecordingService
         }
     }
     
-    public async Task<bool> PlayRecordingAsync()
+    public async Task<bool> PlayRecordingAsync(int surahNumber, int ayaNumber)
     {
         try
         {
-            if (!HasRecording)
+            var recordingPath = GetRecordingPath(surahNumber, ayaNumber);
+            
+            if (!File.Exists(recordingPath))
             {
                 RecordingError?.Invoke(this, "No recording available to play");
                 return false;
             }
             
-            if (string.IsNullOrEmpty(_recordingPath) || !File.Exists(_recordingPath))
-            {
-                RecordingError?.Invoke(this, "Recording file not found");
-                return false;
-            }
+            _currentSurahNumber = surahNumber;
+            _currentAyaNumber = ayaNumber;
+            _recordingPath = recordingPath;
             
             await StopPlaybackAsync();
             
@@ -206,7 +212,7 @@ public class AndroidAudioRecordingService : IAudioRecordingService
             }
             
             _mediaPlayer.SetVolume(1.0f, 1.0f);
-            _mediaPlayer.SetDataSource(_recordingPath);
+            _mediaPlayer.SetDataSource(recordingPath);
             _mediaPlayer.Prepare();
             
             var duration = _mediaPlayer.Duration;
@@ -252,28 +258,53 @@ public class AndroidAudioRecordingService : IAudioRecordingService
         }
     }
     
-    public async Task DeleteRecordingAsync()
+    public async Task DeleteRecordingAsync(int surahNumber, int ayaNumber)
     {
         try
         {
-            if (_isRecording)
+            if (_isRecording && _currentSurahNumber == surahNumber && _currentAyaNumber == ayaNumber)
             {
                 await StopRecordingAsync();
             }
             
             await StopPlaybackAsync();
             
-            if (!string.IsNullOrEmpty(_recordingPath) && File.Exists(_recordingPath))
+            var recordingPath = GetRecordingPath(surahNumber, ayaNumber);
+            if (File.Exists(recordingPath))
             {
-                File.Delete(_recordingPath);
+                File.Delete(recordingPath);
             }
             
-            _recordingPath = null;
+            if (_currentSurahNumber == surahNumber && _currentAyaNumber == ayaNumber)
+            {
+                _recordingPath = null;
+                _currentSurahNumber = null;
+                _currentAyaNumber = null;
+            }
         }
         catch (Exception ex)
         {
             RecordingError?.Invoke(this, "Failed to delete recording: " + ex.Message);
         }
+    }
+    
+    public bool HasRecordingForAya(int surahNumber, int ayaNumber)
+    {
+        return File.Exists(GetRecordingPath(surahNumber, ayaNumber));
+    }
+    
+    public string GetRecordingPath(int surahNumber, int ayaNumber)
+    {
+        var filesDir = global::Android.App.Application.Context.FilesDir?.AbsolutePath;
+        if (string.IsNullOrEmpty(filesDir))
+        {
+            return string.Empty;
+        }
+        
+        var paddedSurah = surahNumber.ToString("D3");
+        var paddedAya = ayaNumber.ToString("D3");
+        var recordingsDir = Path.Combine(filesDir, "audio", "user");
+        return Path.Combine(recordingsDir, string.Format("{0}{1}.m4a", paddedSurah, paddedAya));
     }
     
     private void UpdateDuration(object? state)

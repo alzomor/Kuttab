@@ -14,6 +14,8 @@ public interface IAudioRecordingService
     bool IsRecording { get; }
     bool HasRecording { get; }
     string? RecordingPath { get; }
+    int? CurrentSurahNumber { get; }
+    int? CurrentAyaNumber { get; }
     
     // Events
     event EventHandler<bool>? RecordingStateChanged;
@@ -21,11 +23,13 @@ public interface IAudioRecordingService
     event EventHandler<TimeSpan>? RecordingDurationChanged;
     
     // Methods
-    Task<bool> StartRecordingAsync(string filePath);
+    Task<bool> StartRecordingAsync(int surahNumber, int ayaNumber);
     Task<string?> StopRecordingAsync();
-    Task<bool> PlayRecordingAsync();
+    Task<bool> PlayRecordingAsync(int surahNumber, int ayaNumber);
     Task StopPlaybackAsync();
-    Task DeleteRecordingAsync();
+    Task DeleteRecordingAsync(int surahNumber, int ayaNumber);
+    bool HasRecordingForAya(int surahNumber, int ayaNumber);
+    string GetRecordingPath(int surahNumber, int ayaNumber);
     
     // Permission check
     Task<bool> RequestRecordingPermissionAsync();

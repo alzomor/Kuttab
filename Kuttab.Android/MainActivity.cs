@@ -440,6 +440,7 @@ public class MainActivity : AppCompatActivity
                 ShowAyaImage(_searchResults[position]);
             }
             PlayCurrentAya(false);
+            UpdateRecordingUI(); // Update recording buttons based on selected Ayah
         }
         catch (Exception ex)
         {
@@ -1040,7 +1041,8 @@ public class MainActivity : AppCompatActivity
     // Recording event handlers
     private async void OnRecordClick(object? sender, EventArgs e)
     {
-        if (_recordingService == null) return;
+        if (_recordingService == null || _currentPlayingIndex < 0 || _currentPlayingIndex >= _searchResults.Count)
+            return;
         
         // Check permission
         if (!await _recordingService.RequestRecordingPermissionAsync())
@@ -1049,13 +1051,10 @@ public class MainActivity : AppCompatActivity
             return;
         }
         
-        // Generate recording file path
-        var recordingDir = System.IO.Path.Combine(FilesDir!.AbsolutePath, "recordings");
-        var fileName = $"recitation_{DateTime.Now:yyyyMMdd_HHmmss}.3gp";
-        var recordingPath = System.IO.Path.Combine(recordingDir, fileName);
+        var aya = _searchResults[_currentPlayingIndex];
         
-        // Start recording
-        if (await _recordingService.StartRecordingAsync(recordingPath))
+        // Start recording for the selected Ayah
+        if (await _recordingService.StartRecordingAsync(aya.SurahNumber, aya.AyaNumber))
         {
             UpdateRecordingUI();
         }
@@ -1071,16 +1070,20 @@ public class MainActivity : AppCompatActivity
     
     private async void OnPlayRecordingClick(object? sender, EventArgs e)
     {
-        if (_recordingService == null) return;
+        if (_recordingService == null || _currentPlayingIndex < 0 || _currentPlayingIndex >= _searchResults.Count)
+            return;
         
-        await _recordingService.PlayRecordingAsync();
+        var aya = _searchResults[_currentPlayingIndex];
+        await _recordingService.PlayRecordingAsync(aya.SurahNumber, aya.AyaNumber);
     }
     
     private async void OnDeleteRecordingClick(object? sender, EventArgs e)
     {
-        if (_recordingService == null) return;
+        if (_recordingService == null || _currentPlayingIndex < 0 || _currentPlayingIndex >= _searchResults.Count)
+            return;
         
-        await _recordingService.DeleteRecordingAsync();
+        var aya = _searchResults[_currentPlayingIndex];
+        await _recordingService.DeleteRecordingAsync(aya.SurahNumber, aya.AyaNumber);
         UpdateRecordingUI();
     }
     
@@ -1105,17 +1108,25 @@ public class MainActivity : AppCompatActivity
         if (_recordingService == null) return;
         
         var isRecording = _recordingService.IsRecording;
-        var hasRecording = _recordingService.HasRecording;
+        var hasAyaSelected = _currentPlayingIndex >= 0 && _currentPlayingIndex < _searchResults.Count;
+        var hasRecording = false;
         
-        // Update button states
+        // Check if current Ayah has a recording
+        if (hasAyaSelected)
+        {
+            var aya = _searchResults[_currentPlayingIndex];
+            hasRecording = _recordingService.HasRecordingForAya(aya.SurahNumber, aya.AyaNumber);
+        }
+        
+        // Update button states - only enable when an Ayah is selected
         if (_recordButton != null)
-            _recordButton.Enabled = !isRecording;
+            _recordButton.Enabled = hasAyaSelected && !isRecording;
         if (_stopRecordingButton != null)
             _stopRecordingButton.Enabled = isRecording;
         if (_playRecordingButton != null)
-            _playRecordingButton.Enabled = !isRecording && hasRecording;
+            _playRecordingButton.Enabled = hasAyaSelected && !isRecording && hasRecording;
         if (_deleteRecordingButton != null)
-            _deleteRecordingButton.Enabled = !isRecording && hasRecording;
+            _deleteRecordingButton.Enabled = hasAyaSelected && !isRecording && hasRecording;
         
         // Update status text
         if (_recordingStatus != null)
