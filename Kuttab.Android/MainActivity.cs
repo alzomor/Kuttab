@@ -1,17 +1,21 @@
 using Android.App;
 using Android.Content;
-using Android.OS;
-using Android.Widget;
+using Android.Content.PM;
 using Android.Graphics;
+using Android.OS;
+using Android.Runtime;
 using Android.Views;
+using Android.Widget;
 using AndroidX.AppCompat.App;
 using AndroidX.RecyclerView.Widget;
 using Kuttab.Android.Adapters;
 using Kuttab.Android.Services;
-using Kuttab.Core.Services;
+using Kuttab.Core.Interfaces;
 using Kuttab.Core.Models;
+using Kuttab.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,6 +28,7 @@ public class MainActivity : AppCompatActivity
     private AndroidAudioService? _audioService;
     private AndroidPictureService? _pictureService;
     private LocalizationService? _localizationService;
+    private AndroidAudioRecordingService? _recordingService;
     
     private LinearLayout? _categoryContainer;
     private TextView? _categoryIcon;
@@ -48,6 +53,16 @@ public class MainActivity : AppCompatActivity
     private TextView? _statusText;
     private ImageView? _ayaImage;
     private RecyclerView? _recyclerView;
+    
+    // Recording UI Elements
+    private LinearLayout? _recordingSection;
+    private Button? _recordButton;
+    private Button? _stopRecordingButton;
+    private Button? _playRecordingButton;
+    private Button? _deleteRecordingButton;
+    private TextView? _recordingStatus;
+    private TextView? _recordingDuration;
+    private bool _recordingEnabled = true; // Default to enabled
     private AyaAdapter? _adapter;
     
     private List<QuranAya> _searchResults = new();
@@ -85,6 +100,7 @@ public class MainActivity : AppCompatActivity
             _audioService = new AndroidAudioService(this);
             _pictureService = new AndroidPictureService(this);
             _localizationService = new LocalizationService(fileService);
+            _recordingService = new AndroidAudioRecordingService(this);
             
             // Initialize wake lock to keep screen on during playback
             var powerManager = (PowerManager?)GetSystemService(PowerService);
@@ -99,6 +115,14 @@ public class MainActivity : AppCompatActivity
                 _audioService.PlaybackStateChanged += OnPlaybackStateChanged;
                 _audioService.SequencePlaybackEnded += OnSequencePlaybackEnded;
                 _audioService.PlaybackError += (s, msg) => ShowError(msg);
+            }
+            
+            // Setup recording event handlers
+            if (_recordingService != null)
+            {
+                _recordingService.RecordingStateChanged += OnRecordingStateChanged;
+                _recordingService.RecordingError += (s, msg) => ShowError(msg);
+                _recordingService.RecordingDurationChanged += OnRecordingDurationChanged;
             }
         }
         catch (Exception ex)
@@ -158,6 +182,15 @@ public class MainActivity : AppCompatActivity
         _ayaImage = FindViewById<ImageView>(Resource.Id.ayaImage);
         _recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerView);
         
+        // Recording UI Elements
+        _recordingSection = FindViewById<LinearLayout>(Resource.Id.recordingSection);
+        _recordButton = FindViewById<Button>(Resource.Id.recordButton);
+        _stopRecordingButton = FindViewById<Button>(Resource.Id.stopRecordingButton);
+        _playRecordingButton = FindViewById<Button>(Resource.Id.playRecordingButton);
+        _deleteRecordingButton = FindViewById<Button>(Resource.Id.deleteRecordingButton);
+        _recordingStatus = FindViewById<TextView>(Resource.Id.recordingStatus);
+        _recordingDuration = FindViewById<TextView>(Resource.Id.recordingDuration);
+        
         // Setup button click handlers
         if (_settingsButton != null)
             _settingsButton.Click += OnSettingsClick;
@@ -177,6 +210,16 @@ public class MainActivity : AppCompatActivity
             _playAllButton.Click += OnPlayAllClick;
         if (_stopButton != null)
             _stopButton.Click += OnStopClick;
+        
+        // Setup recording button handlers
+        if (_recordButton != null)
+            _recordButton.Click += OnRecordClick;
+        if (_stopRecordingButton != null)
+            _stopRecordingButton.Click += OnStopRecordingClick;
+        if (_playRecordingButton != null)
+            _playRecordingButton.Click += OnPlayRecordingClick;
+        if (_deleteRecordingButton != null)
+            _deleteRecordingButton.Click += OnDeleteRecordingClick;
         
         // Category spinner selection handler
         if (_categorySpinner != null)
@@ -984,12 +1027,135 @@ public class MainActivity : AppCompatActivity
         {
             _searchService.SetQuranTextFile(quranTextFile);
         }
+        
+        // Load recording enabled setting
+        _recordingEnabled = prefs?.GetBoolean("RecordingEnabled", true) ?? true;
+        
+        System.Diagnostics.Debug.WriteLine($"[MAIN] Recording enabled: {_recordingEnabled}");
+        
+        // Update recording UI visibility
+        UpdateRecordingVisibility();
+    }
+
+    // Recording event handlers
+    private async void OnRecordClick(object? sender, EventArgs e)
+    {
+        if (_recordingService == null) return;
+        
+        // Check permission
+        if (!await _recordingService.RequestRecordingPermissionAsync())
+        {
+            ShowError("Recording permission is required to record audio");
+            return;
+        }
+        
+        // Generate recording file path
+        var recordingDir = System.IO.Path.Combine(FilesDir!.AbsolutePath, "recordings");
+        var fileName = $"recitation_{DateTime.Now:yyyyMMdd_HHmmss}.3gp";
+        var recordingPath = System.IO.Path.Combine(recordingDir, fileName);
+        
+        // Start recording
+        if (await _recordingService.StartRecordingAsync(recordingPath))
+        {
+            UpdateRecordingUI();
+        }
+    }
+    
+    private async void OnStopRecordingClick(object? sender, EventArgs e)
+    {
+        if (_recordingService == null) return;
+        
+        await _recordingService.StopRecordingAsync();
+        UpdateRecordingUI();
+    }
+    
+    private async void OnPlayRecordingClick(object? sender, EventArgs e)
+    {
+        if (_recordingService == null) return;
+        
+        await _recordingService.PlayRecordingAsync();
+    }
+    
+    private async void OnDeleteRecordingClick(object? sender, EventArgs e)
+    {
+        if (_recordingService == null) return;
+        
+        await _recordingService.DeleteRecordingAsync();
+        UpdateRecordingUI();
+    }
+    
+    private void OnRecordingStateChanged(object? sender, bool isRecording)
+    {
+        RunOnUiThread(() => UpdateRecordingUI());
+    }
+    
+    private void OnRecordingDurationChanged(object? sender, TimeSpan duration)
+    {
+        RunOnUiThread(() =>
+        {
+            if (_recordingDuration != null)
+            {
+                _recordingDuration.Text = $"{duration:mm\\:ss}";
+            }
+        });
+    }
+    
+    private void UpdateRecordingUI()
+    {
+        if (_recordingService == null) return;
+        
+        var isRecording = _recordingService.IsRecording;
+        var hasRecording = _recordingService.HasRecording;
+        
+        // Update button states
+        if (_recordButton != null)
+            _recordButton.Enabled = !isRecording;
+        if (_stopRecordingButton != null)
+            _stopRecordingButton.Enabled = isRecording;
+        if (_playRecordingButton != null)
+            _playRecordingButton.Enabled = !isRecording && hasRecording;
+        if (_deleteRecordingButton != null)
+            _deleteRecordingButton.Enabled = !isRecording && hasRecording;
+        
+        // Update status text
+        if (_recordingStatus != null)
+        {
+            if (isRecording)
+                _recordingStatus.Text = "Recording...";
+            else if (hasRecording)
+                _recordingStatus.Text = "Recording saved";
+            else
+                _recordingStatus.Text = "No recording";
+        }
+        
+        // Update duration display
+        if (_recordingDuration != null)
+        {
+            if (isRecording)
+                _recordingDuration.Text = "00:00";
+            else
+                _recordingDuration.Text = "";
+        }
+    }
+    
+    private void UpdateRecordingVisibility()
+    {
+        if (_recordingSection != null)
+        {
+            _recordingSection.Visibility = _recordingEnabled ? global::Android.Views.ViewStates.Visible : global::Android.Views.ViewStates.Gone;
+            System.Diagnostics.Debug.WriteLine($"[MAIN] Recording section visibility set to: {_recordingSection.Visibility}");
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine("[MAIN] Recording section is NULL!");
+        }
     }
 
     protected override void OnDestroy()
     {
         ReleaseWakeLock();
         _audioService?.Dispose();
+        _recordingService?.Dispose();
         base.OnDestroy();
     }
 }

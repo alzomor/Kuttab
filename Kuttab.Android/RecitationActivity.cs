@@ -40,6 +40,7 @@ public class RecitationActivity : AppCompatActivity
     private ImageView? _ayaImage;
     private CheckBox? _teacherModeCheckbox;
     
+        
     // Labels for dynamic language update
     private TextView? _titleTextView;
     private TextView? _reciterLabel;
@@ -182,6 +183,7 @@ public class RecitationActivity : AppCompatActivity
         _ayaImage = FindViewById<ImageView>(Resource.Id.ayaImage);
         _teacherModeCheckbox = FindViewById<CheckBox>(Resource.Id.teacherModeCheckbox);
         
+                
         // Labels for dynamic language update
         _titleTextView = FindViewById<TextView>(Resource.Id.titleTextView);
         _reciterLabel = FindViewById<TextView>(Resource.Id.reciterLabel);

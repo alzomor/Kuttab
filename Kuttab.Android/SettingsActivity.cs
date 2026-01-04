@@ -24,6 +24,7 @@ public class SettingsActivity : AppCompatActivity
     private Spinner? _endSurahSpinner;
     private CheckBox? _useRemoteAudioCheckBox;
     private CheckBox? _useRemoteImagesCheckBox;
+    private CheckBox? _enableRecordingCheckBox;
     private LinearLayout? _reciterContainer;
     private TextView? _selectReciterLabel;
     private Spinner? _reciterSpinner;
@@ -125,6 +126,7 @@ public class SettingsActivity : AppCompatActivity
         _selectReciterLabel = FindViewById<TextView>(Resource.Id.selectReciterLabel);
         _reciterSpinner = FindViewById<Spinner>(Resource.Id.reciterSpinner);
         _useRemoteImagesCheckBox = FindViewById<CheckBox>(Resource.Id.useRemoteImagesCheckBox);
+        _enableRecordingCheckBox = FindViewById<CheckBox>(Resource.Id.enableRecordingCheckBox);
         _saveButton = FindViewById<Button>(Resource.Id.saveButton);
         _cancelButton = FindViewById<Button>(Resource.Id.cancelButton);
         
@@ -287,6 +289,13 @@ public class SettingsActivity : AppCompatActivity
         if (_useRemoteImagesCheckBox != null)
         {
             _useRemoteImagesCheckBox.Checked = useRemoteImages;
+        }
+        
+        // Load recording enabled setting
+        var recordingEnabled = prefs?.GetBoolean("RecordingEnabled", true) ?? true;
+        if (_enableRecordingCheckBox != null)
+        {
+            _enableRecordingCheckBox.Checked = recordingEnabled;
         }
         
         // Load reciter selection
@@ -539,6 +548,7 @@ public class SettingsActivity : AppCompatActivity
                 // Save online resource settings
                 editor.PutBoolean("UseRemoteAudio", _useRemoteAudioCheckBox?.Checked ?? true);
                 editor.PutBoolean("UseRemoteImages", _useRemoteImagesCheckBox?.Checked ?? false);
+                editor.PutBoolean("RecordingEnabled", _enableRecordingCheckBox?.Checked ?? true);
                 
                 // Save reciter selection
                 var selectedReciterIndex = _reciterSpinner?.SelectedItemPosition ?? 2; // Default to Husary
