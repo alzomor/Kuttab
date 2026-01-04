@@ -88,14 +88,22 @@ def build_android_apk():
         return False
     
     # Try to find a dotnet command capable of building Android.
-    # Prefer dotnet-android if it's available, otherwise use dotnet.
+    # Priority: 1) ~/.dotnet-android/dotnet (has Android workload)
+    #           2) dotnet-android command
+    #           3) system dotnet
+    dotnet_android_path = str(Path.home() / ".dotnet-android" / "dotnet")
     android_dotnet_cmd = "dotnet"
-    result = subprocess.run(["which", "dotnet-android"], capture_output=True, text=True)
-    if result.returncode == 0:
-        android_dotnet_cmd = "dotnet-android"
-        print("✅ Using dotnet-android command")
+    
+    if os.path.exists(dotnet_android_path):
+        android_dotnet_cmd = dotnet_android_path
+        print(f"✅ Using .NET with Android workload: {dotnet_android_path}")
     else:
-        print("ℹ️  Using dotnet (ensure Android workload is installed)")
+        result = subprocess.run(["which", "dotnet-android"], capture_output=True, text=True)
+        if result.returncode == 0:
+            android_dotnet_cmd = "dotnet-android"
+            print("✅ Using dotnet-android command")
+        else:
+            print("ℹ️  Using dotnet (ensure Android workload is installed)")
 
     # Set ANDROID_HOME environment variable (prefer existing env, fallback to ~/Android/Sdk)
     env = os.environ.copy()

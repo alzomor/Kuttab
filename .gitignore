@@ -435,3 +435,6 @@ ScheherazadeNew-*/
 *.ttf
 *.otf
 install_fonts.sh
+
+# Marketing materials
+marketing/*
