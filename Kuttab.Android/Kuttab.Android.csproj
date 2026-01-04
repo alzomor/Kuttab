@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationId>com.kuttab.app</ApplicationId>
-    <ApplicationVersion>81</ApplicationVersion>
-    <ApplicationDisplayVersion>0.81</ApplicationDisplayVersion>
+    <ApplicationVersion>82</ApplicationVersion>
+    <ApplicationDisplayVersion>0.82</ApplicationDisplayVersion>
     <!-- Build for ARM64 only to avoid ABI issues -->
     <RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
