@@ -1,0 +1,8 @@
+Version 0.81:
+- Enhanced Tajweed rule search functionality
+- Improved audio playback controls
+- Added multiple reciter options
+- Multi-language interface support
+- Optimized performance and stability
+- Better offline mode support
+- Updated UI for better user experience

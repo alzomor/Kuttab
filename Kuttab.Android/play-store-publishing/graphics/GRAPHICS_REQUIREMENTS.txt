@@ -1,0 +1,53 @@
+GRAPHICS REQUIREMENTS FOR GOOGLE PLAY STORE
+===========================================
+
+✅ COMPLETED:
+- App Icon (512x512): app-icon-original.png (copied from xxxhdpi)
+
+❌ TODO - YOU NEED TO CREATE:
+
+1. FEATURE GRAPHIC (REQUIRED)
+   Dimensions: 1024 x 500 pixels
+   Format: PNG or JPG (24-bit, no alpha)
+   Max Size: 1 MB
+   Purpose: Displayed at top of store listing
+   
+   Design Tips:
+   - Include app name "Kuttab - Tajweed Trainer"
+   - Include app icon
+   - Use Arabic calligraphy or Quranic motifs
+   - Keep text minimal and readable
+   - Use brand colors
+   
+   Tools: Canva, Photoshop, GIMP, Figma
+
+2. SCREENSHOTS (REQUIRED - Minimum 2)
+   Dimensions: 1080 x 1920 (or higher)
+   Format: PNG or JPG
+   Aspect Ratio: 16:9 or 9:16
+   
+   Recommended screenshots:
+   a) Main search screen with Tajweed rules
+   b) Search results with highlighted text
+   c) Audio recitation interface
+   d) Settings screen
+   e) Recitation mode
+   f) Multi-language support
+   
+   How to capture:
+   - Use Android emulator or physical device
+   - Take screenshots of key features
+   - Ensure high resolution (1080p+)
+   - Remove personal information
+   
+3. PROMOTIONAL VIDEO (OPTIONAL)
+   Platform: YouTube
+   Duration: 30-90 seconds
+   Shows: Key features and app usage
+
+CURRENT STATUS:
+- App icon: ✅ Ready
+- Feature graphic: ❌ Needs creation
+- Screenshots: ❌ Needs capture
+
+See ../documentation/SCREENSHOTS_GUIDE.md for detailed instructions.
