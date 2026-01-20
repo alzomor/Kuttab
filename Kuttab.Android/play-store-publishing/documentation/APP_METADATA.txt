@@ -1,0 +1,103 @@
+KUTTAB - APP METADATA FOR GOOGLE PLAY STORE
+============================================
+
+BASIC INFORMATION:
+------------------
+App Name: Kuttab - Tajweed Trainer
+Package Name: com.kuttab.app
+Category: Education
+Content Rating: Everyone
+Version: 0.81
+Version Code: 81
+Minimum SDK: API 21 (Android 5.0)
+Target SDK: API 33+ (Update to latest recommended)
+
+PRICING & DISTRIBUTION:
+-----------------------
+Price: Free
+In-App Purchases: No
+Ads: No
+Countries: Worldwide (recommended)
+
+CONTACT INFORMATION:
+--------------------
+Developer Email: almanar.backup@gmail.com
+Website: [Optional - add if available]
+Support Email: almanar.backup@gmail.com
+
+PRIVACY POLICY:
+---------------
+Status: Created (privacy-policy.html)
+Action Required: Host at public URL
+Suggested URLs:
+- GitHub Pages: https://yourusername.github.io/kuttab/privacy-policy.html
+- Your website: https://yourwebsite.com/kuttab/privacy-policy
+- Google Sites or similar
+
+DATA SAFETY DECLARATIONS:
+-------------------------
+Data Collection: NO
+Data Sharing: NO
+Location: Not collected
+Personal Info: Not collected
+Financial Info: Not collected
+Device IDs: Not collected
+App Activity: Not collected
+
+PERMISSIONS USED:
+-----------------
+- INTERNET: For streaming audio/images
+- ACCESS_NETWORK_STATE: Check connectivity
+- WAKE_LOCK: Keep screen on during audio
+- FOREGROUND_SERVICE: Background audio playback
+- FOREGROUND_SERVICE_MEDIA_PLAYBACK: Media service
+
+CONTENT RATING (IARC):
+----------------------
+Violence: No
+Sexual Content: No
+Profanity: No
+Drugs: No
+Gambling: No
+User Interaction: No
+Shares Location: No
+Unrestricted Internet: Yes (for audio streaming)
+
+Expected Ratings:
+- ESRB: Everyone
+- PEGI: 3
+- USK: 0
+- Generic: 3+
+
+LANGUAGES SUPPORTED:
+--------------------
+- Arabic (العربية)
+- English
+- German (Deutsch)
+
+FEATURES:
+---------
+- Tajweed rule search
+- Audio recitations (multiple reciters)
+- Offline support
+- Multi-language interface
+- Customizable settings
+- Recitation mode with repeat
+- Educational content
+
+THIRD-PARTY CONTENT:
+--------------------
+- Quranic Text: Tanzil.net
+- Audio: EveryAyah.com
+- Images: EveryAyah.com
+
+RELEASE TRACK RECOMMENDATION:
+-----------------------------
+Start with: Internal Testing or Closed Testing
+Then: Open Testing (optional)
+Finally: Production
+
+REVIEW TIME:
+------------
+Initial Review: 1-7 days (typically 1-3 days)
+Updates: Usually faster (hours to 1 day)

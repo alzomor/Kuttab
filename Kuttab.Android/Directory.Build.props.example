@@ -1,0 +1,35 @@
+<!-- 
+  Directory.Build.props.example
+  
+  This is an EXAMPLE configuration file for app signing.
+  
+  To use this file:
+  1. Copy this file to Directory.Build.props (without .example)
+  2. Replace the placeholder values with your actual keystore information
+  3. Add Directory.Build.props to .gitignore (NEVER commit passwords to git!)
+  4. Or use environment variables for passwords (recommended)
+-->
+
+<Project>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <!-- Enable app signing for release builds -->
+    <AndroidKeyStore>true</AndroidKeyStore>
+    
+    <!-- Path to your keystore file (relative or absolute) -->
+    <AndroidSigningKeyStore>$(MSBuildThisFileDirectory)kuttab-release.keystore</AndroidSigningKeyStore>
+    
+    <!-- Keystore alias -->
+    <AndroidSigningKeyAlias>kuttab</AndroidSigningKeyAlias>
+    
+    <!-- Option 1: Use environment variables (RECOMMENDED) -->
+    <AndroidSigningKeyPass>env:KEYSTORE_PASSWORD</AndroidSigningKeyPass>
+    <AndroidSigningStorePass>env:KEYSTORE_PASSWORD</AndroidSigningStorePass>
+    
+    <!-- Option 2: Direct password (NOT RECOMMENDED - only for local testing) -->
+    <!-- <AndroidSigningKeyPass>your-key-password</AndroidSigningKeyPass> -->
+    <!-- <AndroidSigningStorePass>your-store-password</AndroidSigningStorePass> -->
+    
+    <!-- Build AAB by default for Play Store -->
+    <AndroidPackageFormat>aab</AndroidPackageFormat>
+  </PropertyGroup>
+</Project>

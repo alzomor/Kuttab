@@ -436,5 +436,14 @@ ScheherazadeNew-*/
 *.otf
 install_fonts.sh
 
+# Android keystore files - CRITICAL: Never commit these!
+*.keystore
+*.jks
+*.p12
+
+# Android signing configuration - NEVER commit passwords!
+**/Directory.Build.props
+!**/Directory.Build.props.example
+
 # Marketing materials
 marketing/*

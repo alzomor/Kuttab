@@ -1,0 +1,45 @@
+Kuttab is a comprehensive Tajweed training application designed to help you master the rules of Quranic recitation. Whether you're a beginner or advanced student, Kuttab provides an interactive way to learn and practice Tajweed rules with authentic Quranic text and professional recitations.
+
+Key Features:
+
+Tajweed Rule Search
+- Search for specific Tajweed rules throughout the entire Quran
+- Browse by categories: Noon Sakinah, Meem Sakinah, Madd, Qalqalah, and more
+- View all occurrences of each rule with highlighted text
+- Learn through practical examples from the Quran
+
+Audio Recitations
+- Listen to professional recitations by renowned Qaris
+- Multiple reciters available: Abdul Basit, Al-Husary, Ayman Sowaid, and more
+- Repeat individual verses for practice
+- Play entire Surahs or custom verse ranges
+- Teacher mode (Muallim) for learning pronunciation
+
+Flexible Search Options
+- Search the entire Quran (all 114 Surahs)
+- Focus on a single Surah
+- Search within a range of Surahs
+- Find multiple occurrences within verses
+
+Offline Support
+- Download audio files for offline use
+- Download verse images for offline viewing
+- Works without internet connection once content is downloaded
+
+Multi-Language Support
+- Arabic, English, German
+- More languages coming soon
+
+Customizable Settings
+- Choose your preferred reciter
+- Adjust font sizes for comfortable reading
+- Select search domains
+- Configure online/offline resources
+
+Educational Purpose: Kuttab is designed as a training tool to complement your Tajweed studies.
+
+Content Sources: Quranic text from Tanzil.net, Audio from EveryAyah.com
+
+Important Notice: This application is for educational purposes only. It cannot replace learning Tajweed with a qualified Sheikh.
+
+Privacy: We do not collect, store, or transmit any personal information. All settings are stored locally on your device.

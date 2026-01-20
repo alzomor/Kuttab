@@ -1,0 +1,29 @@
+# Android build outputs
+bin/
+obj/
+
+# Keystore files - NEVER commit these!
+*.keystore
+*.jks
+
+# Signing configuration - NEVER commit passwords!
+Directory.Build.props
+
+# Android Studio
+.idea/
+*.iml
+
+# Local configuration
+local.properties
+
+# Gradle (if used)
+.gradle/
+build/
+
+# Sensitive files
+*.pfx
+*.p12
+
+# Backup files
+*.bak
+*~
