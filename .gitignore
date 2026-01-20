@@ -444,3 +444,6 @@ install_fonts.sh
 # Android signing configuration - NEVER commit passwords!
 **/Directory.Build.props
 !**/Directory.Build.props.example
+
+# Marketing materials
+marketing/*

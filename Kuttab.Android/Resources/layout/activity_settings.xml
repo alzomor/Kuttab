@@ -263,6 +263,15 @@
                     android:textSize="14sp"
                     android:minHeight="48dp" />
 
+                <CheckBox
+                    android:id="@+id/enableRecordingCheckBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Enable Recording Feature"
+                    android:textSize="14sp"
+                    android:minHeight="48dp"
+                    android:layout_marginTop="8dp" />
+
                 <TextView
                     android:id="@+id/onlineResourcesNote"
                     android:layout_width="match_parent"

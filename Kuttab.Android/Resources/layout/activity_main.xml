@@ -180,6 +180,99 @@
         android:layout_marginBottom="4dp"
         android:enabled="false" />
 
+    <!-- User Recording Section -->
+    <LinearLayout
+        android:id="@+id/recordingSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#E8F5E9"
+        android:padding="12dp"
+        android:layout_marginBottom="4dp"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your Recording"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#2C5F2D"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Recording Status and Duration -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/recordingStatus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="No recording"
+                android:textSize="14sp"
+                android:textColor="#666666" />
+
+            <TextView
+                android:id="@+id/recordingDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="14sp"
+                android:textColor="#4CAF50"
+                android:fontFamily="monospace" />
+        </LinearLayout>
+
+        <!-- Recording Control Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/recordButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🎤 Record"
+                android:layout_marginEnd="4dp" />
+
+            <Button
+                android:id="@+id/stopRecordingButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="⏹️ Stop"
+                android:enabled="false"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp" />
+
+            <Button
+                android:id="@+id/playRecordingButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="▶️ Play"
+                android:enabled="false"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp" />
+
+            <Button
+                android:id="@+id/deleteRecordingButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🗑️ Delete"
+                android:enabled="false"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+    </LinearLayout>
+
     <!-- Status Text -->
     <TextView
         android:id="@+id/statusText"
