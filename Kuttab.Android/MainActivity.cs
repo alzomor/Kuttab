@@ -29,6 +29,9 @@ public class MainActivity : AppCompatActivity
     private AndroidPictureService? _pictureService;
     private LocalizationService? _localizationService;
     private AndroidAudioRecordingService? _recordingService;
+    private SimpleNotificationService? _notificationService;
+    private SimpleUpdateService? _updateService;
+    private NotificationContentService? _contentService;
     
     private LinearLayout? _categoryContainer;
     private TextView? _categoryIcon;
@@ -75,6 +78,7 @@ public class MainActivity : AppCompatActivity
     private PowerManager.WakeLock? _wakeLock;
     
     private const int SETTINGS_REQUEST_CODE = 1001;
+    private const int NOTIFICATION_PERMISSION_REQUEST_CODE = 1002;
     
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -89,6 +93,12 @@ public class MainActivity : AppCompatActivity
         SetupRecyclerView();
         LoadSettings();
         LoadDataAsync();
+        
+        // Initialize notification and update services
+        InitializeNotificationServices();
+        
+        // Check for app updates
+        CheckForAppUpdates();
     }
     
     private void InitializeServices()
@@ -128,6 +138,48 @@ public class MainActivity : AppCompatActivity
         catch (Exception ex)
         {
             ShowError($"Failed to initialize services: {ex.Message}");
+        }
+    }
+    
+    private void InitializeNotificationServices()
+    {
+        try
+        {
+            _notificationService = new SimpleNotificationService(this);
+            _updateService = new SimpleUpdateService(this, _notificationService);
+            _contentService = new NotificationContentService(this, _notificationService);
+            
+            // Request notification permission for Android 13+
+            _notificationService.RequestNotificationPermission(this, NOTIFICATION_PERMISSION_REQUEST_CODE);
+            
+            // Schedule periodic checks
+            _updateService.SchedulePeriodicUpdateCheck();
+            _contentService.SchedulePeriodicContentCheck();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to initialize notification services: {ex.Message}");
+        }
+    }
+    
+    private async void CheckForAppUpdates()
+    {
+        try
+        {
+            if (_updateService != null)
+            {
+                await _updateService.CheckForUpdatesAsync();
+            }
+            
+            // Also check for content notifications
+            if (_contentService != null)
+            {
+                await _contentService.CheckForContentNotificationsAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to check for updates: {ex.Message}");
         }
     }
     
@@ -1148,6 +1200,36 @@ public class MainActivity : AppCompatActivity
         else
         {
             System.Diagnostics.Debug.WriteLine("[MAIN] Recording section is NULL!");
+        }
+    }
+    
+    public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
+    {
+        base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        
+        try
+        {
+            if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE)
+            {
+                if (grantResults.Length > 0 && grantResults[0] == Permission.Granted)
+                {
+                    // Permission granted, can now show notifications
+                    System.Diagnostics.Debug.WriteLine("Notification permission granted");
+                    
+                    // Check for updates now that we have permission
+                    CheckForAppUpdates();
+                }
+                else
+                {
+                    // Permission denied
+                    System.Diagnostics.Debug.WriteLine("Notification permission denied");
+                    ShowError("Notifications are disabled. You won't receive update notifications.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error handling permission result: {ex.Message}");
         }
     }
 

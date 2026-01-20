@@ -1,0 +1,88 @@
+[
+  {
+    "id": "welcome_to_kuttab",
+    "title": "Welcome to Kuttab!",
+    "message": "Discover the beauty of Tajweed with our interactive learning tools. Start exploring Quranic patterns today!",
+    "type": "feature",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["all"],
+    "schedule": {
+      "startTime": "2025-01-01T00:00:00Z",
+      "endTime": "2025-12-31T23:59:59Z"
+    },
+    "createdAt": "2025-01-15T20:00:00Z"
+  },
+  {
+    "id": "new_recording_feature",
+    "title": "🎤 New Recording Feature",
+    "message": "Practice your recitation with our new audio recording feature! Record, playback, and improve your Tajweed.",
+    "type": "feature",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["all"],
+    "schedule": {
+      "startTime": "2025-01-15T00:00:00Z",
+      "endTime": "2025-02-15T23:59:59Z"
+    },
+    "createdAt": "2025-01-15T20:00:00Z"
+  },
+  {
+    "id": "daily_tip_001",
+    "title": "💡 Daily Tajweed Tip",
+    "message": "Did you know? Proper pronunciation of Arabic letters is the foundation of beautiful recitation. Practice each letter's makhraj (point of articulation) daily!",
+    "type": "educational",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["all"],
+    "schedule": {
+      "startTime": "2025-01-20T00:00:00Z",
+      "endTime": "2025-01-22T23:59:59Z",
+      "daysOfWeek": ["monday", "wednesday", "friday"]
+    },
+    "createdAt": "2025-01-20T10:00:00Z"
+  },
+  {
+    "id": "ramadan_preparation",
+    "title": "🌙 Prepare for Ramadan",
+    "message": "Ramadan is coming! Perfect your Quran recitation with Kuttab's Tajweed tools. Make this Ramadan your best recitation yet!",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": false,
+    "targetAudience": ["all"],
+    "schedule": {
+      "startTime": "2025-02-20T00:00:00Z",
+      "endTime": "2025-03-20T23:59:59Z"
+    },
+    "createdAt": "2025-01-20T10:00:00Z"
+  },
+  {
+    "id": "new_search_features",
+    "title": "🔍 Enhanced Search Features",
+    "message": "Our search tools now support more Tajweed rules and patterns! Find specific recitation techniques faster than ever.",
+    "type": "feature",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["all"],
+    "schedule": {
+      "startTime": "2025-01-20T00:00:00Z",
+      "endTime": "2025-02-20T23:59:59Z"
+    },
+    "createdAt": "2025-01-20T10:00:00Z"
+  },
+  {
+    "id": "educational_series_001",
+    "title": "📚 Learning Series: Ghunnah",
+    "message": "Learn about Ghunnah (nasal sound) in Tajweed. This essential technique appears in many Quranic verses. Practice makes perfect!",
+    "type": "educational",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["all"],
+    "schedule": {
+      "startTime": "2025-01-21T00:00:00Z",
+      "endTime": "2025-01-25T23:59:59Z",
+      "daysOfWeek": ["tuesday", "thursday"]
+    },
+    "createdAt": "2025-01-20T10:00:00Z"
+  }
+]

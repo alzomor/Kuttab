@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "552478512684",
+    "project_id": "kuttab-app-55489",
+    "storage_bucket": "kuttab-app-55489.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:552478512684:android:4e888f638cd101969f6389",
+        "android_client_info": {
+          "package_name": "com.kuttab.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgua-fv2FVQPNkUXay5YAWgxZimlKkiK0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
