@@ -30,9 +30,11 @@ GRAPHICS REQUIREMENTS FOR GOOGLE PLAY STORE
    a) Main search screen with Tajweed rules
    b) Search results with highlighted text
    c) Audio recitation interface
-   d) Settings screen
-   e) Recitation mode
-   f) Multi-language support
+   d) Audio recording interface (NEW - show recording buttons)
+   e) Settings screen
+   f) Recitation mode
+   g) Multi-language support
+   h) Notification settings (NEW)
    
    How to capture:
    - Use Android emulator or physical device

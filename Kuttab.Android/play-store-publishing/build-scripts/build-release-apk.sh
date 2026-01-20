@@ -40,8 +40,8 @@ if [ -f "$APK_PATH" ]; then
     echo "APK location: $APK_PATH"
     
     # Copy to publishing folder
-    cp "$APK_PATH" "play-store-publishing/com.kuttab.app-v0.81.apk"
-    echo "✅ Copied to: play-store-publishing/com.kuttab.app-v0.81.apk"
+    cp "$APK_PATH" "play-store-publishing/com.kuttab.app-v0.82.apk"
+    echo "✅ Copied to: play-store-publishing/com.kuttab.app-v0.82.apk"
     
     # Show file size
     SIZE=$(du -h "$APK_PATH" | cut -f1)
@@ -49,7 +49,7 @@ if [ -f "$APK_PATH" ]; then
     
     echo ""
     echo "Next steps:"
-    echo "1. Install on device: adb install -r play-store-publishing/com.kuttab.app-v0.81.apk"
+    echo "1. Install on device: adb install -r play-store-publishing/com.kuttab.app-v0.82.apk"
     echo "2. Test all features"
 else
     echo "❌ Build failed - APK not found"

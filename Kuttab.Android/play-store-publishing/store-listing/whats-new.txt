@@ -1,8 +1,8 @@
-Version 0.81:
-- Enhanced Tajweed rule search functionality
-- Improved audio playback controls
-- Added multiple reciter options
-- Multi-language interface support
-- Optimized performance and stability
-- Better offline mode support
-- Updated UI for better user experience
+Version 0.82:
+- 🎤 Ayah-specific audio recording - Record your recitation for each Ayah
+- 📁 Organized storage - Recordings saved with Sura_Ayah naming in user folder
+- 🔔 Push notifications - Stay updated with app news and features
+- 📱 Enhanced UI improvements for better user experience
+- 🎯 Recording buttons only enable when Ayah is selected
+- 📚 Better offline mode support
+- ⚡ Optimized performance and stability

@@ -21,7 +21,7 @@ export KEYSTORE_PASSWORD="your-password-here"
 ./play-store-publishing/build-scripts/build-release-aab.sh
 ```
 
-Output: `play-store-publishing/com.kuttab.app-v0.81.aab`
+Output: `play-store-publishing/com.kuttab.app-v0.82.aab`
 
 ### Step 3: Submit to Play Store (2 hours)
 

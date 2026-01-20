@@ -7,8 +7,8 @@ App Name: Kuttab - Tajweed Trainer
 Package Name: com.kuttab.app
 Category: Education
 Content Rating: Everyone
-Version: 0.81
-Version Code: 81
+Version: 0.82
+Version Code: 82
 Minimum SDK: API 21 (Android 5.0)
 Target SDK: API 33+ (Update to latest recommended)
 
@@ -51,6 +51,8 @@ PERMISSIONS USED:
 - WAKE_LOCK: Keep screen on during audio
 - FOREGROUND_SERVICE: Background audio playback
 - FOREGROUND_SERVICE_MEDIA_PLAYBACK: Media service
+- RECORD_AUDIO: For audio recording feature
+- POST_NOTIFICATIONS: For push notifications (Android 13+)
 
 CONTENT RATING (IARC):
 ----------------------
@@ -79,6 +81,8 @@ FEATURES:
 ---------
 - Tajweed rule search
 - Audio recitations (multiple reciters)
+- Audio recording (Ayah-specific)
+- Push notifications
 - Offline support
 - Multi-language interface
 - Customizable settings

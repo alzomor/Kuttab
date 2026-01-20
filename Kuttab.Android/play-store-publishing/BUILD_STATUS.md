@@ -2,13 +2,13 @@
 
 ## ✅ Release Build Complete
 
-**Build Date**: January 15, 2026  
-**Build Time**: 08:23 AM
+**Build Date**: January 20, 2026  
+**Build Time**: 10:42 PM
 
 ### Generated Files
 
 **AAB (Google Play Store)**:
-- Location: `play-store-publishing/com.kuttab.app-v0.81.aab`
+- Location: `play-store-publishing/com.kuttab.app-v0.82.aab`
 - Size: 40 MB
 - Status: ✅ Ready for upload to Play Console
 
@@ -20,8 +20,8 @@
 ### Build Configuration
 
 - Package: com.kuttab.app
-- Version: 0.81
-- Version Code: 81
+- Version: 0.82
+- Version Code: 82
 - Keystore: kuttab-release.keystore
 - Build Type: Release
 - Signing: Enabled
@@ -31,7 +31,7 @@
 1. **Test the AAB** (Optional but recommended):
    ```bash
    # Convert AAB to APK for testing
-   bundletool build-apks --bundle=play-store-publishing/com.kuttab.app-v0.81.aab \
+   bundletool build-apks --bundle=play-store-publishing/com.kuttab.app-v0.82.aab \
      --output=test.apks --mode=universal
    unzip test.apks universal.apk
    adb install universal.apk
@@ -41,7 +41,7 @@
    - Go to https://play.google.com/console
    - Select your app (or create new app)
    - Navigate to Release → Production (or Testing track)
-   - Upload: `play-store-publishing/com.kuttab.app-v0.81.aab`
+   - Upload: `play-store-publishing/com.kuttab.app-v0.82.aab`
 
 3. **Complete Store Listing**:
    - Copy text from `store-listing/*.txt` files
@@ -66,7 +66,7 @@
 
 To verify the AAB is properly signed:
 ```bash
-jarsigner -verify -verbose -certs play-store-publishing/com.kuttab.app-v0.81.aab
+jarsigner -verify -verbose -certs play-store-publishing/com.kuttab.app-v0.82.aab
 ```
 
 ### Important Notes

@@ -96,7 +96,7 @@ export KEYSTORE_PASSWORD="your-password"
 ./play-store-publishing/build-scripts/build-release-aab.sh
 ```
 
-Output will be in: `play-store-publishing/com.kuttab.app-v0.81.aab`
+Output will be in: `play-store-publishing/com.kuttab.app-v0.82.aab`
 
 ### Step 3: Create Graphics
 
@@ -207,6 +207,6 @@ All the automated work is done. Just create the graphics, build the AAB, and sub
 
 ---
 
-**Last Updated**: January 14, 2025  
+**Last Updated**: January 20, 2026  
 **Package Version**: 1.0  
-**App Version**: 0.81
+**App Version**: 0.82

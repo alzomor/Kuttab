@@ -15,6 +15,13 @@ Audio Recitations
 - Play entire Surahs or custom verse ranges
 - Teacher mode (Muallim) for learning pronunciation
 
+Audio Recording
+- Record your own recitation for each Ayah
+- Ayah-specific recording with organized storage
+- Playback your recordings to practice and improve
+- Delete and re-record as needed
+- Recordings saved with Sura_Ayah naming format
+
 Flexible Search Options
 - Search the entire Quran (all 114 Surahs)
 - Focus on a single Surah
@@ -29,6 +36,11 @@ Offline Support
 Multi-Language Support
 - Arabic, English, German
 - More languages coming soon
+
+Notifications
+- Push notifications for app updates and news
+- Stay informed about new features and content
+- Optional notification settings
 
 Customizable Settings
 - Choose your preferred reciter
