@@ -30,7 +30,8 @@ if [ ! -f "kuttab-release.keystore" ]; then
 fi
 
 echo "Building APK for testing..."
-dotnet publish -c Release -f net8.0-android -p:AndroidPackageFormat=apk Kuttab.Android.csproj
+# Use the .NET with Android workload
+ANDROID_HOME=~/Android/Sdk ~/.dotnet-android/dotnet publish -c Release -f net8.0-android -p:AndroidPackageFormat=apk Kuttab.Android.csproj
 
 # Find the signed APK
 APK_PATH="bin/Release/net8.0-android/publish/com.kuttab.app-Signed.apk"
