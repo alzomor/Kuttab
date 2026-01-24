@@ -1,0 +1,13 @@
+🎤 Record Your Recitation - Ayah by Ayah!
+
+🆕 NEW FEATURES:
+• Audio Recording - Record your recitation for each specific Ayah
+• Smart UI - Recording buttons only enable when you select an Ayah
+• Push Notifications - Stay updated with app news and features
+
+📝 HOW TO USE:
+1. Search and select any Ayah
+2. Tap the 🎤 record button
+3. Recite and playback your recording
+
+Perfect your Tajweed with personalized practice! 🌟

@@ -2,12 +2,13 @@
   <PropertyGroup>
     <TargetFramework>net8.0-android</TargetFramework>
     <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+    <AndroidTargetSdkVersion>35</AndroidTargetSdkVersion>
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationId>com.kuttab.app</ApplicationId>
-    <ApplicationVersion>82</ApplicationVersion>
-    <ApplicationDisplayVersion>0.82</ApplicationDisplayVersion>
+    <ApplicationVersion>84</ApplicationVersion>
+    <ApplicationDisplayVersion>0.84</ApplicationDisplayVersion>
     <!-- Build for ARM64 only to avoid ABI issues -->
     <RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
