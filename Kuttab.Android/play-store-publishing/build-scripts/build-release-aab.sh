@@ -41,8 +41,8 @@ if [ -f "$AAB_PATH" ]; then
     echo "AAB location: $AAB_PATH"
     
     # Copy to publishing folder
-    cp "$AAB_PATH" "play-store-publishing/com.kuttab.app-v0.82.aab"
-    echo "✅ Copied to: play-store-publishing/com.kuttab.app-v0.82.aab"
+    cp "$AAB_PATH" "play-store-publishing/com.kuttab.app-v0.83.aab"
+    echo "✅ Copied to: play-store-publishing/com.kuttab.app-v0.83.aab"
     
     # Show file size
     SIZE=$(du -h "$AAB_PATH" | cut -f1)
