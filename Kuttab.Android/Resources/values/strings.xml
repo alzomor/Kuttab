@@ -146,4 +146,11 @@
     <string name="display_settings_title">🔤 Display Settings</string>
     <string name="font_size_label">Font Size:</string>
     <string name="quran_text_label">Quran Text:</string>
+    
+    <!-- Tajweed Rules Feature -->
+    <string name="show_tajweed_rules">📖 Show Tajweed Rule Explanations</string>
+    <string name="rule_button">Rule</string>
+    <string name="tajweed_rule_title">Tajweed Rule</string>
+    <string name="no_rule_selected">Please select a Tajweed rule first</string>
+    <string name="no_explanation_available">No explanation available for this rule</string>
 </resources>

@@ -272,6 +272,15 @@
                     android:minHeight="48dp"
                     android:layout_marginTop="8dp" />
 
+                <CheckBox
+                    android:id="@+id/showTajweedRulesCheckBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/show_tajweed_rules"
+                    android:textSize="14sp"
+                    android:minHeight="48dp"
+                    android:layout_marginTop="8dp" />
+
                 <TextView
                     android:id="@+id/onlineResourcesNote"
                     android:layout_width="match_parent"

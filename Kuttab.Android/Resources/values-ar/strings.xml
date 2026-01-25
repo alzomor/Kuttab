@@ -115,4 +115,11 @@
     <string name="tax_deduction_note">✅ جمعية BBF معترف بها كجمعية ذات نفع عام في ألمانيا. تبرعاتكم قابلة للخصم من الضرائب.</string>
     <string name="barakah_message">بارك الله فيكم على كرمكم وجزاكم خيراً في الدنيا والآخرة.</string>
     <string name="copied_to_clipboard">تم النسخ إلى الحافظة</string>
+    
+    <!-- Tajweed Rules Feature -->
+    <string name="show_tajweed_rules">📖 عرض شرح قواعد التجويد</string>
+    <string name="rule_button">القاعدة</string>
+    <string name="tajweed_rule_title">قاعدة التجويد</string>
+    <string name="no_rule_selected">الرجاء اختيار قاعدة تجويد أولاً</string>
+    <string name="no_explanation_available">لا يوجد شرح متاح لهذه القاعدة</string>
 </resources>

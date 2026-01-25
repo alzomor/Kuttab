@@ -25,6 +25,7 @@ public class SettingsActivity : AppCompatActivity
     private CheckBox? _useRemoteAudioCheckBox;
     private CheckBox? _useRemoteImagesCheckBox;
     private CheckBox? _enableRecordingCheckBox;
+    private CheckBox? _showTajweedRulesCheckBox;
     private LinearLayout? _reciterContainer;
     private TextView? _selectReciterLabel;
     private Spinner? _reciterSpinner;
@@ -127,6 +128,7 @@ public class SettingsActivity : AppCompatActivity
         _reciterSpinner = FindViewById<Spinner>(Resource.Id.reciterSpinner);
         _useRemoteImagesCheckBox = FindViewById<CheckBox>(Resource.Id.useRemoteImagesCheckBox);
         _enableRecordingCheckBox = FindViewById<CheckBox>(Resource.Id.enableRecordingCheckBox);
+        _showTajweedRulesCheckBox = FindViewById<CheckBox>(Resource.Id.showTajweedRulesCheckBox);
         _saveButton = FindViewById<Button>(Resource.Id.saveButton);
         _cancelButton = FindViewById<Button>(Resource.Id.cancelButton);
         
@@ -296,6 +298,13 @@ public class SettingsActivity : AppCompatActivity
         if (_enableRecordingCheckBox != null)
         {
             _enableRecordingCheckBox.Checked = recordingEnabled;
+        }
+        
+        // Load show Tajweed rules setting
+        var showTajweedRules = prefs?.GetBoolean("ShowTajweedRules", true) ?? true;
+        if (_showTajweedRulesCheckBox != null)
+        {
+            _showTajweedRulesCheckBox.Checked = showTajweedRules;
         }
         
         // Load reciter selection
@@ -549,6 +558,7 @@ public class SettingsActivity : AppCompatActivity
                 editor.PutBoolean("UseRemoteAudio", _useRemoteAudioCheckBox?.Checked ?? true);
                 editor.PutBoolean("UseRemoteImages", _useRemoteImagesCheckBox?.Checked ?? false);
                 editor.PutBoolean("RecordingEnabled", _enableRecordingCheckBox?.Checked ?? true);
+                editor.PutBoolean("ShowTajweedRules", _showTajweedRulesCheckBox?.Checked ?? true);
                 
                 // Save reciter selection
                 var selectedReciterIndex = _reciterSpinner?.SelectedItemPosition ?? 2; // Default to Husary
