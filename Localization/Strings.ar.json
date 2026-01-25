@@ -168,5 +168,13 @@
   "ContactEmail": "البريد الإلكتروني للاتصال:",
   "ContactEmailText": "almanar.backup@gmail.com",
   "ContactSubject": "الموضوع: Kuttab",
-  "ContactNote": "يرجى تضمين 'Kuttab' في موضوع البريد الإلكتروني للتوجيه الصحيح."
+  "ContactNote": "يرجى تضمين 'Kuttab' في موضوع البريد الإلكتروني للتوجيه الصحيح.",
+  
+  "TajweedRuleTitle": "📖 شرح قاعدة التجويد",
+  "RuleNameLabel": "📜 اسم القاعدة",
+  "ExplanationLabel": "📝 الشرح",
+  "RuleButton": "📖 القاعدة",
+  "NoRuleSelected": "لم يتم اختيار قاعدة",
+  "NoExplanationAvailable": "لا يوجد شرح متاح لهذه القاعدة.",
+  "ShowTajweedRules": "عرض شرح قواعد التجويد"
 }

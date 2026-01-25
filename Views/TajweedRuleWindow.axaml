@@ -1,0 +1,127 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Kuttab.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="450"
+        x:Class="Kuttab.Views.TajweedRuleWindow"
+        x:DataType="vm:TajweedRuleViewModel"
+        Title="{Binding Localization.TajweedRuleTitle}"
+        Width="550" Height="450"
+        Background="#F5F5DC"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Design.DataContext>
+        <vm:TajweedRuleViewModel/>
+    </Design.DataContext>
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="CardBackground" Color="White"/>
+        <SolidColorBrush x:Key="TextColor" Color="#333333"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#2C5F2D"/>
+        <SolidColorBrush x:Key="GoldColor" Color="#B8860B"/>
+    </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextColor}"/>
+        </Style>
+        
+        <Style Selector="Border.rule-card">
+            <Setter Property="Background" Value="{DynamicResource CardBackground}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BoxShadow" Value="0 4 12 0 #20000000"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+        </Style>
+        
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource AccentColor}"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+        
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#2C5F2D"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="30,12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        
+        <Style Selector="Button.primary:pointerover">
+            <Setter Property="Background" Value="#3A7A3C"/>
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20">
+            <!-- Header -->
+            <Border Classes="rule-card">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="📖" 
+                               FontSize="36" 
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding Localization.TajweedRuleTitle}" 
+                               FontSize="24" 
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AccentColor}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,4"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Rule Name Card -->
+            <Border Classes="rule-card">
+                <StackPanel>
+                    <TextBlock Classes="section-title" Text="{Binding Localization.RuleNameLabel}"/>
+                    <Border Background="#F8F4EF" 
+                            CornerRadius="8" 
+                            Padding="16">
+                        <TextBlock Text="{Binding RuleName}" 
+                                   FontSize="20" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource GoldColor}"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontFamily="Traditional Arabic"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Explanation Card -->
+            <Border Classes="rule-card">
+                <StackPanel>
+                    <TextBlock Classes="section-title" Text="{Binding Localization.ExplanationLabel}"/>
+                    <Border Background="#FAFAF8" 
+                            CornerRadius="8" 
+                            Padding="16"
+                            BorderBrush="#E8DCC4"
+                            BorderThickness="1">
+                        <TextBlock Text="{Binding RuleExplanation}" 
+                                   FontSize="15" 
+                                   TextWrapping="Wrap"
+                                   LineHeight="24"
+                                   Foreground="#444444"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Close Button -->
+            <StackPanel Orientation="Horizontal" 
+                       HorizontalAlignment="Center"
+                       Margin="0,5,0,0">
+                <Button Classes="primary"
+                        Content="{Binding Localization.CloseButton}"
+                        Command="{Binding CloseCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

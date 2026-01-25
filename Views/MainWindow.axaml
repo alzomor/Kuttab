@@ -227,6 +227,11 @@
                         <Button Content="{Binding Localization.Search}" 
                                 Classes="primary"
                                 Command="{Binding SearchCommand}"
+                                Margin="0,0,10,0"/>
+                        <Button Content="{Binding Localization.RuleButton}" 
+                                Classes="secondary"
+                                Command="{Binding OpenTajweedRuleCommand}"
+                                ToolTip.Tip="View Tajweed Rule Explanation"
                                 Margin="0,0,15,0"/>
                     </StackPanel>
 

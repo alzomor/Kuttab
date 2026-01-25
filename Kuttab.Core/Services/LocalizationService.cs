@@ -146,6 +146,15 @@ public class LocalizationService : ReactiveObject
         this.RaisePropertyChanged(nameof(AssociationDescription));
         this.RaisePropertyChanged(nameof(BarakahMessage));
         this.RaisePropertyChanged(nameof(TaxDeductionNote));
+        
+        // Tajweed Rule window properties
+        this.RaisePropertyChanged(nameof(TajweedRuleTitle));
+        this.RaisePropertyChanged(nameof(RuleNameLabel));
+        this.RaisePropertyChanged(nameof(ExplanationLabel));
+        this.RaisePropertyChanged(nameof(RuleButton));
+        this.RaisePropertyChanged(nameof(NoRuleSelected));
+        this.RaisePropertyChanged(nameof(NoExplanationAvailable));
+        this.RaisePropertyChanged(nameof(ShowTajweedRules));
     }
 
     private void LoadLanguage(string languageCode)
@@ -295,6 +304,15 @@ public class LocalizationService : ReactiveObject
     public string AssociationDescription => this["AssociationDescription"];
     public string BarakahMessage => this["BarakahMessage"];
     public string TaxDeductionNote => this["TaxDeductionNote"];
+
+    // Tajweed Rule window properties
+    public string TajweedRuleTitle => this["TajweedRuleTitle"];
+    public string RuleNameLabel => this["RuleNameLabel"];
+    public string ExplanationLabel => this["ExplanationLabel"];
+    public string RuleButton => this["RuleButton"];
+    public string NoRuleSelected => this["NoRuleSelected"];
+    public string NoExplanationAvailable => this["NoExplanationAvailable"];
+    public string ShowTajweedRules => this["ShowTajweedRules"];
 
     public bool IsRightToLeft => _currentLanguage == "ar";
 

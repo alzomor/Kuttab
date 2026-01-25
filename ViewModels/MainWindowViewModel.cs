@@ -87,6 +87,7 @@ public class MainWindowViewModel : ViewModelBase
         OpenRecitationCommand = new SimpleCommand(OpenRecitation);
         OpenInfoCommand = new SimpleCommand(OpenInfo);
         OpenDonateCommand = new SimpleCommand(OpenDonate);
+        OpenTajweedRuleCommand = new SimpleCommand(OpenTajweedRule);
         
         _ = LoadDataAsync();
     }
@@ -318,6 +319,7 @@ public class MainWindowViewModel : ViewModelBase
     public ICommand OpenRecitationCommand { get; }
     public ICommand OpenInfoCommand { get; }
     public ICommand OpenDonateCommand { get; }
+    public ICommand OpenTajweedRuleCommand { get; }
 
     private async Task LoadDataAsync()
     {
@@ -1043,6 +1045,35 @@ public class MainWindowViewModel : ViewModelBase
         };
 
         await donateWindow.ShowDialog(
+            Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow
+                : null);
+    }
+
+    private async void OpenTajweedRule()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedRule))
+        {
+            StatusMessage = _localizationService.GetString("NoRuleSelected");
+            return;
+        }
+
+        // Get the Arabic rule name from the selected display name
+        var selectedDisplayName = SelectedRule ?? string.Empty;
+        if (!_ruleDisplayToArabic.TryGetValue(selectedDisplayName, out var arabicRuleName))
+        {
+            arabicRuleName = selectedDisplayName;
+        }
+
+        var tajweedRuleViewModel = new TajweedRuleViewModel(_localizationService);
+        tajweedRuleViewModel.SetRule(arabicRuleName);
+
+        var tajweedRuleWindow = new Views.TajweedRuleWindow
+        {
+            DataContext = tajweedRuleViewModel
+        };
+
+        await tajweedRuleWindow.ShowDialog(
             Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
                 ? desktop.MainWindow
                 : null);
