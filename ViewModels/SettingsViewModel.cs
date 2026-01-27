@@ -17,16 +17,28 @@ public class SurahItem
     public string DisplayText => $"{Number}. {Name}";
 }
 
-public class ReciterOption
+public class ReciterOption : ViewModelBase
 {
     public string FolderName { get; set; } = string.Empty;
     public string DisplayKey { get; set; } = string.Empty;
+    private string _displayText = string.Empty;
+    public string DisplayText 
+    { 
+        get => _displayText;
+        set => this.RaiseAndSetIfChanged(ref _displayText, value);
+    }
 }
 
-public class QuranTextOption
+public class QuranTextOption : ViewModelBase
 {
     public string FileName { get; set; } = string.Empty;
     public string DisplayKey { get; set; } = string.Empty;
+    private string _displayText = string.Empty;
+    public string DisplayText 
+    { 
+        get => _displayText;
+        set => this.RaiseAndSetIfChanged(ref _displayText, value);
+    }
 }
 
 public class SettingsViewModel : ViewModelBase
@@ -80,6 +92,35 @@ public class SettingsViewModel : ViewModelBase
         
         // Subscribe to language changes
         _localizationService.LanguageChanged += OnLanguageChanged;
+        
+        // Initialize display texts
+        InitializeDisplayTexts();
+    }
+    
+    private void InitializeDisplayTexts()
+    {
+        // Initialize SearchDomainOptions display texts
+        foreach (var option in SearchDomainOptions)
+        {
+            option.DisplayText = _localizationService.GetString(option.DisplayKey);
+        }
+        
+        // Initialize ReciterOptions display texts
+        foreach (var option in ReciterOptions)
+        {
+            option.DisplayText = _localizationService.GetString(option.DisplayKey);
+        }
+        
+        // Initialize QuranTextOptions display texts
+        foreach (var option in QuranTextOptions)
+        {
+            option.DisplayText = _localizationService.GetString(option.DisplayKey);
+        }
+        
+        // Notify UI that the collections have been updated
+        this.RaisePropertyChanged(nameof(SearchDomainOptions));
+        this.RaisePropertyChanged(nameof(ReciterOptions));
+        this.RaisePropertyChanged(nameof(QuranTextOptions));
     }
     
     private void InitializeSurahList()
@@ -292,13 +333,21 @@ public class SettingsViewModel : ViewModelBase
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
         this.RaisePropertyChanged(nameof(Localization));
+        // Reinitialize display texts when language changes
+        InitializeDisplayTexts();
     }
 }
 
-public class SearchDomainOption
+public class SearchDomainOption : ViewModelBase
 {
     public SearchDomainType Type { get; set; }
     public string DisplayKey { get; set; } = string.Empty;
+    private string _displayText = string.Empty;
+    public string DisplayText 
+    { 
+        get => _displayText;
+        set => this.RaiseAndSetIfChanged(ref _displayText, value);
+    }
 }
 
 public enum SearchDomainType

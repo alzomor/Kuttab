@@ -116,6 +116,13 @@
     <string name="barakah_message">بارك الله فيكم على كرمكم وجزاكم خيراً في الدنيا والآخرة.</string>
     <string name="copied_to_clipboard">تم النسخ إلى الحافظة</string>
     
+    <!-- Display Settings -->
+    <string name="display_settings_title">🔤 إعدادات العرض</string>
+    <string name="font_size_label">حجم الخط:</string>
+    <string name="quran_text_label">نص القرآن:</string>
+    <string name="quran_text_uthmani_clean">عثماني (معدل - موصى به)</string>
+    <string name="quran_text_uthmani_original">العثماني (الأصلي مع التعليقات)</string>
+    
     <!-- Tajweed Rules Feature -->
     <string name="show_tajweed_rules">📖 عرض شرح قواعد التجويد</string>
     <string name="rule_button">القاعدة</string>

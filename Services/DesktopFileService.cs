@@ -47,4 +47,12 @@ public class DesktopFileService : IFileService
             : Path.Combine(GetAppDataDirectory(), path);
         return File.OpenRead(fullPath);
     }
+    
+    public async Task WriteAllTextAsync(string path, string content)
+    {
+        var fullPath = Path.IsPathRooted(path) 
+            ? path 
+            : Path.Combine(GetAppDataDirectory(), path);
+        await File.WriteAllTextAsync(fullPath, content);
+    }
 }

@@ -116,6 +116,13 @@
     <string name="barakah_message">Möge Allah Sie für Ihre Großzügigkeit segnen und Sie reichlich belohnen in diesem Leben und im Jenseits.</string>
     <string name="copied_to_clipboard">In die Zwischenablage kopiert</string>
     
+    <!-- Display Settings -->
+    <string name="display_settings_title">🔤 Anzeigeeinstellungen</string>
+    <string name="font_size_label">Schriftgröße:</string>
+    <string name="quran_text_label">Korantext:</string>
+    <string name="quran_text_uthmani_clean">Uthmani (Modifiziert - Empfohlen)</string>
+    <string name="quran_text_uthmani_original">Uthmani (Original mit Anmerkungen)</string>
+    
     <!-- Tajweed Rules Feature -->
     <string name="show_tajweed_rules">📖 Tajweed-Regelerklärungen anzeigen</string>
     <string name="rule_button">Regel</string>

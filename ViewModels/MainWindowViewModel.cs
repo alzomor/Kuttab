@@ -55,6 +55,7 @@ public class MainWindowViewModel : ViewModelBase
 
     // Map from display name (may be localized) to Arabic rule name used in rules.json
     private readonly Dictionary<string, string> _ruleDisplayToArabic = new();
+    private readonly DesktopSettingsService _settingsService;
 
     public MainWindowViewModel()
     {
@@ -64,6 +65,7 @@ public class MainWindowViewModel : ViewModelBase
         _pictureService = new PictureService();
         _screenKeepAwakeService = new ScreenKeepAwakeService();
         _localizationService = new LocalizationService(fileService);
+        _settingsService = new DesktopSettingsService(fileService);
         
         // Initialize audio remote source setting
         _audioService.UseRemoteSource = _useRemoteAudio;
@@ -75,6 +77,9 @@ public class MainWindowViewModel : ViewModelBase
         
         // Subscribe to language change events
         _localizationService.LanguageChanged += OnLanguageChanged;
+        
+        // Load saved settings
+        _ = LoadSettingsAsync();
         
         SearchCommand = new AsyncCommand(SearchAsync);
         PlaySingleCommand = new SimpleCommand(PlaySingle);
@@ -1017,6 +1022,9 @@ public class MainWindowViewModel : ViewModelBase
 
             // Update status message
             StatusMessage = _localizationService.GetString("SettingsSaved");
+            
+            // Save settings to persist for next session
+            await SaveSettingsAsync();
         }
     }
 
@@ -1126,6 +1134,71 @@ public class MainWindowViewModel : ViewModelBase
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error scrolling to top: {ex.Message}");
+        }
+    }
+private async Task LoadSettingsAsync()
+    {
+        try
+        {
+            var settings = await _settingsService.LoadSettingsAsync();
+            
+            // Apply loaded settings
+            _selectedQuranTextFile = settings.SelectedQuranTextFile;
+            _useRemoteAudio = settings.UseRemoteAudio;
+            _useRemoteImages = settings.UseRemoteImages;
+            _selectedReciterFolder = settings.SelectedReciterFolder;
+            _fontSize = settings.FontSize;
+            _searchStartSurah = settings.SearchStartSurah;
+            _searchEndSurah = settings.SearchEndSurah;
+            
+            // Parse search domain type
+            if (Enum.TryParse<SearchDomainType>(settings.SearchDomainType, out var domainType))
+            {
+                _searchDomainType = domainType;
+            }
+            
+            // Set language
+            var language = _localizationService.AvailableLanguages.FirstOrDefault(l => l.Code == settings.SelectedLanguage);
+            if (language != null)
+            {
+                SelectedLanguage = language;
+            }
+            
+            // Apply settings to services
+            _audioService.UseRemoteSource = _useRemoteAudio;
+            _searchService.SetQuranTextFile(_selectedQuranTextFile);
+            
+            // Reload data with new settings
+            _ = LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error loading settings: {ex.Message}";
+        }
+    }
+    
+    private async Task SaveSettingsAsync()
+    {
+        try
+        {
+            var settings = new AppSettings
+            {
+                SelectedLanguage = SelectedLanguage?.Code ?? "en",
+                SelectedQuranTextFile = _selectedQuranTextFile,
+                UseRemoteAudio = _useRemoteAudio,
+                UseRemoteImages = _useRemoteImages,
+                SelectedReciterFolder = _selectedReciterFolder,
+                FontSize = _fontSize,
+                SearchStartSurah = _searchStartSurah,
+                SearchEndSurah = _searchEndSurah,
+                SearchDomainType = _searchDomainType.ToString()
+            };
+            
+            await _settingsService.SaveSettingsAsync(settings);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error saving settings: {ex.Message}";
         }
     }
 }

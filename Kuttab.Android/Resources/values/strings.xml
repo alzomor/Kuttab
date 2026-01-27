@@ -146,6 +146,8 @@
     <string name="display_settings_title">🔤 Display Settings</string>
     <string name="font_size_label">Font Size:</string>
     <string name="quran_text_label">Quran Text:</string>
+    <string name="quran_text_uthmani_clean">Uthmani (Modified - Recommended)</string>
+    <string name="quran_text_uthmani_original">Uthmani (Original with annotations)</string>
     
     <!-- Tajweed Rules Feature -->
     <string name="show_tajweed_rules">📖 Show Tajweed Rule Explanations</string>

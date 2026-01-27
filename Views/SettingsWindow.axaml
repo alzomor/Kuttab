@@ -137,8 +137,8 @@
                                   SelectedItem="{Binding SelectedSearchDomain}"
                                   x:Name="SearchDomainComboBox">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate DataType="vm:SearchDomainOption" x:CompileBindings="False">
-                                    <TextBlock Text="{Binding $parent[Window].DataContext.Localization[DisplayKey]}"/>
+                                <DataTemplate DataType="vm:SearchDomainOption">
+                                    <TextBlock Text="{Binding DisplayText}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
@@ -213,8 +213,8 @@
                                   SelectedItem="{Binding SelectedReciter}"
                                   MinWidth="280">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate DataType="vm:ReciterOption" x:CompileBindings="False">
-                                    <TextBlock Text="{Binding $parent[Window].DataContext.Localization[DisplayKey]}"/>
+                                <DataTemplate DataType="vm:ReciterOption">
+                                    <TextBlock Text="{Binding DisplayText}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
@@ -253,8 +253,8 @@
                                   SelectedItem="{Binding SelectedQuranText}"
                                   MinWidth="280">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate DataType="vm:QuranTextOption" x:CompileBindings="False">
-                                    <TextBlock Text="{Binding $parent[Window].DataContext.Localization[DisplayKey]}"/>
+                                <DataTemplate DataType="vm:QuranTextOption">
+                                    <TextBlock Text="{Binding DisplayText}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
