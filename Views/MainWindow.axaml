@@ -10,6 +10,7 @@
         x:Class="Kuttab.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="{Binding Localization.WindowTitle}"
+        Icon="/Assets/kuttab_icon.png"
         Width="1280" Height="720"
         Background="{DynamicResource ThemeBackgroundBrush}"
         RequestedThemeVariant="Light"

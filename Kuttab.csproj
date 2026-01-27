@@ -97,6 +97,7 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Fonts\*.ttf" />
+    <AvaloniaResource Include="Assets\kuttab_icon.png" />
   </ItemGroup>
 
 </Project>
