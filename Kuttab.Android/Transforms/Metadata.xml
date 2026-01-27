@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <!-- Remove problematic transitive Java dependencies from binding generation -->
+  <!-- These packages come from bundletool and other AndroidX transitive dependencies -->
+  
+  <!-- JNA (Java Native Access) - causes many IJavaPeerable errors -->
+  <remove-node path="/api/package[starts-with(@name,'com.sun.jna')]"/>
+  
+  <!-- Kotlin -->
+  <remove-node path="/api/package[starts-with(@name,'kotlin')]"/>
+  
+  <!-- Google libraries with binding issues -->
+  <remove-node path="/api/package[starts-with(@name,'com.google.protobuf')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.google.common')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.google.gson')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.google.errorprone')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.google.j2objc')]"/>
+  
+  <!-- Dagger dependency injection -->
+  <remove-node path="/api/package[starts-with(@name,'dagger')]"/>
+  <remove-node path="/api/package[starts-with(@name,'javax.inject')]"/>
+  
+  <!-- Jose4j -->
+  <remove-node path="/api/package[starts-with(@name,'org.jose4j')]"/>
+  
+  <!-- JetBrains/IntelliJ annotations -->
+  <remove-node path="/api/package[starts-with(@name,'org.intellij')]"/>
+  <remove-node path="/api/package[starts-with(@name,'org.jetbrains')]"/>
+  
+  <!-- Checker framework -->
+  <remove-node path="/api/package[starts-with(@name,'org.checkerframework')]"/>
+  
+  <!-- SLF4J logging -->
+  <remove-node path="/api/package[starts-with(@name,'org.slf4j')]"/>
+  
+  <!-- Android build tools (bundletool, aapt, etc.) -->
+  <remove-node path="/api/package[starts-with(@name,'com.android.tools')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.android.bundle')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.android.aapt')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.android.io')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.android.utils')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.android.zipflinger')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.android.apksig')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.android.ddmlib')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.android.signflinger')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.android.sdklib')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.android.repository')]"/>
+  <remove-node path="/api/package[starts-with(@name,'com.android.prefs')]"/>
+  <remove-node path="/api/package[starts-with(@name,'bundletool')]"/>
+  
+  <!-- R8/D8 compiler internals -->
+  <remove-node path="/api/package[starts-with(@name,'com.android.tools.r8')]"/>
+  
+  <!-- Bundletool - causes D8 mixed DEX/bytecode error -->
+  <remove-node path="/api/package[starts-with(@name,'com.android.tools.build.bundletool')]"/>
+  <remove-node path="/api/package[@name='com.android.tools.build.bundletool']"/>
+</metadata>
