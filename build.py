@@ -7,7 +7,7 @@ from pathlib import Path
 
 # Configuration
 PROJECT_NAME = "Kuttab"
-VERSION = "0.82"
+VERSION = "0.85"
 TARGETS = [
     {"rid": "win-x64", "ext": "zip"},
     {"rid": "linux-x64", "ext": "tar.gz"},
@@ -122,7 +122,7 @@ def build_android_apk():
     cmd = [
         android_dotnet_cmd, "publish",
         "-c", "Release",
-        "-f", "net8.0-android",
+        "-f", "net9.0-android",
         "Kuttab.Android.csproj"
     ]
     
@@ -131,10 +131,10 @@ def build_android_apk():
         return False
     
     # Find the generated APK (universal APK goes to publish subfolder)
-    apk_search_dir = os.path.join(android_project_dir, "bin/Release/net8.0-android/publish")
+    apk_search_dir = os.path.join(android_project_dir, "bin/Release/net9.0-android/publish")
     if not os.path.exists(apk_search_dir):
         # Fallback to non-publish path
-        apk_search_dir = os.path.join(android_project_dir, "bin/Release/net8.0-android")
+        apk_search_dir = os.path.join(android_project_dir, "bin/Release/net9.0-android")
     
     if not os.path.exists(apk_search_dir):
         print("❌ APK output directory not found")
