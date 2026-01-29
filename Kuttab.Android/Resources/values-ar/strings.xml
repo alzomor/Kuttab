@@ -47,6 +47,8 @@
     <string name="stop">إيقاف</string>
     <string name="use_remote_audio">استخدام الصوت عن بُعد</string>
     <string name="ready">جاهز</string>
+    <string name="reciter">القارئ</string>
+    <string name="your_recording">تسجيلك</string>
     
     <!-- Status Messages -->
     <string name="loading">جاري تحميل بيانات القرآن...</string>

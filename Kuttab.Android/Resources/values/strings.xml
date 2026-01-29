@@ -47,6 +47,8 @@
     <string name="stop">Stop</string>
     <string name="use_remote_audio">Use Remote Audio</string>
     <string name="ready">Ready</string>
+    <string name="reciter">Reciter</string>
+    <string name="your_recording">Your Recording</string>
     
     <!-- Status Messages -->
     <string name="loading">Loading Quran data...</string>

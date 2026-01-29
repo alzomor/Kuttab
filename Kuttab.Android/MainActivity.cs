@@ -48,9 +48,7 @@ public class MainActivity : AppCompatActivity
     private Button? _infoButton;
     private Button? _recitationButton;
     private Button? _donateButton;
-    private Button? _searchButton;
-    private Button? _ruleButton;
-    private bool _showTajweedRules = true;
+        private bool _showTajweedRules = true;
     private Button? _playButton;
     private Button? _playRepeatButton;
     private Button? _playAllButton;
@@ -61,12 +59,14 @@ public class MainActivity : AppCompatActivity
     
     // Recording UI Elements
     private LinearLayout? _recordingSection;
+    private LinearLayout? _audioControlsSection;
+    private LinearLayout? _bottomControlsContainer;
+    private TextView? _reciterLabel;
+    private TextView? _yourRecordingLabel;
     private Button? _recordButton;
     private Button? _stopRecordingButton;
     private Button? _playRecordingButton;
     private Button? _deleteRecordingButton;
-    private TextView? _recordingStatus;
-    private TextView? _recordingDuration;
     private bool _recordingEnabled = true; // Default to enabled
     private AyaAdapter? _adapter;
     
@@ -134,7 +134,6 @@ public class MainActivity : AppCompatActivity
             {
                 _recordingService.RecordingStateChanged += OnRecordingStateChanged;
                 _recordingService.RecordingError += (s, msg) => ShowError(msg);
-                _recordingService.RecordingDurationChanged += OnRecordingDurationChanged;
             }
         }
         catch (Exception ex)
@@ -227,8 +226,6 @@ public class MainActivity : AppCompatActivity
         _infoButton = FindViewById<Button>(Resource.Id.infoButton);
         _recitationButton = FindViewById<Button>(Resource.Id.recitationButton);
         _donateButton = FindViewById<Button>(Resource.Id.donateButton);
-        _searchButton = FindViewById<Button>(Resource.Id.searchButton);
-        _ruleButton = FindViewById<Button>(Resource.Id.ruleButton);
         _playButton = FindViewById<Button>(Resource.Id.playButton);
         _playRepeatButton = FindViewById<Button>(Resource.Id.playRepeatButton);
         _playAllButton = FindViewById<Button>(Resource.Id.playAllButton);
@@ -239,12 +236,14 @@ public class MainActivity : AppCompatActivity
         
         // Recording UI Elements
         _recordingSection = FindViewById<LinearLayout>(Resource.Id.recordingSection);
+        _audioControlsSection = FindViewById<LinearLayout>(Resource.Id.audioControlsSection);
+        _bottomControlsContainer = FindViewById<LinearLayout>(Resource.Id.bottomControlsContainer);
+        _reciterLabel = FindViewById<TextView>(Resource.Id.reciterLabel);
+        _yourRecordingLabel = FindViewById<TextView>(Resource.Id.yourRecordingLabel);
         _recordButton = FindViewById<Button>(Resource.Id.recordButton);
         _stopRecordingButton = FindViewById<Button>(Resource.Id.stopRecordingButton);
         _playRecordingButton = FindViewById<Button>(Resource.Id.playRecordingButton);
         _deleteRecordingButton = FindViewById<Button>(Resource.Id.deleteRecordingButton);
-        _recordingStatus = FindViewById<TextView>(Resource.Id.recordingStatus);
-        _recordingDuration = FindViewById<TextView>(Resource.Id.recordingDuration);
         
         // Setup button click handlers
         if (_settingsButton != null)
@@ -255,10 +254,6 @@ public class MainActivity : AppCompatActivity
             _recitationButton.Click += OnRecitationClick;
         if (_donateButton != null)
             _donateButton.Click += OnDonateClick;
-        if (_searchButton != null)
-            _searchButton.Click += OnSearchClick;
-        if (_ruleButton != null)
-            _ruleButton.Click += OnRuleClick;
         if (_playButton != null)
             _playButton.Click += OnPlayClick;
         if (_playRepeatButton != null)
@@ -352,6 +347,20 @@ public class MainActivity : AppCompatActivity
                 ShowError(GetString(Resource.String.SelectRuleFirst));
                 return;
             }
+            
+            PerformSearch(arabicRuleName);
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Search failed: {ex.Message}");
+        }
+    }
+    
+    private async void PerformSearch(string arabicRuleName)
+    {
+        try
+        {
+            if (_searchService == null) return;
             
             // Reset UI from any previously displayed Aya before running a new search
             HideAyaImage();
@@ -476,11 +485,11 @@ public class MainActivity : AppCompatActivity
             // Only react for real rules (mapping exists and not empty). Group headers map to empty string.
             if (_ruleDisplayToArabic.TryGetValue(selected, out var mapped) && !string.IsNullOrEmpty(mapped))
             {
-                // Hide any currently shown Aya and stop playback
-                HideAyaImage();
-                _audioService?.StopPlayback();
-                _currentPlayingIndex = -1;
-                UpdateAudioButtonsState(_searchResults.Count > 0);
+                // Store the selected rule name
+                _selectedRuleName = mapped;
+                
+                // Automatically trigger search
+                PerformSearch(mapped);
             }
         }
         catch { /* no-op */ }
@@ -496,13 +505,9 @@ public class MainActivity : AppCompatActivity
             {
                 ShowAyaImage(_searchResults[position]);
             }
-            PlayCurrentAya(false);
-            UpdateRecordingUI(); // Update recording buttons based on selected Ayah
+            UpdateRecordingVisibility();
         }
-        catch (Exception ex)
-        {
-            UpdateStatus($"Click error: {ex.Message}");
-        }
+        catch { /* no-op */ }
     }
     
     private void OnPlayClick(object? sender, EventArgs e)
@@ -516,6 +521,7 @@ public class MainActivity : AppCompatActivity
             _currentPlayingIndex = 0;
             PlayCurrentAya(false);
         }
+        UpdateRecordingVisibility();
     }
     
     private void OnPlayRepeatClick(object? sender, EventArgs e)
@@ -529,6 +535,7 @@ public class MainActivity : AppCompatActivity
             _currentPlayingIndex = 0;
             PlayCurrentAya(true);
         }
+        UpdateRecordingVisibility();
     }
     
     private void OnPlayAllClick(object? sender, EventArgs e)
@@ -540,6 +547,7 @@ public class MainActivity : AppCompatActivity
             HighlightAndScrollToPlayingAya();
             PlayCurrentAya(false);
         }
+        UpdateRecordingVisibility();
     }
     
     private void OnStopClick(object? sender, EventArgs e)
@@ -549,6 +557,7 @@ public class MainActivity : AppCompatActivity
         _adapter?.ClearPlayingPosition();
         ReleaseWakeLock();
         UpdateStatus(GetString(Resource.String.stopped));
+        UpdateRecordingVisibility();
     }
     
     private void UpdateLayoutDirection(string language)
@@ -575,17 +584,13 @@ public class MainActivity : AppCompatActivity
         
         try
         {
-            // Update button texts using LocalizationService
-            if (_searchButton != null)
-                _searchButton.Text = _localizationService.GetString("Search");
-            if (_playButton != null)
-                _playButton.Text = _localizationService.GetString("Play");
-            if (_playRepeatButton != null)
-                _playRepeatButton.Text = _localizationService.GetString("PlayRepeat");
-            if (_playAllButton != null)
-                _playAllButton.Text = _localizationService.GetString("PlayAll");
-            if (_stopButton != null)
-                _stopButton.Text = _localizationService.GetString("Stop");
+            // Audio buttons are now icon-only, no text updates needed
+            
+            // Update bottom control labels based on selected language
+            if (_reciterLabel != null)
+                _reciterLabel.Text = _localizationService.GetString("Reciter");
+            if (_yourRecordingLabel != null)
+                _yourRecordingLabel.Text = _localizationService.GetString("YourRecording");
             
             // Update status
             UpdateStatus(_localizationService.GetString("Ready"));
@@ -866,6 +871,9 @@ public class MainActivity : AppCompatActivity
             {
                 ReleaseWakeLock();
             }
+            
+            // Update recording visibility when playback state changes
+            UpdateRecordingVisibility();
         });
     }
     
@@ -1091,66 +1099,9 @@ public class MainActivity : AppCompatActivity
         
         System.Diagnostics.Debug.WriteLine($"[MAIN] Recording enabled: {_recordingEnabled}");
         
-        // Update recording UI visibility
-        UpdateRecordingVisibility();
-        
+                
         // Load show Tajweed rules setting
         _showTajweedRules = prefs?.GetBoolean("ShowTajweedRules", true) ?? true;
-        
-        // Update Rule button visibility
-        UpdateRuleButtonVisibility();
-    }
-    
-    private void UpdateRuleButtonVisibility()
-    {
-        if (_ruleButton == null) return;
-        
-        RunOnUiThread(() =>
-        {
-            _ruleButton.Visibility = _showTajweedRules ? ViewStates.Visible : ViewStates.Gone;
-        });
-    }
-    
-    private void OnRuleClick(object? sender, EventArgs e)
-    {
-        try
-        {
-            if (_ruleSpinner == null || _localizationService == null) return;
-            
-            // Get the selected rule
-            var selectedDisplayName = _ruleSpinner.SelectedItem?.ToString();
-            string? arabicRuleName = null;
-            
-            if (!string.IsNullOrEmpty(selectedDisplayName) && _ruleDisplayToArabic.TryGetValue(selectedDisplayName, out var mappedName))
-            {
-                if (!string.IsNullOrEmpty(mappedName))
-                {
-                    arabicRuleName = mappedName;
-                }
-            }
-            
-            if (string.IsNullOrEmpty(arabicRuleName))
-            {
-                ShowError(GetString(Resource.String.no_rule_selected));
-                return;
-            }
-            
-            // Check if explanation exists for this rule
-            if (!TajweedRulesExplanation.HasExplanation(arabicRuleName))
-            {
-                ShowError(GetString(Resource.String.no_explanation_available));
-                return;
-            }
-            
-            // Open the TajweedRuleActivity
-            var intent = new Intent(this, typeof(TajweedRuleActivity));
-            intent.PutExtra("ArabicRuleName", arabicRuleName);
-            StartActivity(intent);
-        }
-        catch (Exception ex)
-        {
-            ShowError($"Error showing rule: {ex.Message}");
-        }
     }
 
     // Recording event handlers
@@ -1207,16 +1158,6 @@ public class MainActivity : AppCompatActivity
         RunOnUiThread(() => UpdateRecordingUI());
     }
     
-    private void OnRecordingDurationChanged(object? sender, TimeSpan duration)
-    {
-        RunOnUiThread(() =>
-        {
-            if (_recordingDuration != null)
-            {
-                _recordingDuration.Text = $"{duration:mm\\:ss}";
-            }
-        });
-    }
     
     private void UpdateRecordingUI()
     {
@@ -1243,37 +1184,115 @@ public class MainActivity : AppCompatActivity
         if (_deleteRecordingButton != null)
             _deleteRecordingButton.Enabled = hasAyaSelected && !isRecording && hasRecording;
         
-        // Update status text
-        if (_recordingStatus != null)
-        {
-            if (isRecording)
-                _recordingStatus.Text = "Recording...";
-            else if (hasRecording)
-                _recordingStatus.Text = "Recording saved";
-            else
-                _recordingStatus.Text = "No recording";
-        }
-        
-        // Update duration display
-        if (_recordingDuration != null)
-        {
-            if (isRecording)
-                _recordingDuration.Text = "00:00";
-            else
-                _recordingDuration.Text = "";
-        }
     }
     
     private void UpdateRecordingVisibility()
     {
         if (_recordingSection != null)
         {
-            _recordingSection.Visibility = _recordingEnabled ? global::Android.Views.ViewStates.Visible : global::Android.Views.ViewStates.Gone;
-            System.Diagnostics.Debug.WriteLine($"[MAIN] Recording section visibility set to: {_recordingSection.Visibility}");
+            // Show recording section only when:
+            // 1. Single file is selected (_currentPlayingIndex >= 0)
+            // 2. Playback is not active (audio finished or stopped)
+            // 3. Recording is enabled in settings
+            var hasSingleFileSelected = _currentPlayingIndex >= 0 && _currentPlayingIndex < _searchResults.Count;
+            var isPlaybackActive = _audioService?.IsPlaying ?? false;
+            var shouldShow = _recordingEnabled && hasSingleFileSelected && !isPlaybackActive;
+            
+            _recordingSection.Visibility = shouldShow ? global::Android.Views.ViewStates.Visible : global::Android.Views.ViewStates.Gone;
+            System.Diagnostics.Debug.WriteLine($"[MAIN] Recording section visibility: enabled={_recordingEnabled}, hasFile={hasSingleFileSelected}, playing={isPlaybackActive}, show={shouldShow}");
+            
+            // Update audio controls alignment based on recording section visibility
+            UpdateAudioControlsAlignment(shouldShow);
         }
         else
         {
             System.Diagnostics.Debug.WriteLine("[MAIN] Recording section is NULL!");
+        }
+    }
+    
+    private void UpdateAudioControlsAlignment(bool recordingSectionVisible)
+    {
+        if (_bottomControlsContainer != null && _audioControlsSection != null && _recordingSection != null)
+        {
+            RunOnUiThread(() =>
+            {
+                var currentLanguage = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+                
+                if (recordingSectionVisible)
+                {
+                    // Both sections are visible - handle layout direction based on language
+                    if (currentLanguage == "ar")
+                    {
+                        // Arabic: Recording on left, Reciter on right
+                        // Remove both views from container
+                        _bottomControlsContainer.RemoveView(_audioControlsSection);
+                        _bottomControlsContainer.RemoveView(_recordingSection);
+                        
+                        // Add Recording first (left), then Reciter (right)
+                        _bottomControlsContainer.AddView(_recordingSection, 0);
+                        _bottomControlsContainer.AddView(_audioControlsSection, 1);
+                        
+                        // Update margins
+                        var recordingParams = _recordingSection.LayoutParameters as LinearLayout.LayoutParams;
+                        var audioParams = _audioControlsSection.LayoutParameters as LinearLayout.LayoutParams;
+                        
+                        if (recordingParams != null)
+                        {
+                            recordingParams.RightMargin = (int)(8 * Resources.DisplayMetrics.Density);
+                            recordingParams.LeftMargin = 0;
+                            _recordingSection.LayoutParameters = recordingParams;
+                        }
+                        
+                        if (audioParams != null)
+                        {
+                            audioParams.LeftMargin = (int)(8 * Resources.DisplayMetrics.Density);
+                            audioParams.RightMargin = 0;
+                            _audioControlsSection.LayoutParameters = audioParams;
+                        }
+                    }
+                    else
+                    {
+                        // English/German: Reciter on left, Recording on right (default layout)
+                        // Remove both views from container
+                        _bottomControlsContainer.RemoveView(_audioControlsSection);
+                        _bottomControlsContainer.RemoveView(_recordingSection);
+                        
+                        // Add Reciter first (left), then Recording (right)
+                        _bottomControlsContainer.AddView(_audioControlsSection, 0);
+                        _bottomControlsContainer.AddView(_recordingSection, 1);
+                        
+                        // Update margins
+                        var audioParams = _audioControlsSection.LayoutParameters as LinearLayout.LayoutParams;
+                        var recordingParams = _recordingSection.LayoutParameters as LinearLayout.LayoutParams;
+                        
+                        if (audioParams != null)
+                        {
+                            audioParams.RightMargin = (int)(8 * Resources.DisplayMetrics.Density);
+                            audioParams.LeftMargin = 0;
+                            _audioControlsSection.LayoutParameters = audioParams;
+                        }
+                        
+                        if (recordingParams != null)
+                        {
+                            recordingParams.LeftMargin = (int)(8 * Resources.DisplayMetrics.Density);
+                            recordingParams.RightMargin = 0;
+                            _recordingSection.LayoutParameters = recordingParams;
+                        }
+                    }
+                }
+                else
+                {
+                    // Only reciter controls visible - center them
+                    var audioParams = _audioControlsSection.LayoutParameters as LinearLayout.LayoutParams;
+                    if (audioParams != null)
+                    {
+                        audioParams.Weight = 1;
+                        audioParams.LeftMargin = 0;
+                        audioParams.RightMargin = 0;
+                        _audioControlsSection.LayoutParameters = audioParams;
+                    }
+                }
+            });
         }
     }
     
