@@ -1,18 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary Islamic/Quran theme colors -->
-    <color name="primary">#1B5E20</color>          <!-- Dark Green -->
-    <color name="primary_dark">#0D3F13</color>     <!-- Darker Green -->
-    <color name="primary_light">#4CAF50</color>    <!-- Light Green -->
-    <color name="accent">#FFD700</color>           <!-- Gold -->
+    <!-- Primary Islamic Green Palette -->
+    <color name="primary">#1B5E20</color>              <!-- Deep Forest Green -->
+    <color name="primary_dark">#0A3D12</color>         <!-- Darker Green for status bar -->
+    <color name="primary_light">#2E7D32</color>        <!-- Lighter Green for accents -->
+    <color name="primary_surface">#E8F5E9</color>      <!-- Very light green surface -->
     
-    <!-- Background colors -->
-    <color name="background">#F5F5DC</color>       <!-- Beige/Cream (like paper) -->
-    <color name="surface">#FFFFFF</color>          <!-- White -->
+    <!-- Gold Accent (Islamic calligraphy color) -->
+    <color name="accent">#C9A227</color>               <!-- Antique Gold -->
+    <color name="accent_light">#D4AF37</color>         <!-- Lighter Gold -->
+    <color name="accent_dark">#A68523</color>          <!-- Darker Gold -->
     
-    <!-- Text colors -->
-    <color name="text_primary">#212121</color>     <!-- Dark Gray -->
-    <color name="text_secondary">#757575</color>   <!-- Medium Gray -->
+    <!-- Warm Neutrals (Parchment/Paper feel) -->
+    <color name="background">#FAF8F5</color>           <!-- Warm off-white -->
+    <color name="background_cream">#F5F2EB</color>     <!-- Cream/parchment -->
+    <color name="surface">#FFFFFF</color>              <!-- Pure white for cards -->
+    <color name="surface_variant">#F8F6F2</color>      <!-- Slightly warm white -->
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#1A1A1A</color>         <!-- Near black -->
+    <color name="text_secondary">#5C5C5C</color>       <!-- Dark gray -->
+    <color name="text_tertiary">#8A8A8A</color>        <!-- Medium gray -->
+    <color name="text_on_primary">#FFFFFF</color>      <!-- White on green -->
+    <color name="text_on_accent">#1A1A1A</color>       <!-- Dark on gold -->
+    
+    <!-- Semantic Colors -->
+    <color name="success">#2E7D32</color>
+    <color name="warning">#F57C00</color>
+    <color name="error">#C62828</color>
+    <color name="info">#1565C0</color>
+    
+    <!-- Recording Section -->
+    <color name="recording_background">#E3F2E6</color>
+    <color name="recording_active">#C62828</color>
+    
+    <!-- Border/Divider -->
+    <color name="divider">#E0DCD5</color>
+    <color name="border">#D5D0C8</color>
+    
+    <!-- Highlight for Tajweed matches -->
+    <color name="highlight_tajweed">#FFB74D</color>    <!-- Orange highlight -->
+    
+    <!-- Legacy colors for backward compatibility -->
+    <color name="primary_light_legacy">#4CAF50</color>
+    <color name="background_legacy">#F5F5DC</color>
     
     <!-- Splash screen colors -->
     <color name="splash_background">#1B5E20</color>  <!-- Dark Green -->

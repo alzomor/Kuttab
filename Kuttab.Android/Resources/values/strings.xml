@@ -36,6 +36,18 @@
     <string name="info_close_button">✓ Close</string>
     <string name="close_button">✓ Close</string>
     
+    <!-- Accessibility Content Descriptions -->
+    <string name="settings_button_description">Open settings</string>
+    <string name="recitation_button_description">Open recitation mode</string>
+    <string name="info_button_description">View app information</string>
+    <string name="donate_button_description">Support the app</string>
+    <string name="play_button_description">Play audio</string>
+    <string name="stop_button_description">Stop playback</string>
+    <string name="record_button_description">Start recording</string>
+    <string name="delete_recording_description">Delete recording</string>
+    <string name="back_button_description">Go back</string>
+    <string name="search_button_description">Search Quran</string>
+    
     <!-- UI Labels -->
     <string name="select_language">Select Language</string>
     <string name="select_category">Select Category</string>

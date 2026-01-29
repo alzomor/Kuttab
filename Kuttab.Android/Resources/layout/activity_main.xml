@@ -1,82 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <!-- Green Header Bar with App Name and Settings Button -->
-    <RelativeLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="#4CAF50"
-        android:padding="8dp"
-        android:elevation="4dp">
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="8dp" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            android:background="@color/primary"
+            android:elevation="4dp">
 
-        <Button
-            android:id="@+id/donateButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="🕌"
-            android:textSize="24sp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:textColor="#FFFFFF"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@+id/recitationButton"
-            android:layout_marginEnd="8dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textSize="@dimen/text_headline3"
+                android:textStyle="bold"
+                android:textColor="@color/text_on_primary"
+                android:layout_gravity="start" />
 
-        <Button
-            android:id="@+id/recitationButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="🎧"
-            android:textSize="24sp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:textColor="#FFFFFF"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@+id/infoButton"
-            android:layout_marginEnd="8dp" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/infoButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="ℹ️"
-            android:textSize="24sp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:textColor="#FFFFFF"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@+id/settingsButton"
-            android:layout_marginEnd="8dp" />
+                <ImageButton
+                    android:id="@+id/donateButton"
+                    android:layout_width="@dimen/icon_size_lg"
+                    android:layout_height="@dimen/icon_size_lg"
+                    android:src="@drawable/ic_mosque"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/donate_button_description"
+                    android:layout_marginEnd="@dimen/spacing_xs" />
 
-        <Button
-            android:id="@+id/settingsButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="⚙️"
-            android:textSize="24sp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:textColor="#FFFFFF"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true" />
-    </RelativeLayout>
+                <ImageButton
+                    android:id="@+id/recitationButton"
+                    android:layout_width="@dimen/icon_size_lg"
+                    android:layout_height="@dimen/icon_size_lg"
+                    android:src="@drawable/ic_headphones"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/recitation_button_description"
+                    android:layout_marginEnd="@dimen/spacing_xs" />
+
+                <ImageButton
+                    android:id="@+id/infoButton"
+                    android:layout_width="@dimen/icon_size_lg"
+                    android:layout_height="@dimen/icon_size_lg"
+                    android:src="@drawable/ic_info"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/info_button_description"
+                    android:layout_marginEnd="@dimen/spacing_xs" />
+
+                <ImageButton
+                    android:id="@+id/settingsButton"
+                    android:layout_width="@dimen/icon_size_lg"
+                    android:layout_height="@dimen/icon_size_lg"
+                    android:src="@drawable/ic_settings"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/settings_button_description" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <!-- Main Content Container -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:padding="@dimen/spacing_sm">
 
     <!-- Category Selector -->
     <LinearLayout
@@ -84,7 +84,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="@dimen/spacing_xs"
         android:gravity="center_vertical">
         
         <TextView
@@ -92,15 +92,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="📚"
-            android:textSize="24sp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp" />
+            android:textSize="@dimen/icon_size_md"
+            android:layout_marginEnd="@dimen/spacing_xs"
+            android:layout_marginStart="@dimen/spacing_xs" />
         
         <Spinner
             android:id="@+id/categorySpinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            style="@style/IslamicSpinner" />
     </LinearLayout>
 
     <!-- Rule Selector -->
@@ -109,7 +110,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="@dimen/spacing_xs"
         android:gravity="center_vertical">
         
         <TextView
@@ -117,15 +118,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="📖"
-            android:textSize="24sp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp" />
+            android:textSize="@dimen/icon_size_md"
+            android:layout_marginEnd="@dimen/spacing_xs"
+            android:layout_marginStart="@dimen/spacing_xs" />
         
         <Spinner
             android:id="@+id/ruleSpinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            style="@style/IslamicSpinner" />
     </LinearLayout>
 
     <!-- Search and Rule Buttons -->
@@ -133,15 +135,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="4dp">
+        android:layout_marginBottom="@dimen/spacing_xs">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/searchButton"
+            style="@style/IslamicButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:text="@string/search"
-            android:layout_marginEnd="4dp" />
+            app:icon="@drawable/ic_search"
+            app:iconGravity="start"
+            app:iconPadding="@dimen/spacing_xs"
+            android:layout_marginEnd="@dimen/spacing_xs" />
 
         <Button
             android:id="@+id/ruleButton"
@@ -157,43 +163,59 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="4dp">
+        android:layout_marginBottom="@dimen/spacing_xs">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/playButton"
+            style="@style/IslamicButton.Outlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/play"
-            android:layout_marginEnd="4dp"
+            app:icon="@drawable/ic_play"
+            app:iconGravity="start"
+            app:iconPadding="@dimen/spacing_xs"
+            android:layout_marginEnd="@dimen/spacing_xs"
             android:enabled="false" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/playRepeatButton"
+            style="@style/IslamicButton.Outlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/play_repeat"
-            android:layout_marginEnd="4dp"
+            app:icon="@drawable/ic_repeat"
+            app:iconGravity="start"
+            app:iconPadding="@dimen/spacing_xs"
+            android:layout_marginEnd="@dimen/spacing_xs"
             android:enabled="false" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/playAllButton"
+            style="@style/IslamicButton.Outlined"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/play_all"
+            app:icon="@drawable/ic_play"
+            app:iconGravity="start"
+            app:iconPadding="@dimen/spacing_xs"
             android:enabled="false" />
 
     </LinearLayout>
 
     <!-- Stop Button -->
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/stopButton"
+        style="@style/IslamicButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/stop"
-        android:layout_marginBottom="4dp"
+        app:icon="@drawable/ic_stop"
+        app:iconGravity="start"
+        app:iconPadding="@dimen/spacing_xs"
+        android:layout_marginBottom="@dimen/spacing_xs"
         android:enabled="false" />
 
     <!-- User Recording Section -->
@@ -202,19 +224,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#E8F5E9"
-        android:padding="12dp"
-        android:layout_marginBottom="4dp"
+        android:background="@drawable/bg_recording_section"
+        android:padding="@dimen/spacing_sm"
+        android:layout_marginBottom="@dimen/spacing_xs"
         android:visibility="visible">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Your Recording"
-            android:textSize="16sp"
+            android:textSize="@dimen/text_body1"
             android:textStyle="bold"
-            android:textColor="#2C5F2D"
-            android:layout_marginBottom="8dp" />
+            android:textColor="@color/primary"
+            android:layout_marginBottom="@dimen/spacing_xs" />
 
         <!-- Recording Status and Duration -->
         <LinearLayout
@@ -222,7 +244,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="@dimen/spacing_sm">
 
             <TextView
                 android:id="@+id/recordingStatus"
@@ -230,16 +252,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="No recording"
-                android:textSize="14sp"
-                android:textColor="#666666" />
+                android:textSize="@dimen/text_body2"
+                android:textColor="@color/text_secondary" />
 
             <TextView
                 android:id="@+id/recordingDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textSize="14sp"
-                android:textColor="#4CAF50"
+                android:textSize="@dimen/text_body2"
+                android:textColor="@color/success"
                 android:fontFamily="monospace" />
         </LinearLayout>
 
@@ -250,42 +272,58 @@
             android:orientation="horizontal"
             android:gravity="center">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/recordButton"
+                style="@style/IslamicButton.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="🎤 Record"
-                android:layout_marginEnd="4dp" />
+                android:text="Record"
+                app:icon="@drawable/ic_mic"
+                app:iconGravity="start"
+                app:iconPadding="@dimen/spacing_xs"
+                android:layout_marginEnd="@dimen/spacing_xs" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/stopRecordingButton"
+                style="@style/IslamicButton.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="⏹️ Stop"
+                android:text="Stop"
+                app:icon="@drawable/ic_stop"
+                app:iconGravity="start"
+                app:iconPadding="@dimen/spacing_xs"
                 android:enabled="false"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp" />
+                android:layout_marginStart="@dimen/spacing_xs"
+                android:layout_marginEnd="@dimen/spacing_xs" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/playRecordingButton"
+                style="@style/IslamicButton.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="▶️ Play"
+                android:text="Play"
+                app:icon="@drawable/ic_play"
+                app:iconGravity="start"
+                app:iconPadding="@dimen/spacing_xs"
                 android:enabled="false"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp" />
+                android:layout_marginStart="@dimen/spacing_xs"
+                android:layout_marginEnd="@dimen/spacing_xs" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/deleteRecordingButton"
+                style="@style/IslamicButton.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="🗑️ Delete"
+                android:text="Delete"
+                app:icon="@drawable/ic_delete"
+                app:iconGravity="start"
+                app:iconPadding="@dimen/spacing_xs"
                 android:enabled="false"
-                android:layout_marginStart="4dp" />
+                android:layout_marginStart="@dimen/spacing_xs" />
         </LinearLayout>
     </LinearLayout>
 
@@ -295,8 +333,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/ready"
-        android:layout_marginBottom="4dp"
-        android:textStyle="bold" />
+        android:layout_marginBottom="@dimen/spacing_xs"
+        android:textSize="@dimen/text_body1"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary" />
 
     <!-- Results RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView

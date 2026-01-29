@@ -9,8 +9,8 @@
     <ApplicationId>com.kuttab.app</ApplicationId>
     <ApplicationVersion>85</ApplicationVersion>
     <ApplicationDisplayVersion>0.85</ApplicationDisplayVersion>
-    <!-- Build for ARM64 only to avoid ABI issues -->
-    <RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>
+    <!-- Build for multiple architectures for emulator compatibility -->
+    <RuntimeIdentifiers>android-arm64;android-x86;android-x64</RuntimeIdentifiers>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <!-- Enable assembly compression to reduce APK size -->
     <AndroidEnableAssemblyCompression>true</AndroidEnableAssemblyCompression>
