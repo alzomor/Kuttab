@@ -43,20 +43,6 @@
     "createdAt": "2026-01-20T10:00:00Z"
   },
   {
-    "id": "ramadan_preparation",
-    "title": "🌙 Prepare for Ramadan",
-    "message": "Ramadan is coming! Perfect your Quran recitation with Kuttab's Tajweed tools. Make this Ramadan your best recitation yet!",
-    "type": "announcement",
-    "actionUrl": "",
-    "isActive": false,
-    "targetAudience": ["all"],
-    "schedule": {
-      "startTime": "2026-02-20T00:00:00Z",
-      "endTime": "2026-03-20T23:59:59Z"
-    },
-    "createdAt": "2026-01-20T10:00:00Z"
-  },
-  {
     "id": "new_search_features",
     "title": "🔍 Enhanced Search Features",
     "message": "Our search tools now support more Tajweed rules and patterns! Find specific recitation techniques faster than ever.",
