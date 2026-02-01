@@ -90,6 +90,27 @@ public class MainActivity : AppCompatActivity
         SetTheme(Resource.Style.AppTheme);
         
         base.OnCreate(savedInstanceState);
+        
+        // Handle system UI for different Android versions
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+        {
+            // Modern Android versions (API 21+) - proper status bar theming
+            if (Window != null)
+            {
+                Window.SetStatusBarColor(global::Android.Graphics.Color.ParseColor("#0D3F13")); // primary_dark
+                Window.SetNavigationBarColor(global::Android.Graphics.Color.ParseColor("#1B5E20")); // primary
+            }
+        }
+        else
+        {
+            // Older Android versions (API 16-20) - ensure proper system UI handling
+            if (Window != null)
+            {
+                Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
+                Window.ClearFlags(WindowManagerFlags.Fullscreen);
+            }
+        }
+        
         SetContentView(Resource.Layout.activity_main);
         
         InitializeServices();
