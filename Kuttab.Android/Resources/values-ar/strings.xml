@@ -126,9 +126,10 @@
     <string name="quran_text_uthmani_original">العثماني (الأصلي مع التعليقات)</string>
     
     <!-- Tajweed Rules Feature -->
-    <string name="show_tajweed_rules">📖 عرض شرح قواعد التجويد</string>
+    <string name="show_tajweed_rules">📖 إظهار شرح قواعد التجويد</string>
     <string name="rule_button">القاعدة</string>
+    <string name="rule_explanation">شرح القاعدة</string>
     <string name="tajweed_rule_title">قاعدة التجويد</string>
-    <string name="no_rule_selected">الرجاء اختيار قاعدة تجويد أولاً</string>
+    <string name="no_rule_selected">يرجى اختيار قاعدة تجويد أولاً</string>
     <string name="no_explanation_available">لا يوجد شرح متاح لهذه القاعدة</string>
 </resources>

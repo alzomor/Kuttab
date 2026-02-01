@@ -126,9 +126,10 @@
     <string name="quran_text_uthmani_original">Uthmani (Original mit Anmerkungen)</string>
     
     <!-- Tajweed Rules Feature -->
-    <string name="show_tajweed_rules">📖 Tajweed-Regelerklärungen anzeigen</string>
+    <string name="show_tajweed_rules">📖 Tajweed-Regel-Erklärungen anzeigen</string>
     <string name="rule_button">Regel</string>
+    <string name="rule_explanation">Regel-Erklärung</string>
     <string name="tajweed_rule_title">Tajweed-Regel</string>
-    <string name="no_rule_selected">Bitte wählen Sie zuerst eine Tajweed-Regel</string>
+    <string name="no_rule_selected">Bitte wählen Sie zuerst eine Tajweed-Regel aus</string>
     <string name="no_explanation_available">Keine Erklärung für diese Regel verfügbar</string>
 </resources>

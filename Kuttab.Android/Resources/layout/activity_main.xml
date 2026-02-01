@@ -128,7 +128,14 @@
             android:layout_weight="1" />
     </LinearLayout>
 
-    <!-- Search and Rule Buttons -->
+    <!-- Rule Button -->
+    <Button
+        android:id="@+id/ruleButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/rule_explanation"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone" />
 
     <!-- Status Text -->
     <TextView

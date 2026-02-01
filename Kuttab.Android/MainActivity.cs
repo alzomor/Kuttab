@@ -48,6 +48,7 @@ public class MainActivity : AppCompatActivity
     private Button? _infoButton;
     private Button? _recitationButton;
     private Button? _donateButton;
+    private Button? _ruleButton;
         private bool _showTajweedRules = true;
     private Button? _playButton;
     private Button? _playRepeatButton;
@@ -226,6 +227,7 @@ public class MainActivity : AppCompatActivity
         _infoButton = FindViewById<Button>(Resource.Id.infoButton);
         _recitationButton = FindViewById<Button>(Resource.Id.recitationButton);
         _donateButton = FindViewById<Button>(Resource.Id.donateButton);
+        _ruleButton = FindViewById<Button>(Resource.Id.ruleButton);
         _playButton = FindViewById<Button>(Resource.Id.playButton);
         _playRepeatButton = FindViewById<Button>(Resource.Id.playRepeatButton);
         _playAllButton = FindViewById<Button>(Resource.Id.playAllButton);
@@ -254,6 +256,8 @@ public class MainActivity : AppCompatActivity
             _recitationButton.Click += OnRecitationClick;
         if (_donateButton != null)
             _donateButton.Click += OnDonateClick;
+        if (_ruleButton != null)
+            _ruleButton.Click += OnRuleClick;
         if (_playButton != null)
             _playButton.Click += OnPlayClick;
         if (_playRepeatButton != null)
@@ -632,6 +636,16 @@ public class MainActivity : AppCompatActivity
         
         // Update rule spinner based on selected category
         UpdateRuleSpinnerForCategory(languageCode);
+    }
+
+    private void UpdateRuleButtonVisibility()
+    {
+        if (_ruleButton == null) return;
+        
+        RunOnUiThread(() =>
+        {
+            _ruleButton.Visibility = _showTajweedRules ? ViewStates.Visible : ViewStates.Gone;
+        });
     }
 
     private void UpdateCategorySpinner(string languageCode)
@@ -1027,6 +1041,50 @@ public class MainActivity : AppCompatActivity
         var intent = new Intent(this, typeof(InfoActivity));
         StartActivity(intent);
     }
+    
+    private void OnRuleClick(object? sender, EventArgs e)
+    {
+        try
+        {
+            if (_ruleSpinner == null || _localizationService == null) return;
+            
+            // Get the selected rule
+            var selectedDisplayName = _ruleSpinner.SelectedItem?.ToString();
+            string? arabicRuleName = null;
+            
+            System.Diagnostics.Debug.WriteLine($"[RULE] Selected display name: '{selectedDisplayName}'");
+            System.Diagnostics.Debug.WriteLine($"[RULE] Available mappings: {string.Join(", ", _ruleDisplayToArabic.Keys)}");
+            
+            if (!string.IsNullOrEmpty(selectedDisplayName) && _ruleDisplayToArabic.TryGetValue(selectedDisplayName, out var mappedName))
+            {
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    arabicRuleName = mappedName;
+                    System.Diagnostics.Debug.WriteLine($"[RULE] Found Arabic name: '{arabicRuleName}'");
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"[RULE] No mapping found for: '{selectedDisplayName}'");
+            }
+            
+            // If we have a valid rule name, show the explanation
+            if (!string.IsNullOrEmpty(arabicRuleName))
+            {
+                var intent = new Intent(this, typeof(TajweedRuleActivity));
+                intent.PutExtra("ArabicRuleName", arabicRuleName);
+                StartActivity(intent);
+            }
+            else
+            {
+                ShowError(_localizationService.GetString("NoRuleSelected"));
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Error showing rule explanation: {ex.Message}");
+        }
+    }
 
     protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
     {
@@ -1102,6 +1160,9 @@ public class MainActivity : AppCompatActivity
                 
         // Load show Tajweed rules setting
         _showTajweedRules = prefs?.GetBoolean("ShowTajweedRules", true) ?? true;
+        
+        // Update Rule button visibility
+        UpdateRuleButtonVisibility();
     }
 
     // Recording event handlers

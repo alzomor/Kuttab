@@ -154,6 +154,7 @@
     <!-- Tajweed Rules Feature -->
     <string name="show_tajweed_rules">📖 Show Tajweed Rule Explanations</string>
     <string name="rule_button">Rule</string>
+    <string name="rule_explanation">Rule Explanation</string>
     <string name="tajweed_rule_title">Tajweed Rule</string>
     <string name="no_rule_selected">Please select a Tajweed rule first</string>
     <string name="no_explanation_available">No explanation available for this rule</string>
