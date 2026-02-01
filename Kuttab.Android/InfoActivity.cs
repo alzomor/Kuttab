@@ -6,6 +6,7 @@ using Android.Views;
 using Android.Widget;
 using AndroidX.AppCompat.App;
 using Kuttab.Core.Services;
+using Kuttab.Android.Utils;
 using Kuttab.Android.Services;
 
 namespace Kuttab.Android;
@@ -46,8 +47,8 @@ public class InfoActivity : AppCompatActivity
     {
         var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
         
-        // Load language
-        var language = prefs?.GetString("Language", "en") ?? "en";
+        // Load language with system language detection
+        var language = LanguageHelper.GetLanguageFromPreferences(this);
         if (_localizationService != null)
         {
             _localizationService.CurrentLanguage = language;

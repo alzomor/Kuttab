@@ -5,6 +5,7 @@ using Android.Views;
 using Android.Widget;
 using AndroidX.AppCompat.App;
 using Kuttab.Core.Services;
+using Kuttab.Android.Utils;
 
 namespace Kuttab.Android;
 
@@ -38,9 +39,8 @@ public class TajweedRuleActivity : AppCompatActivity
         var fileService = new Services.AndroidFileService(this);
         _localizationService = new LocalizationService(fileService);
         
-        // Load saved language from SharedPreferences
-        var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
-        _languageCode = prefs?.GetString("Language", "en") ?? "en";
+        // Load saved language from SharedPreferences with system language detection
+        _languageCode = LanguageHelper.GetLanguageFromPreferences(this);
         _localizationService.CurrentLanguage = _languageCode;
         
         // Get rule name from intent

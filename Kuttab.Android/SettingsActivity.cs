@@ -6,6 +6,7 @@ using Android.Widget;
 using AndroidX.AppCompat.App;
 using Kuttab.Core.Models;
 using Kuttab.Core.Services;
+using Kuttab.Android.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -83,9 +84,8 @@ public class SettingsActivity : AppCompatActivity
         var fileService = new Services.AndroidFileService(this);
         _localizationService = new LocalizationService(fileService);
         
-        // Load saved language from SharedPreferences
-        var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
-        var language = prefs?.GetString("Language", "en") ?? "en";
+        // Load saved language from SharedPreferences with system language detection
+        var language = LanguageHelper.GetLanguageFromPreferences(this);
         _localizationService.CurrentLanguage = language;
         
         _availableLanguages = _localizationService.AvailableLanguages;
@@ -247,8 +247,8 @@ public class SettingsActivity : AppCompatActivity
     {
         var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
         
-        // Load language
-        var currentLanguage = prefs?.GetString("Language", "en") ?? "en";
+        // Load language with system language detection
+        var currentLanguage = LanguageHelper.GetLanguageFromPreferences(this);
         var languageIndex = _availableLanguages.FindIndex(l => l.Code == currentLanguage);
         if (languageIndex >= 0 && _languageSpinner != null)
         {
