@@ -14,7 +14,7 @@ public class NotificationContentService
     private const string TAG = "NotificationContentService";
     private const string PREFS_NAME = "KuttabPrefs";
     private const string LAST_CONTENT_CHECK_KEY = "last_content_check";
-    private const string CONTENT_URL = "https://raw.githubusercontent.com/alzomor/Kuttab/main/notifications.json";
+    private const string CONTENT_URL = "https://raw.githubusercontent.com/alzomor/Kuttab/AndroidMigration/notifications.json";
     
     private readonly Context _context;
     private readonly SimpleNotificationService _notificationService;
