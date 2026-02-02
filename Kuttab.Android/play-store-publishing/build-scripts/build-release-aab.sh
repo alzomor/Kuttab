@@ -31,18 +31,18 @@ fi
 
 echo "Building AAB for Play Store..."
 # Use the system dotnet command
-ANDROID_HOME=~/Android/Sdk dotnet publish -c Release -f net8.0-android -p:AndroidPackageFormat=aab Kuttab.Android.csproj
+ANDROID_HOME=~/Android/Sdk ~/.dotnet-9/dotnet publish -c Release -f net9.0-android -p:AndroidPackageFormat=aab Kuttab.Android.csproj
 
 # Find the signed AAB
-AAB_PATH="bin/Release/net8.0-android/publish/com.kuttab.app-Signed.aab"
+AAB_PATH="bin/Release/net9.0-android/publish/com.kuttab.app-Signed.aab"
 
 if [ -f "$AAB_PATH" ]; then
     echo "✅ Build successful!"
     echo "AAB location: $AAB_PATH"
     
     # Copy to publishing folder
-    cp "$AAB_PATH" "play-store-publishing/com.kuttab.app-v0.83.aab"
-    echo "✅ Copied to: play-store-publishing/com.kuttab.app-v0.83.aab"
+    cp "$AAB_PATH" "play-store-publishing/com.kuttab.app-v0.87.aab"
+    echo "✅ Copied to: play-store-publishing/com.kuttab.app-v0.87.aab"
     
     # Show file size
     SIZE=$(du -h "$AAB_PATH" | cut -f1)
