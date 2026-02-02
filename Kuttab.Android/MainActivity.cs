@@ -195,10 +195,10 @@ public class MainActivity : AppCompatActivity
                 await _updateService.CheckForUpdatesAsync();
             }
             
-            // Also check for content notifications
+            // Also check for content notifications (force check for testing)
             if (_contentService != null)
             {
-                await _contentService.CheckForContentNotificationsAsync();
+                await _contentService.CheckForContentNotificationsAsync(forceCheck: true);
             }
         }
         catch (Exception ex)
