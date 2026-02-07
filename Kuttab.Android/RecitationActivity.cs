@@ -49,8 +49,6 @@ public class RecitationActivity : AppCompatActivity
     private TextView? _surahLabel;
     private TextView? _fromAyaLabel;
     private TextView? _toAyaLabel;
-    private TextView? _repeatCountLabel;
-    private TextView? _timesLabel;
     private TextView? _nowPlayingLabel;
     
     // State
@@ -202,8 +200,6 @@ public class RecitationActivity : AppCompatActivity
         _surahLabel = FindViewById<TextView>(Resource.Id.surahLabel);
         _fromAyaLabel = FindViewById<TextView>(Resource.Id.fromAyaLabel);
         _toAyaLabel = FindViewById<TextView>(Resource.Id.toAyaLabel);
-        _repeatCountLabel = FindViewById<TextView>(Resource.Id.repeatCountLabel);
-        _timesLabel = FindViewById<TextView>(Resource.Id.timesLabel);
         _nowPlayingLabel = FindViewById<TextView>(Resource.Id.nowPlayingLabel);
         
         // Setup click handlers
@@ -264,10 +260,6 @@ public class RecitationActivity : AppCompatActivity
             _fromAyaLabel.Text = _localizationService["FromAya"];
         if (_toAyaLabel != null)
             _toAyaLabel.Text = _localizationService["ToAya"];
-        if (_repeatCountLabel != null)
-            _repeatCountLabel.Text = _localizationService["RepeatCount"];
-        if (_timesLabel != null)
-            _timesLabel.Text = _localizationService["Times"];
         if (_nowPlayingLabel != null)
             _nowPlayingLabel.Text = _localizationService["NowPlaying"];
         if (_teacherModeCheckbox != null)
