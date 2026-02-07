@@ -183,5 +183,8 @@
   "NoRuleSelected": "لم يتم اختيار قاعدة",
   "NoExplanationAvailable": "لا يوجد شرح متاح لهذه القاعدة.",
   "ShowTajweedRules": "عرض شرح قواعد التجويد",
-  "RuleExplanation": "شرح القاعدة"
+  "RuleExplanation": "شرح القاعدة",
+  "UnsavedChangesTitle": "تغييرات غير محفوظة",
+  "UnsavedChangesMessage": "لديك تغييرات غير محفوظة. هل تريد الحفظ قبل المغادرة؟",
+  "DiscardChanges": "تجاهل"
 }

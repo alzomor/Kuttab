@@ -14,17 +14,6 @@
         android:padding="8dp"
         android:elevation="4dp">
 
-        <Button
-            android:id="@+id/backButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="←"
-            android:textSize="24sp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:textColor="#FFFFFF"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true" />
-
         <TextView
             android:id="@+id/titleTextView"
             android:layout_width="wrap_content"

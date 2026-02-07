@@ -15,6 +15,6 @@
     <color name="text_secondary">#757575</color>   <!-- Medium Gray -->
     
     <!-- Splash screen colors -->
-    <color name="splash_background">#1B5E20</color>  <!-- Dark Green -->
+    <color name="splash_background">#FFFFFF</color>  <!-- White -->
     <color name="splash_text">#FFD700</color>        <!-- Gold -->
 </resources>

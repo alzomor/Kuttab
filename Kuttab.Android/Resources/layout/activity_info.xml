@@ -392,20 +392,6 @@
 
         </LinearLayout>
 
-        <!-- Close Button -->
-        <Button
-            android:id="@+id/closeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/info_close_button"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:background="#2C5F2D"
-            android:padding="30dp"
-            android:layout_gravity="center"
-            android:elevation="4dp" />
-
     </LinearLayout>
 
 </ScrollView>

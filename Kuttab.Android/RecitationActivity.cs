@@ -177,7 +177,6 @@ public class RecitationActivity : AppCompatActivity
     
     private void InitializeViews()
     {
-        _backButton = FindViewById<Button>(Resource.Id.backButton);
         _reciterSpinner = FindViewById<Spinner>(Resource.Id.reciterSpinner);
         _surahSpinner = FindViewById<Spinner>(Resource.Id.surahSpinner);
         _fromAyaInput = FindViewById<EditText>(Resource.Id.fromAyaInput);
@@ -201,8 +200,6 @@ public class RecitationActivity : AppCompatActivity
         _nowPlayingLabel = FindViewById<TextView>(Resource.Id.nowPlayingLabel);
         
         // Setup click handlers
-        if (_backButton != null)
-            _backButton.Click += (s, e) => Finish();
         if (_startButton != null)
             _startButton.Click += OnStartClick;
         if (_stopButton != null)
@@ -514,11 +511,24 @@ public class RecitationActivity : AppCompatActivity
             {
                 await _searchService.LoadQuranTextAsync();
             }
+            
+            // Display 1st aya of the default selected surah
+            DisplayDefaultAya();
         }
         catch (Exception ex)
         {
             ShowError($"Failed to load Quran data: {ex.Message}");
         }
+    }
+    
+    private void DisplayDefaultAya()
+    {
+        var ayaText = GetAyaText(_selectedSurah, 1);
+        if (_ayaTextView != null)
+            _ayaTextView.Text = ayaText;
+        if (_currentAyaInfo != null)
+            _currentAyaInfo.Text = $"{SurahInfo.GetSurahName(_selectedSurah)} - 1";
+        ShowAyaImage(_selectedSurah, 1);
     }
     
     private void OnReciterSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
@@ -543,6 +553,7 @@ public class RecitationActivity : AppCompatActivity
     {
         _selectedSurah = e.Position + 1; // 1-based
         UpdateAyaInputsForSurah();
+        DisplayDefaultAya();
     }
     
     private void OnStartClick(object? sender, EventArgs e)

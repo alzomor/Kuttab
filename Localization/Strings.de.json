@@ -182,5 +182,8 @@
   "NoRuleSelected": "Keine Regel ausgewählt",
   "NoExplanationAvailable": "Keine Erklärung für diese Regel verfügbar.",
   "ShowTajweedRules": "Tadschuid-Regel Erklärungen anzeigen",
-  "RuleExplanation": "Regelerklärung"
+  "RuleExplanation": "Regelerklärung",
+  "UnsavedChangesTitle": "Ungespeicherte Änderungen",
+  "UnsavedChangesMessage": "Sie haben ungespeicherte Änderungen. Möchten Sie vor dem Verlassen speichern?",
+  "DiscardChanges": "Verwerfen"
 }

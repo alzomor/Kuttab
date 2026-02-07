@@ -50,6 +50,8 @@ public class SettingsActivity : AppCompatActivity
     private TextView? _onlineResourcesNote;
 
     private LocalizationService? _localizationService;
+    private bool _hasUnsavedChanges = false;
+    private bool _initialLoadComplete = false;
     private List<LanguageOption> _availableLanguages = new();
     private List<SearchDomainOption> _searchDomainOptions = new();
     private List<string> _surahDisplayNames = new();
@@ -77,6 +79,7 @@ public class SettingsActivity : AppCompatActivity
         InitializeViews();
         LoadCurrentSettings();
         SetupEventHandlers();
+        _initialLoadComplete = true;
     }
 
     private void InitializeServices()
@@ -363,6 +366,7 @@ public class SettingsActivity : AppCompatActivity
             _searchDomainSpinner.ItemSelected += (s, e) =>
             {
                 UpdateSearchDomainVisibility(e.Position);
+                if (_initialLoadComplete) _hasUnsavedChanges = true;
             };
         }
         
@@ -371,8 +375,28 @@ public class SettingsActivity : AppCompatActivity
             _useRemoteAudioCheckBox.CheckedChange += (s, e) =>
             {
                 UpdateReciterVisibility(e.IsChecked);
+                if (_initialLoadComplete) _hasUnsavedChanges = true;
             };
         }
+        
+        if (_useRemoteImagesCheckBox != null)
+            _useRemoteImagesCheckBox.CheckedChange += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
+        if (_enableRecordingCheckBox != null)
+            _enableRecordingCheckBox.CheckedChange += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
+        if (_showTajweedRulesCheckBox != null)
+            _showTajweedRulesCheckBox.CheckedChange += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
+        if (_singleSurahSpinner != null)
+            _singleSurahSpinner.ItemSelected += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
+        if (_startSurahSpinner != null)
+            _startSurahSpinner.ItemSelected += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
+        if (_endSurahSpinner != null)
+            _endSurahSpinner.ItemSelected += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
+        if (_reciterSpinner != null)
+            _reciterSpinner.ItemSelected += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
+        if (_fontSizeSpinner != null)
+            _fontSizeSpinner.ItemSelected += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
+        if (_quranTextSpinner != null)
+            _quranTextSpinner.ItemSelected += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
 
         if (_saveButton != null)
         {
@@ -391,6 +415,8 @@ public class SettingsActivity : AppCompatActivity
         {
             var selectedLanguage = _availableLanguages[e.Position];
             _localizationService.CurrentLanguage = selectedLanguage.Code;
+            
+            if (_initialLoadComplete) _hasUnsavedChanges = true;
             
             // Reload the UI with the new language
             RefreshUIForLanguageChange();
@@ -605,10 +631,38 @@ public class SettingsActivity : AppCompatActivity
     {
         if (item.ItemId == global::Android.Resource.Id.Home)
         {
-            Finish();
+            HandleBackNavigation();
             return true;
         }
         return base.OnOptionsItemSelected(item);
+    }
+    
+    public override void OnBackPressed()
+    {
+        HandleBackNavigation();
+    }
+    
+    private void HandleBackNavigation()
+    {
+        if (_hasUnsavedChanges)
+        {
+            var saveText = _localizationService?["SaveSettingsButton"] ?? "Save";
+            var discardText = _localizationService?["DiscardChanges"] ?? "Discard";
+            var messageText = _localizationService?["UnsavedChangesMessage"] ?? "You have unsaved changes. Would you like to save before leaving?";
+            var titleText = _localizationService?["UnsavedChangesTitle"] ?? "Unsaved Changes";
+            
+            new global::AndroidX.AppCompat.App.AlertDialog.Builder(this)
+                .SetTitle(titleText)
+                .SetMessage(messageText)
+                .SetPositiveButton(saveText, (s, e) => { SaveButton_Click(null, EventArgs.Empty); })
+                .SetNegativeButton(discardText, (s, e) => { Finish(); })
+                .SetCancelable(true)
+                .Show();
+        }
+        else
+        {
+            Finish();
+        }
     }
 }
 

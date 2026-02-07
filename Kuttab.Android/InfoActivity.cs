@@ -44,13 +44,6 @@ public class InfoActivity : AppCompatActivity
             }
         }
         
-        // Set up close button
-        var closeButton = FindViewById<Button>(Resource.Id.closeButton);
-        if (closeButton != null)
-        {
-            closeButton.Click += (sender, e) => Finish();
-        }
-        
         // Set up action bar
         if (SupportActionBar != null)
         {

@@ -182,5 +182,8 @@
   "NoRuleSelected": "No rule selected",
   "NoExplanationAvailable": "No explanation available for this rule.",
   "ShowTajweedRules": "Show Tajweed Rule Explanations",
-  "RuleExplanation": "Rule Explanation"
+  "RuleExplanation": "Rule Explanation",
+  "UnsavedChangesTitle": "Unsaved Changes",
+  "UnsavedChangesMessage": "You have unsaved changes. Would you like to save before leaving?",
+  "DiscardChanges": "Discard"
 }
