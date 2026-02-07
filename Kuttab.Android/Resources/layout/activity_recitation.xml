@@ -175,7 +175,7 @@
                     android:background="@android:drawable/btn_dropdown" />
             </LinearLayout>
 
-            <!-- Row 3: Aya Range (EditText inputs) + Repeat Count -->
+            <!-- Row 3: Aya Range + Teacher Mode -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -224,36 +224,24 @@
                     android:textSize="14sp"
                     android:gravity="center"
                     android:background="@android:drawable/edit_text"
-                    android:padding="4dp"
-                    android:layout_marginEnd="12dp" />
+                    android:padding="4dp" />
 
-                <TextView
-                    android:id="@+id/repeatCountLabel"
+                <!-- Spacer -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <CheckBox
+                    android:id="@+id/teacherModeCheckbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/repeat_count"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:textColor="#2C5F2D"
-                    android:layout_marginEnd="4dp" />
-
-                <Spinner
-                    android:id="@+id/repeatCountSpinner"
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/btn_dropdown" />
-
-                <TextView
-                    android:id="@+id/timesLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/times"
-                    android:textSize="12sp"
-                    android:textColor="#2C5F2D"
-                    android:layout_marginStart="4dp" />
+                    android:text="@string/teacher_mode"
+                    android:textSize="11sp"
+                    android:textColor="#2C5F2D" />
             </LinearLayout>
 
-            <!-- Row 4: Repeat Mode + Teacher Mode + Start/Stop -->
+            <!-- Row 4: Repeat Mode + Repeat Count + Start/Stop icons -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -268,36 +256,56 @@
                     android:background="@android:drawable/btn_dropdown"
                     android:layout_marginEnd="4dp" />
 
-                <CheckBox
-                    android:id="@+id/teacherModeCheckbox"
+                <TextView
+                    android:id="@+id/repeatCountLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/teacher_mode"
+                    android:text="@string/repeat_count"
                     android:textSize="11sp"
+                    android:textStyle="bold"
                     android:textColor="#2C5F2D"
                     android:layout_marginEnd="4dp" />
 
+                <EditText
+                    android:id="@+id/repeatCountInput"
+                    android:layout_width="44dp"
+                    android:layout_height="36dp"
+                    android:inputType="number"
+                    android:text="1"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@android:drawable/edit_text"
+                    android:padding="4dp"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:id="@+id/timesLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/times"
+                    android:textSize="11sp"
+                    android:textColor="#2C5F2D"
+                    android:layout_marginEnd="8dp" />
+
                 <Button
                     android:id="@+id/startButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="@string/start_recitation"
-                    android:textSize="12sp"
-                    android:layout_marginEnd="4dp"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:minWidth="0dp" />
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:text="▶️"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:padding="0dp"
+                    android:layout_marginEnd="2dp" />
 
                 <Button
                     android:id="@+id/stopButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="@string/stop_recitation"
-                    android:textSize="12sp"
-                    android:enabled="false"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:minWidth="0dp" />
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:text="⏹️"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:padding="0dp"
+                    android:enabled="false" />
             </LinearLayout>
 
         </LinearLayout>

@@ -35,7 +35,7 @@ public class RecitationActivity : AppCompatActivity
     private EditText? _toAyaInput;
     private Button? _startButton;
     private Button? _stopButton;
-    private Spinner? _repeatCountSpinner;
+    private EditText? _repeatCountInput;
     private Spinner? _repeatModeSpinner;
     private TextView? _currentAyaInfo;
     private TextView? _ayaTextView;
@@ -188,7 +188,7 @@ public class RecitationActivity : AppCompatActivity
         _toAyaInput = FindViewById<EditText>(Resource.Id.toAyaInput);
         _startButton = FindViewById<Button>(Resource.Id.startButton);
         _stopButton = FindViewById<Button>(Resource.Id.stopButton);
-        _repeatCountSpinner = FindViewById<Spinner>(Resource.Id.repeatCountSpinner);
+        _repeatCountInput = FindViewById<EditText>(Resource.Id.repeatCountInput);
         _repeatModeSpinner = FindViewById<Spinner>(Resource.Id.repeatModeSpinner);
         _currentAyaInfo = FindViewById<TextView>(Resource.Id.currentAyaInfo);
         _ayaTextView = FindViewById<TextView>(Resource.Id.ayaTextView);
@@ -273,11 +273,7 @@ public class RecitationActivity : AppCompatActivity
         if (_teacherModeCheckbox != null)
             _teacherModeCheckbox.Text = _localizationService["TeacherMode"];
         
-        // Update buttons
-        if (_startButton != null)
-            _startButton.Text = _localizationService["StartRecitation"];
-        if (_stopButton != null)
-            _stopButton.Text = _localizationService["StopRecitation"];
+        // Start/Stop buttons are icon-only, no text update needed
     }
     
     private void UpdateLayoutDirection(string language)
@@ -338,22 +334,14 @@ public class RecitationActivity : AppCompatActivity
     
     private void SetupRepeatSpinners()
     {
-        // Setup Repeat Count Spinner (1-100)
-        var repeatCounts = new List<string>();
-        for (int i = 1; i <= 100; i++)
+        // Setup Repeat Count EditText (1-100)
+        if (_repeatCountInput != null)
         {
-            repeatCounts.Add(i.ToString());
-        }
-        
-        var repeatAdapter = new ArrayAdapter<string>(this,
-            global::Android.Resource.Layout.SimpleSpinnerItem, repeatCounts);
-        repeatAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
-        
-        if (_repeatCountSpinner != null)
-        {
-            _repeatCountSpinner.Adapter = repeatAdapter;
-            _repeatCountSpinner.SetSelection(0); // Default to 1
-            _repeatCountSpinner.ItemSelected += OnRepeatCountSelected;
+            _repeatCountInput.Text = "1";
+            _repeatCountInput.FocusChange += (s, e) =>
+            {
+                if (!e.HasFocus) ValidateRepeatCount();
+            };
         }
         
         // Setup Repeat Mode Spinner
@@ -375,9 +363,17 @@ public class RecitationActivity : AppCompatActivity
         }
     }
     
-    private void OnRepeatCountSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
+    private void ValidateRepeatCount()
     {
-        _repeatCount = e.Position + 1; // 1-based
+        if (!int.TryParse(_repeatCountInput?.Text, out int val) || val < 1)
+            val = 1;
+        if (val > 100)
+            val = 100;
+        
+        _repeatCount = val;
+        
+        if (_repeatCountInput != null && _repeatCountInput.Text != val.ToString())
+            _repeatCountInput.Text = val.ToString();
     }
     
     private void OnRepeatModeSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
@@ -523,8 +519,9 @@ public class RecitationActivity : AppCompatActivity
     
     private void StartRecitation()
     {
-        // Validate aya inputs before starting
+        // Validate inputs before starting
         ValidateAyaInputs();
+        ValidateRepeatCount();
         
         _currentSurah = _selectedSurah;
         _currentAya = _fromAya;
