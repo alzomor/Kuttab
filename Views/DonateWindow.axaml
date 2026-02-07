@@ -124,7 +124,7 @@
                                Foreground="{DynamicResource AccentColor}"
                                HorizontalAlignment="Center"
                                Margin="0,0,0,8"/>
-                    <TextBlock Text="{Binding Localization.DonateSubtitle}" 
+                    <TextBlock Text="{Binding DonateSubtitle}" 
                                FontSize="14" 
                                Foreground="#666666"
                                TextWrapping="Wrap"

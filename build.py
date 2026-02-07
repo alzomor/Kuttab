@@ -172,6 +172,8 @@ def build_android_apk():
         # Rename to a cleaner name
         dest_apk = os.path.join("dist", f"{PROJECT_NAME}-android-{VERSION}.apk")
         shutil.copy2(src_apk, dest_apk)
+        # Fix timestamp (deterministic builds set it to 1981)
+        os.utime(dest_apk, None)
         print(f"✅ Copied APK to: {dest_apk}")
         break  # Only copy the first (signed) APK
     

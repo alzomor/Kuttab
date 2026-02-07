@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Windows.Input;
 using ReactiveUI;
 using Kuttab.Core.Services;
@@ -22,7 +23,21 @@ public class InfoViewModel : ViewModelBase
 
     public LocalizationService Localization => _localizationService;
 
-    public string AppVersion => "v0.8 TEST VERSION";
+    public string AppVersion
+    {
+        get
+        {
+            try
+            {
+                var version = Assembly.GetExecutingAssembly().GetName().Version;
+                return $"v{version?.ToString(3) ?? "0.0"}";
+            }
+            catch
+            {
+                return "v0.0";
+            }
+        }
+    }
 
     public ICommand CloseCommand { get; }
 
