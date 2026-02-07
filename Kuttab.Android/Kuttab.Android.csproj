@@ -31,6 +31,11 @@
     <DebugType>none</DebugType>
     <AndroidLinkTool>r8</AndroidLinkTool>
     <AndroidR8IgnoreWarnings>true</AndroidR8IgnoreWarnings>
+    <AndroidKeyStore>true</AndroidKeyStore>
+    <AndroidSigningKeyStore>kuttab-release.keystore</AndroidSigningKeyStore>
+    <AndroidSigningKeyAlias>kuttab</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>SanaAziz_2016</AndroidSigningKeyPass>
+    <AndroidSigningStorePass>SanaAziz_2016</AndroidSigningStorePass>
   </PropertyGroup>
 
   <ItemGroup>
@@ -62,6 +67,10 @@
     <!-- Include localization JSON files as Android assets -->
     <AndroidAsset Include="..\Localization\*.json">
       <Link>Localization/%(FileName)%(Extension)</Link>
+    </AndroidAsset>
+    <!-- Include donation data from repo root -->
+    <AndroidAsset Include="..\donation.json">
+      <Link>donation.json</Link>
     </AndroidAsset>
   </ItemGroup>
 </Project>

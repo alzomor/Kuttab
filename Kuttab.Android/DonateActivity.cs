@@ -7,6 +7,8 @@ using AndroidX.AppCompat.App;
 using Kuttab.Core.Services;
 using Kuttab.Android.Utils;
 using System;
+using System.IO;
+using System.Text.Json;
 
 namespace Kuttab.Android;
 
@@ -19,6 +21,10 @@ public class DonateActivity : AppCompatActivity
     private const string PaymentReference = "Spende BBF-Bauprojekt | über die App Kuttab";
 
     private LocalizationService? _localizationService;
+
+    // Donation data (loaded from donation.json)
+    private long _totalCost = 1000000;
+    private long _currentDonations = 700000;
 
     private Button? _paypalButton;
     private Button? _copyIbanButton;
@@ -53,9 +59,34 @@ public class DonateActivity : AppCompatActivity
         }
 
         InitializeServices();
+        LoadDonationData();
         InitializeViews();
         SetupEventHandlers();
         UpdateLocalizedText();
+    }
+
+    private void LoadDonationData()
+    {
+        try
+        {
+            using var stream = Assets?.Open("donation.json");
+            if (stream != null)
+            {
+                using var reader = new StreamReader(stream);
+                var json = reader.ReadToEnd();
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                
+                if (root.TryGetProperty("totalCost", out var totalCostEl))
+                    _totalCost = totalCostEl.GetInt64();
+                if (root.TryGetProperty("currentDonations", out var currentEl))
+                    _currentDonations = currentEl.GetInt64();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading donation data: {ex.Message}");
+        }
     }
 
     private void InitializeServices()
@@ -116,7 +147,13 @@ public class DonateActivity : AppCompatActivity
             _donateTitle.Text = _localizationService.DonateTitle;
 
         if (_donateSubtitle != null)
-            _donateSubtitle.Text = _localizationService.DonateSubtitle;
+        {
+            var remaining = _totalCost - _currentDonations;
+            var totalStr = _totalCost.ToString("N0");
+            var currentStr = _currentDonations.ToString("N0");
+            var remainingStr = remaining.ToString("N0");
+            _donateSubtitle.Text = string.Format(_localizationService.DonateSubtitle, totalStr, currentStr, remainingStr);
+        }
 
         if (_paypalTitle != null)
             _paypalTitle.Text = _localizationService.DonateViaPayPal;

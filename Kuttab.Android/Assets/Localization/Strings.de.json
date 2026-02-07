@@ -124,7 +124,7 @@
   "OpenInfo": "ℹ️ Info",
   "OpenDonate": "🕌 Spenden",
   "DonateTitle": "🕌 BBF-Zentrum unterstützen",
-  "DonateSubtitle": "Helfen Sie uns, das BBF-Gemeindezentrum in Freiburg zu bauen! Das Grundstück (1.307 m²) kostet 1.000.000 € - wir haben 700.000 € gesammelt und benötigen noch 300.000 €.",
+  "DonateSubtitle": "Helfen Sie uns, das BBF-Gemeindezentrum in Freiburg zu bauen! Das Grundstück (1.307 m²) kostet {0} € - wir haben {1} € gesammelt und benötigen noch {2} €.",
   "DonateViaPayPal": "💳 Spenden via PayPal",
   "PayPalDescription": "Schnelle und sichere Online-Spende über PayPal.",
   "DonateViaBankTransfer": "🏦 Spenden via Banküberweisung",

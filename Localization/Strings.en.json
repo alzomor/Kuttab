@@ -122,7 +122,7 @@
   "OpenInfo": "ℹ️ Info",
   "OpenDonate": "🕌 Donate",
   "DonateTitle": "🕌 Support BBF Center Project",
-  "DonateSubtitle": "Help us build the BBF Community Center in Freiburg! The land (1,307 m²) costs €1,000,000 - we have raised €700,000 and still need €300,000.",
+  "DonateSubtitle": "Help us build the BBF Community Center in Freiburg! The land (1,307 m²) costs €{0} - we have raised €{1} and still need €{2}.",
   "DonateViaPayPal": "💳 Donate via PayPal",
   "PayPalDescription": "Quick and secure online donation through PayPal.",
   "DonateViaBankTransfer": "🏦 Donate via Bank Transfer",

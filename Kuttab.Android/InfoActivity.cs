@@ -28,6 +28,22 @@ public class InfoActivity : AppCompatActivity
         
         SetContentView(Resource.Layout.activity_info);
         
+        // Set version dynamically from package info
+        var versionTextView = FindViewById<TextView>(Resource.Id.appVersionTextView);
+        if (versionTextView != null)
+        {
+            try
+            {
+                var packageInfo = PackageManager?.GetPackageInfo(PackageName ?? "", 0);
+                var versionName = packageInfo?.VersionName ?? "0.0";
+                versionTextView.Text = $"v{versionName}";
+            }
+            catch
+            {
+                // Keep default from layout
+            }
+        }
+        
         // Set up close button
         var closeButton = FindViewById<Button>(Resource.Id.closeButton);
         if (closeButton != null)

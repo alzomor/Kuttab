@@ -7,7 +7,7 @@ from pathlib import Path
 
 # Configuration
 PROJECT_NAME = "Kuttab"
-VERSION = "0.85"
+VERSION = "0.88"
 TARGETS = [
     {"rid": "win-x64", "ext": "zip"},
     {"rid": "linux-x64", "ext": "tar.gz"},
@@ -40,6 +40,13 @@ def run_command(cmd, cwd=None, env=None):
             print(f"Error output:\n{e.stderr}")
         return False
 
+def get_dotnet_command():
+    """Find the best .NET SDK command (prefer .NET 9)."""
+    dotnet9_path = str(Path.home() / ".dotnet-9" / "dotnet")
+    if os.path.exists(dotnet9_path):
+        return dotnet9_path
+    return "dotnet"
+
 def build_for_platform(target):
     """Build the project for a specific platform."""
     rid = target["rid"]
@@ -54,9 +61,12 @@ def build_for_platform(target):
         print(f"🧹 Cleaning previous build for {rid}...")
         shutil.rmtree(output_dir)
     
+    dotnet_cmd = get_dotnet_command()
+    print(f"ℹ️  Using dotnet: {dotnet_cmd}")
+    
     # Build command
     cmd = [
-        "dotnet", "publish",
+        dotnet_cmd, "publish",
         "-c", "Release",
         "-r", rid,
         "--self-contained", "true",
@@ -88,13 +98,18 @@ def build_android_apk():
         return False
     
     # Try to find a dotnet command capable of building Android.
-    # Priority: 1) ~/.dotnet-android/dotnet (has Android workload)
-    #           2) dotnet-android command
-    #           3) system dotnet
+    # Priority: 1) ~/.dotnet-9/dotnet (has Android workload)
+    #           2) ~/.dotnet-android/dotnet
+    #           3) dotnet-android command
+    #           4) system dotnet
+    dotnet9_path = str(Path.home() / ".dotnet-9" / "dotnet")
     dotnet_android_path = str(Path.home() / ".dotnet-android" / "dotnet")
     android_dotnet_cmd = "dotnet"
     
-    if os.path.exists(dotnet_android_path):
+    if os.path.exists(dotnet9_path):
+        android_dotnet_cmd = dotnet9_path
+        print(f"✅ Using .NET 9 SDK: {dotnet9_path}")
+    elif os.path.exists(dotnet_android_path):
         android_dotnet_cmd = dotnet_android_path
         print(f"✅ Using .NET with Android workload: {dotnet_android_path}")
     else:
