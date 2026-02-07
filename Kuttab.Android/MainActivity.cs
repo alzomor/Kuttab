@@ -7,6 +7,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using AndroidX.AppCompat.App;
+using AndroidX.Core.View;
 using AndroidX.RecyclerView.Widget;
 using Kuttab.Android.Adapters;
 using Kuttab.Android.Services;
@@ -99,6 +100,10 @@ public class MainActivity : AppCompatActivity
             {
                 Window.SetStatusBarColor(global::Android.Graphics.Color.ParseColor("#0D3F13")); // primary_dark
                 Window.SetNavigationBarColor(global::Android.Graphics.Color.ParseColor("#1B5E20")); // primary
+                
+                // Fix edge-to-edge overlap on Android 15+ (API 35+)
+                // This ensures app content does not overlap with system bars
+                WindowCompat.SetDecorFitsSystemWindows(Window, false);
             }
         }
         else
@@ -112,6 +117,19 @@ public class MainActivity : AppCompatActivity
         }
         
         SetContentView(Resource.Layout.activity_main);
+        
+        // Apply WindowInsets to handle edge-to-edge on Android 15/16
+        // This dynamically adds padding to avoid overlapping system bars
+        var rootView = FindViewById<FrameLayout>(global::Android.Resource.Id.Content);
+        if (rootView != null)
+        {
+            // Add a dark green view behind the status bar only
+            var statusBarBg = new global::Android.Views.View(this);
+            statusBarBg.SetBackgroundColor(global::Android.Graphics.Color.ParseColor("#0D3F13"));
+            rootView.AddView(statusBarBg);
+            
+            ViewCompat.SetOnApplyWindowInsetsListener(rootView, new StatusBarInsetsListener(statusBarBg));
+        }
         
         InitializeServices();
         InitializeViews();
@@ -1415,5 +1433,31 @@ public class MainActivity : AppCompatActivity
         _audioService?.Dispose();
         _recordingService?.Dispose();
         base.OnDestroy();
+    }
+
+    // Insets listener that colors only the status bar area and pads content below it
+    private class StatusBarInsetsListener : Java.Lang.Object, IOnApplyWindowInsetsListener
+    {
+        private readonly global::Android.Views.View _statusBarBg;
+
+        public StatusBarInsetsListener(global::Android.Views.View statusBarBg)
+        {
+            _statusBarBg = statusBarBg;
+        }
+
+        public WindowInsetsCompat OnApplyWindowInsets(global::Android.Views.View v, WindowInsetsCompat insets)
+        {
+            var systemBars = insets.GetInsets(WindowInsetsCompat.Type.SystemBars());
+            
+            // Size the status bar background view to exactly the status bar height
+            var lp = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MatchParent, systemBars.Top);
+            _statusBarBg.LayoutParameters = lp;
+            _statusBarBg.BringToFront();
+            
+            // Pad the content to avoid overlapping system bars
+            v.SetPadding(systemBars.Left, systemBars.Top, systemBars.Right, systemBars.Bottom);
+            return insets;
+        }
     }
 }
