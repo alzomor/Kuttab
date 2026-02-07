@@ -83,6 +83,8 @@
   "GetImagesFromInternetLabel": "📷 Aya-Bilder aus dem Internet abrufen",
   "OnlineResourcesNoteText": "Hinweis: Aktivieren Sie diese Optionen, wenn lokale Dateien nicht verfügbar sind",
   "SelectReciterLabel": "Rezitator:",
+  "ReciterBottomLabel": "Rezitator",
+  "YourRecordingBottomLabel": "Ihre Aufnahme",
   "ReciterAbdulBasit": "Abdul Basit (Murattal)",
   "ReciterAymanSowaid": "Ayman Sowaid",
   "ReciterHusary": "Mahmoud Khalil Al-Husary",
@@ -176,5 +178,6 @@
   "RuleButton": "📖 Regel",
   "NoRuleSelected": "Keine Regel ausgewählt",
   "NoExplanationAvailable": "Keine Erklärung für diese Regel verfügbar.",
-  "ShowTajweedRules": "Tadschuid-Regel Erklärungen anzeigen"
+  "ShowTajweedRules": "Tadschuid-Regel Erklärungen anzeigen",
+  "RuleExplanation": "Regelerklärung"
 }

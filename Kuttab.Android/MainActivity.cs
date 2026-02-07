@@ -605,9 +605,13 @@ public class MainActivity : AppCompatActivity
             
             // Update bottom control labels based on selected language
             if (_reciterLabel != null)
-                _reciterLabel.Text = _localizationService.GetString("Reciter");
+                _reciterLabel.Text = _localizationService.GetString("ReciterBottomLabel");
             if (_yourRecordingLabel != null)
-                _yourRecordingLabel.Text = _localizationService.GetString("YourRecording");
+                _yourRecordingLabel.Text = _localizationService.GetString("YourRecordingBottomLabel");
+            
+            // Update rule button text
+            if (_ruleButton != null)
+                _ruleButton.Text = _localizationService.GetString("RuleExplanation");
             
             // Update status
             UpdateStatus(_localizationService.GetString("Ready"));

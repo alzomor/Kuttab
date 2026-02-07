@@ -96,6 +96,9 @@
   "CancelButton": "❌ إلغاء",
   "RecitationMode": "وضع التلاوة",
   "SelectReciter": "اختر القارئ:",
+  "YourRecording": "تسجيلك",
+  "ReciterBottomLabel": "القارئ",
+  "YourRecordingBottomLabel": "تسجيلك",
   "SelectSurah": "اختر السورة:",
   "FromAya": "من الآية:",
   "ToAya": "إلى الآية:",
@@ -176,5 +179,6 @@
   "RuleButton": "📖 القاعدة",
   "NoRuleSelected": "لم يتم اختيار قاعدة",
   "NoExplanationAvailable": "لا يوجد شرح متاح لهذه القاعدة.",
-  "ShowTajweedRules": "عرض شرح قواعد التجويد"
+  "ShowTajweedRules": "عرض شرح قواعد التجويد",
+  "RuleExplanation": "شرح القاعدة"
 }

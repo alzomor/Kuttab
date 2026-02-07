@@ -100,8 +100,10 @@
   "FromAya": "From Aya:",
   "ToAya": "To Aya:",
   "RepeatCount": "Repeat Count:",
-  "Times": "times",
-  "RepeatMode": "Repeat Mode:",
+  "Reciter": "Reciter",
+  "YourRecording": "Your Recording",
+  "ReciterBottomLabel": "Reciter",
+  "YourRecordingBottomLabel": "Your Recording",
   "RepeatEachAya": "Repeat Each Aya",
   "RepeatWholeRange": "Repeat Whole Range",
   "CurrentRepeat": "Repeat {0} of {1}",
@@ -176,5 +178,6 @@
   "RuleButton": "📖 Rule",
   "NoRuleSelected": "No rule selected",
   "NoExplanationAvailable": "No explanation available for this rule.",
-  "ShowTajweedRules": "Show Tajweed Rule Explanations"
+  "ShowTajweedRules": "Show Tajweed Rule Explanations",
+  "RuleExplanation": "Rule Explanation"
 }

@@ -22,6 +22,8 @@
   "AudioControls": "التحكم في الصوت",
   "Reciter": "القارئ",
   "YourRecording": "تسجيلك",
+  "ReciterBottomLabel": "القارئ",
+  "YourRecordingBottomLabel": "تسجيلك",
   "PlaySingle": "▶️ تشغيل مرة",
   "PlayAllSequence": "📋 تشغيل الكل بالترتيب",
   "PauseSequence": "⏸️ إيقاف مؤقت",
@@ -170,5 +172,14 @@
   "ContactEmail": "البريد الإلكتروني للاتصال:",
   "ContactEmailText": "almanar.backup@gmail.com",
   "ContactSubject": "الموضوع: Kuttab",
-  "ContactNote": "يرجى تضمين 'Kuttab' في موضوع البريد الإلكتروني للتوجيه الصحيح."
+  "ContactNote": "يرجى تضمين 'Kuttab' في موضوع البريد الإلكتروني للتوجيه الصحيح.",
+
+  "RuleExplanation": "شرح القاعدة",
+  "TajweedRuleTitle": "شرح قاعدة التجويد",
+  "RuleNameLabel": "اسم القاعدة",
+  "ExplanationLabel": "الشرح",
+  "RuleButton": "القاعدة",
+  "NoRuleSelected": "لم يتم اختيار قاعدة",
+  "NoExplanationAvailable": "لا يوجد شرح متاح لهذه القاعدة.",
+  "ShowTajweedRules": "عرض شرح قواعد التجويد"
 }

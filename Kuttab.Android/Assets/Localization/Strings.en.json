@@ -22,6 +22,8 @@
   "AudioControls": "Audio Controls",
   "Reciter": "Reciter",
   "YourRecording": "Your Recording",
+  "ReciterBottomLabel": "Reciter",
+  "YourRecordingBottomLabel": "Your Recording",
   "PlaySingle": "▶️ Play Single",
   "PlayAllSequence": "📋 Play All Sequence",
   "PauseSequence": "⏸️ Pause Sequence",
@@ -170,5 +172,14 @@
   "ContactEmail": "Contact Email:",
   "ContactEmailText": "almanar.backup@gmail.com",
   "ContactSubject": "Subject: Kuttab",
-  "ContactNote": "Please include 'Kuttab' in the email subject for proper routing."
+  "ContactNote": "Please include 'Kuttab' in the email subject for proper routing.",
+
+  "RuleExplanation": "Rule Explanation",
+  "TajweedRuleTitle": "Tajweed Rule Explanation",
+  "RuleNameLabel": "Rule Name",
+  "ExplanationLabel": "Explanation",
+  "RuleButton": "Rule",
+  "NoRuleSelected": "No rule selected",
+  "NoExplanationAvailable": "No explanation available for this rule.",
+  "ShowTajweedRules": "Show Tajweed Rule Explanations"
 }

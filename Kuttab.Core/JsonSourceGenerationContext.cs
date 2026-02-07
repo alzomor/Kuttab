@@ -8,7 +8,6 @@ namespace Kuttab.Core;
 [JsonSerializable(typeof(List<TajweedRule>))]
 [JsonSerializable(typeof(TajweedRule))]
 [JsonSerializable(typeof(TajweedCase))]
-[JsonSerializable(typeof(Dictionary<string, string>))]
 [JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]
 public partial class KuttabJsonContext : JsonSerializerContext
 {

@@ -22,6 +22,8 @@
   "AudioControls": "Audio-Steuerung",
   "Reciter": "Rezitator",
   "YourRecording": "Ihre Aufnahme",
+  "ReciterBottomLabel": "Rezitator",
+  "YourRecordingBottomLabel": "Ihre Aufnahme",
   "PlaySingle": "▶️ Einmal abspielen",
   "PlayAllSequence": "📋 Alle nacheinander abspielen",
   "PauseSequence": "⏸️ Sequenz pausieren",
@@ -170,5 +172,14 @@
   "ContactEmail": "Kontakt E-Mail:",
   "ContactEmailText": "almanar.backup@gmail.com",
   "ContactSubject": "Betreff: Kuttab",
-  "ContactNote": "Bitte fügen Sie 'Kuttab' in die E-Mail-Betreffzeile für richtige Weiterleitung ein."
+  "ContactNote": "Bitte fügen Sie 'Kuttab' in die E-Mail-Betreffzeile für richtige Weiterleitung ein.",
+
+  "RuleExplanation": "Regelerklärung",
+  "TajweedRuleTitle": "Tadschuid-Regel Erklärung",
+  "RuleNameLabel": "Regelname",
+  "ExplanationLabel": "Erklärung",
+  "RuleButton": "Regel",
+  "NoRuleSelected": "Keine Regel ausgewählt",
+  "NoExplanationAvailable": "Keine Erklärung für diese Regel verfügbar.",
+  "ShowTajweedRules": "Tadschuid-Regel Erklärungen anzeigen"
 }
