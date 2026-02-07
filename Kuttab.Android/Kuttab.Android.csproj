@@ -15,18 +15,22 @@
     <!-- Enable assembly compression to reduce APK size -->
     <AndroidEnableAssemblyCompression>true</AndroidEnableAssemblyCompression>
     <AndroidUseFastDeployment>false</AndroidUseFastDeployment>
-    <!-- Disable AOT compilation to avoid SDK resolution issues -->
-    <RunAOTCompilation>false</RunAOTCompilation>
-    <EnableLLVM>false</EnableLLVM>
+    <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <!-- D8 configuration for bundletool.jar compatibility -->
     <AndroidD8IgnoreWarnings>true</AndroidD8IgnoreWarnings>
-    <!-- Keep linking disabled to prevent issues -->
-    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+
+  <!-- Release-only optimizations for smaller APK -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <EnableLLVM>true</EnableLLVM>
+    <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>
-    <AndroidLinkMode>None</AndroidLinkMode>
-    <!-- Strip debug symbols in release -->
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
+    <AndroidLinkTool>r8</AndroidLinkTool>
+    <AndroidR8IgnoreWarnings>true</AndroidR8IgnoreWarnings>
   </PropertyGroup>
 
   <ItemGroup>

@@ -89,12 +89,7 @@ public class QuranSearchService
                 throw new Exception("rules.json file is empty");
             }
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-
-            var rulesContainer = JsonSerializer.Deserialize<RulesContainer>(jsonContent, options);
+            var rulesContainer = JsonSerializer.Deserialize(jsonContent, KuttabJsonContext.Default.RulesContainer);
             if (rulesContainer == null)
             {
                 throw new Exception("Failed to deserialize rules.json");

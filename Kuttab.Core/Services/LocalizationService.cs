@@ -170,7 +170,7 @@ public class LocalizationService : ReactiveObject
             }
 
             var jsonContent = _fileService.ReadAllText(filePath); // Use synchronous version to avoid deadlock
-            _currentStrings = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent) ?? new Dictionary<string, string>();
+            _currentStrings = JsonSerializer.Deserialize(jsonContent, KuttabJsonContext.Default.DictionaryStringString) ?? new Dictionary<string, string>();
             
             Console.WriteLine($"Loaded language: {languageCode} with {_currentStrings.Count} strings");
         }
