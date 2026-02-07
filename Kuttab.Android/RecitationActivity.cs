@@ -28,7 +28,6 @@ public class RecitationActivity : AppCompatActivity
     
     // UI Elements
     private Button? _backButton;
-    private Button? _settingsButton;
     private Spinner? _reciterSpinner;
     private Spinner? _surahSpinner;
     private EditText? _fromAyaInput;
@@ -72,18 +71,18 @@ public class RecitationActivity : AppCompatActivity
     private DateTime _currentAyaStartTime = DateTime.UtcNow;
     private PowerManager.WakeLock? _wakeLock;
     
-    // Reciters list (same as SettingsActivity)
-    private readonly List<(string Key, string Name)> _reciters = new()
+    // Reciters list (folder key + localization display key)
+    private readonly List<(string FolderKey, string DisplayKey)> _reciters = new()
     {
-        ("Abdul_Basit_Murattal_192kbps", "Abdul Basit (Murattal)"),
-        ("Ayman_Sowaid_64kbps", "Ayman Sowaid"),
-        ("Husary_128kbps", "Mahmoud Khalil Al-Husary"),
-        ("Husary_Muallim_128kbps", "Al-Husary (Muallim)"),
-        ("Menshawi_32kbps", "Mohamed Siddiq Al-Menshawi"),
-        ("Mohammad_al_Tablaway_128kbps", "Mohammad Al-Tablaway"),
-        ("Mustafa_Ismail_48kbps", "Mustafa Ismail"),
-        ("Muhammad_Ayyoub_128kbps", "Muhammad Ayyoub"),
-        ("mahmoud_ali_al_banna_32kbps", "Mahmoud Ali Al-Banna")
+        ("Abdul_Basit_Murattal_192kbps", "ReciterAbdulBasit"),
+        ("Ayman_Sowaid_64kbps", "ReciterAymanSowaid"),
+        ("Husary_128kbps", "ReciterHusary"),
+        ("Husary_Muallim_128kbps", "ReciterHusaryMuallim"),
+        ("Menshawi_32kbps", "ReciterMenshawi"),
+        ("Mohammad_al_Tablaway_128kbps", "ReciterTablaway"),
+        ("Mustafa_Ismail_48kbps", "ReciterMustafaIsmail"),
+        ("Muhammad_Ayyoub_128kbps", "ReciterAyyoub"),
+        ("mahmoud_ali_al_banna_32kbps", "ReciterBanna")
     };
     
     private const int SETTINGS_REQUEST_CODE = 1002;
@@ -179,7 +178,6 @@ public class RecitationActivity : AppCompatActivity
     private void InitializeViews()
     {
         _backButton = FindViewById<Button>(Resource.Id.backButton);
-        _settingsButton = FindViewById<Button>(Resource.Id.settingsButton);
         _reciterSpinner = FindViewById<Spinner>(Resource.Id.reciterSpinner);
         _surahSpinner = FindViewById<Spinner>(Resource.Id.surahSpinner);
         _fromAyaInput = FindViewById<EditText>(Resource.Id.fromAyaInput);
@@ -205,8 +203,6 @@ public class RecitationActivity : AppCompatActivity
         // Setup click handlers
         if (_backButton != null)
             _backButton.Click += (s, e) => Finish();
-        if (_settingsButton != null)
-            _settingsButton.Click += OnSettingsClick;
         if (_startButton != null)
             _startButton.Click += OnStartClick;
         if (_stopButton != null)
@@ -281,13 +277,14 @@ public class RecitationActivity : AppCompatActivity
     
     private void SetupSpinners()
     {
-        // Setup Reciter Spinner
+        // Setup Reciter Spinner (localized names)
         var reciterNames = new List<string>();
         int selectedReciterIndex = 0;
         for (int i = 0; i < _reciters.Count; i++)
         {
-            reciterNames.Add(_reciters[i].Name);
-            if (_reciters[i].Key == _selectedReciter)
+            var displayName = _localizationService?[_reciters[i].DisplayKey] ?? _reciters[i].DisplayKey;
+            reciterNames.Add(displayName);
+            if (_reciters[i].FolderKey == _selectedReciter)
                 selectedReciterIndex = i;
         }
         
@@ -357,15 +354,32 @@ public class RecitationActivity : AppCompatActivity
     
     private void ValidateRepeatCount()
     {
+        int origVal;
         if (!int.TryParse(_repeatCountInput?.Text, out int val) || val < 1)
+        {
+            origVal = -1;
             val = 1;
-        if (val > 100)
-            val = 100;
+        }
+        else
+        {
+            origVal = val;
+        }
+        if (val > 99)
+        {
+            origVal = val;
+            val = 99;
+        }
         
         _repeatCount = val;
         
         if (_repeatCountInput != null && _repeatCountInput.Text != val.ToString())
             _repeatCountInput.Text = val.ToString();
+        
+        if (origVal != val)
+        {
+            var message = $"{_localizationService?["RepeatRangeError"] ?? "Valid repeat range"}: 1 - 99";
+            Toast.MakeText(this, message, ToastLength.Short)?.Show();
+        }
     }
     
     private void OnRepeatModeSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
@@ -433,22 +447,51 @@ public class RecitationActivity : AppCompatActivity
     private void ValidateAyaInputs()
     {
         int ayaCount = SurahInfo.GetAyaCount(_selectedSurah);
+        bool showNotification = false;
+        string message = "";
         
         // Parse and clamp fromAya
+        int origFrom;
         if (!int.TryParse(_fromAyaInput?.Text, out int fromVal) || fromVal < 1)
+        {
+            origFrom = -1;
             fromVal = 1;
+        }
+        else
+        {
+            origFrom = fromVal;
+        }
         if (fromVal > ayaCount)
             fromVal = ayaCount;
         
         // Parse and clamp toAya
+        int origTo;
         if (!int.TryParse(_toAyaInput?.Text, out int toVal) || toVal < 1)
+        {
+            origTo = -1;
             toVal = ayaCount;
+        }
+        else
+        {
+            origTo = toVal;
+        }
         if (toVal > ayaCount)
             toVal = ayaCount;
         
+        // Check if values were corrected
+        if (origFrom != fromVal || origTo != toVal)
+        {
+            showNotification = true;
+            message = $"{_localizationService?["AyaRangeError"] ?? "Valid Aya range"}: 1 - {ayaCount}";
+        }
+        
         // Ensure fromAya <= toAya
         if (fromVal > toVal)
+        {
             toVal = fromVal;
+            showNotification = true;
+            message = $"{_localizationService?["FromAyaLessOrEqual"] ?? "From Aya must be ≤ To Aya"}";
+        }
         
         _fromAya = fromVal;
         _toAya = toVal;
@@ -458,6 +501,9 @@ public class RecitationActivity : AppCompatActivity
             _fromAyaInput.Text = fromVal.ToString();
         if (_toAyaInput != null && _toAyaInput.Text != toVal.ToString())
             _toAyaInput.Text = toVal.ToString();
+        
+        if (showNotification)
+            Toast.MakeText(this, message, ToastLength.Short)?.Show();
     }
     
     private async void LoadQuranData()
@@ -479,7 +525,7 @@ public class RecitationActivity : AppCompatActivity
     {
         if (e.Position >= 0 && e.Position < _reciters.Count)
         {
-            _selectedReciter = _reciters[e.Position].Key;
+            _selectedReciter = _reciters[e.Position].FolderKey;
             if (_audioService != null)
             {
                 _audioService.SelectedReciter = _selectedReciter;
@@ -882,7 +928,7 @@ public class RecitationActivity : AppCompatActivity
             // Update reciter spinner selection
             for (int i = 0; i < _reciters.Count; i++)
             {
-                if (_reciters[i].Key == _selectedReciter)
+                if (_reciters[i].FolderKey == _selectedReciter)
                 {
                     _reciterSpinner?.SetSelection(i);
                     break;
