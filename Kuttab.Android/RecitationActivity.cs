@@ -13,6 +13,7 @@ using LocalizationService = Kuttab.Core.Services.LocalizationService;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Android.Text;
 
 namespace Kuttab.Android;
 
@@ -30,8 +31,8 @@ public class RecitationActivity : AppCompatActivity
     private Button? _settingsButton;
     private Spinner? _reciterSpinner;
     private Spinner? _surahSpinner;
-    private Spinner? _fromAyaSpinner;
-    private Spinner? _toAyaSpinner;
+    private EditText? _fromAyaInput;
+    private EditText? _toAyaInput;
     private Button? _startButton;
     private Button? _stopButton;
     private Spinner? _repeatCountSpinner;
@@ -50,7 +51,6 @@ public class RecitationActivity : AppCompatActivity
     private TextView? _toAyaLabel;
     private TextView? _repeatCountLabel;
     private TextView? _timesLabel;
-    private TextView? _repeatModeLabel;
     private TextView? _nowPlayingLabel;
     
     // State
@@ -184,8 +184,8 @@ public class RecitationActivity : AppCompatActivity
         _settingsButton = FindViewById<Button>(Resource.Id.settingsButton);
         _reciterSpinner = FindViewById<Spinner>(Resource.Id.reciterSpinner);
         _surahSpinner = FindViewById<Spinner>(Resource.Id.surahSpinner);
-        _fromAyaSpinner = FindViewById<Spinner>(Resource.Id.fromAyaSpinner);
-        _toAyaSpinner = FindViewById<Spinner>(Resource.Id.toAyaSpinner);
+        _fromAyaInput = FindViewById<EditText>(Resource.Id.fromAyaInput);
+        _toAyaInput = FindViewById<EditText>(Resource.Id.toAyaInput);
         _startButton = FindViewById<Button>(Resource.Id.startButton);
         _stopButton = FindViewById<Button>(Resource.Id.stopButton);
         _repeatCountSpinner = FindViewById<Spinner>(Resource.Id.repeatCountSpinner);
@@ -204,7 +204,6 @@ public class RecitationActivity : AppCompatActivity
         _toAyaLabel = FindViewById<TextView>(Resource.Id.toAyaLabel);
         _repeatCountLabel = FindViewById<TextView>(Resource.Id.repeatCountLabel);
         _timesLabel = FindViewById<TextView>(Resource.Id.timesLabel);
-        _repeatModeLabel = FindViewById<TextView>(Resource.Id.repeatModeLabel);
         _nowPlayingLabel = FindViewById<TextView>(Resource.Id.nowPlayingLabel);
         
         // Setup click handlers
@@ -269,8 +268,6 @@ public class RecitationActivity : AppCompatActivity
             _repeatCountLabel.Text = _localizationService["RepeatCount"];
         if (_timesLabel != null)
             _timesLabel.Text = _localizationService["Times"];
-        if (_repeatModeLabel != null)
-            _repeatModeLabel.Text = _localizationService["RepeatMode"];
         if (_nowPlayingLabel != null)
             _nowPlayingLabel.Text = _localizationService["NowPlaying"];
         if (_teacherModeCheckbox != null)
@@ -332,8 +329,8 @@ public class RecitationActivity : AppCompatActivity
             _surahSpinner.ItemSelected += OnSurahSelected;
         }
         
-        // Initial Aya spinners setup
-        UpdateAyaSpinners();
+        // Initial Aya inputs setup
+        SetupAyaInputs();
         
         // Setup Repeat Spinners
         SetupRepeatSpinners();
@@ -388,40 +385,91 @@ public class RecitationActivity : AppCompatActivity
         _repeatEachAya = (e.Position == 1); // 0 = Whole Range, 1 = Each Aya
     }
     
-    private void UpdateAyaSpinners()
+    private void SetupAyaInputs()
     {
         int ayaCount = SurahInfo.GetAyaCount(_selectedSurah);
-        var ayaNumbers = new List<string>();
-        for (int i = 1; i <= ayaCount; i++)
-        {
-            ayaNumbers.Add(i.ToString());
-        }
-        
-        var ayaAdapter = new ArrayAdapter<string>(this,
-            global::Android.Resource.Layout.SimpleSpinnerItem, ayaNumbers);
-        ayaAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
-        
-        if (_fromAyaSpinner != null)
-        {
-            _fromAyaSpinner.Adapter = ayaAdapter;
-            _fromAyaSpinner.SetSelection(0); // First aya
-            _fromAyaSpinner.ItemSelected += OnFromAyaSelected;
-        }
-        
-        // Clone adapter for toAya spinner
-        var toAyaAdapter = new ArrayAdapter<string>(this,
-            global::Android.Resource.Layout.SimpleSpinnerItem, ayaNumbers);
-        toAyaAdapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
-        
-        if (_toAyaSpinner != null)
-        {
-            _toAyaSpinner.Adapter = toAyaAdapter;
-            _toAyaSpinner.SetSelection(ayaCount - 1); // Last aya
-            _toAyaSpinner.ItemSelected += OnToAyaSelected;
-        }
-        
         _fromAya = 1;
         _toAya = ayaCount;
+        
+        if (_fromAyaInput != null)
+        {
+            _fromAyaInput.Text = "1";
+            _fromAyaInput.AfterTextChanged -= OnFromAyaTextChanged;
+            _fromAyaInput.AfterTextChanged += OnFromAyaTextChanged;
+            _fromAyaInput.FocusChange -= OnFromAyaFocusChange;
+            _fromAyaInput.FocusChange += OnFromAyaFocusChange;
+        }
+        
+        if (_toAyaInput != null)
+        {
+            _toAyaInput.Text = ayaCount.ToString();
+            _toAyaInput.AfterTextChanged -= OnToAyaTextChanged;
+            _toAyaInput.AfterTextChanged += OnToAyaTextChanged;
+            _toAyaInput.FocusChange -= OnToAyaFocusChange;
+            _toAyaInput.FocusChange += OnToAyaFocusChange;
+        }
+    }
+    
+    private void UpdateAyaInputsForSurah()
+    {
+        int ayaCount = SurahInfo.GetAyaCount(_selectedSurah);
+        _fromAya = 1;
+        _toAya = ayaCount;
+        
+        if (_fromAyaInput != null)
+            _fromAyaInput.Text = "1";
+        if (_toAyaInput != null)
+            _toAyaInput.Text = ayaCount.ToString();
+    }
+    
+    private void OnFromAyaTextChanged(object? sender, AfterTextChangedEventArgs e)
+    {
+        // Validation happens on focus change to avoid interfering while typing
+    }
+    
+    private void OnToAyaTextChanged(object? sender, AfterTextChangedEventArgs e)
+    {
+        // Validation happens on focus change to avoid interfering while typing
+    }
+    
+    private void OnFromAyaFocusChange(object? sender, View.FocusChangeEventArgs e)
+    {
+        if (!e.HasFocus) ValidateAyaInputs();
+    }
+    
+    private void OnToAyaFocusChange(object? sender, View.FocusChangeEventArgs e)
+    {
+        if (!e.HasFocus) ValidateAyaInputs();
+    }
+    
+    private void ValidateAyaInputs()
+    {
+        int ayaCount = SurahInfo.GetAyaCount(_selectedSurah);
+        
+        // Parse and clamp fromAya
+        if (!int.TryParse(_fromAyaInput?.Text, out int fromVal) || fromVal < 1)
+            fromVal = 1;
+        if (fromVal > ayaCount)
+            fromVal = ayaCount;
+        
+        // Parse and clamp toAya
+        if (!int.TryParse(_toAyaInput?.Text, out int toVal) || toVal < 1)
+            toVal = ayaCount;
+        if (toVal > ayaCount)
+            toVal = ayaCount;
+        
+        // Ensure fromAya <= toAya
+        if (fromVal > toVal)
+            toVal = fromVal;
+        
+        _fromAya = fromVal;
+        _toAya = toVal;
+        
+        // Update UI without re-triggering events
+        if (_fromAyaInput != null && _fromAyaInput.Text != fromVal.ToString())
+            _fromAyaInput.Text = fromVal.ToString();
+        if (_toAyaInput != null && _toAyaInput.Text != toVal.ToString())
+            _toAyaInput.Text = toVal.ToString();
     }
     
     private async void LoadQuranData()
@@ -460,31 +508,7 @@ public class RecitationActivity : AppCompatActivity
     private void OnSurahSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
     {
         _selectedSurah = e.Position + 1; // 1-based
-        UpdateAyaSpinners();
-    }
-    
-    private void OnFromAyaSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
-    {
-        _fromAya = e.Position + 1; // 1-based
-        
-        // Ensure toAya is not less than fromAya
-        if (_toAya < _fromAya)
-        {
-            _toAya = _fromAya;
-            _toAyaSpinner?.SetSelection(_toAya - 1);
-        }
-    }
-    
-    private void OnToAyaSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
-    {
-        _toAya = e.Position + 1; // 1-based
-        
-        // Ensure fromAya is not greater than toAya
-        if (_fromAya > _toAya)
-        {
-            _fromAya = _toAya;
-            _fromAyaSpinner?.SetSelection(_fromAya - 1);
-        }
+        UpdateAyaInputsForSurah();
     }
     
     private void OnStartClick(object? sender, EventArgs e)
@@ -499,6 +523,9 @@ public class RecitationActivity : AppCompatActivity
     
     private void StartRecitation()
     {
+        // Validate aya inputs before starting
+        ValidateAyaInputs();
+        
         _currentSurah = _selectedSurah;
         _currentAya = _fromAya;
         _currentRepeat = 1;

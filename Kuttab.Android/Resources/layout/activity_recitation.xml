@@ -47,38 +47,99 @@
             android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
-    <!-- Main Content -->
-    <ScrollView
+    <!-- Main Content Area (scrollable) -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:background="#F5F5DC">
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:background="#F5F5DC">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="#F5F5DC">
+
+                <!-- Now Playing Status -->
+                <TextView
+                    android:id="@+id/nowPlayingLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/now_playing"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/currentAyaInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="16sp"
+                    android:textColor="#4CAF50"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Current Aya Text Display -->
+                <TextView
+                    android:id="@+id/ayaTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="24sp"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:background="#F5F5F5"
+                    android:layout_marginBottom="16dp"
+                    android:minHeight="100dp" />
+
+                <!-- Aya Image Preview -->
+                <ImageView
+                    android:id="@+id/ayaImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Bottom Controls Panel -->
         <LinearLayout
+            android:id="@+id/bottomControlsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:background="#F5F5DC">
+            android:background="@drawable/rounded_green_background"
+            android:padding="10dp"
+            android:layout_margin="8dp">
 
-            <!-- Reciter Selection -->
+            <!-- Row 1: Reciter Selection -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
+                android:layout_marginBottom="4dp">
 
                 <TextView
                     android:id="@+id/reciterLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/select_reciter_label"
-                    android:textSize="16sp"
+                    android:textSize="13sp"
                     android:textStyle="bold"
-                    android:layout_marginEnd="12dp"
-                    android:minWidth="80dp" />
+                    android:textColor="#2C5F2D"
+                    android:layout_marginEnd="8dp" />
 
                 <Spinner
                     android:id="@+id/reciterSpinner"
@@ -88,23 +149,23 @@
                     android:background="@android:drawable/btn_dropdown" />
             </LinearLayout>
 
-            <!-- Surah Selection -->
+            <!-- Row 2: Surah Selection -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
+                android:layout_marginBottom="4dp">
 
                 <TextView
                     android:id="@+id/surahLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/select_surah"
-                    android:textSize="16sp"
+                    android:textSize="13sp"
                     android:textStyle="bold"
-                    android:layout_marginEnd="12dp"
-                    android:minWidth="80dp" />
+                    android:textColor="#2C5F2D"
+                    android:layout_marginEnd="8dp" />
 
                 <Spinner
                     android:id="@+id/surahSpinner"
@@ -114,96 +175,71 @@
                     android:background="@android:drawable/btn_dropdown" />
             </LinearLayout>
 
-            <!-- Aya Range Selection -->
+            <!-- Row 3: Aya Range (EditText inputs) + Repeat Count -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="6dp">
+                android:gravity="center_vertical"
+                android:layout_marginBottom="4dp">
 
-                <!-- From Aya -->
                 <TextView
                     android:id="@+id/fromAyaLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/from_aya"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:layout_marginEnd="12dp"
-                    android:minWidth="80dp"
-                    android:gravity="center_vertical" />
+                    android:textColor="#2C5F2D"
+                    android:layout_marginEnd="4dp" />
 
-                <Spinner
-                    android:id="@+id/fromAyaSpinner"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/btn_dropdown"
-                    android:layout_marginEnd="20dp" />
+                <EditText
+                    android:id="@+id/fromAyaInput"
+                    android:layout_width="52dp"
+                    android:layout_height="36dp"
+                    android:inputType="number"
+                    android:text="1"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:background="@android:drawable/edit_text"
+                    android:padding="4dp"
+                    android:layout_marginEnd="8dp" />
 
-                <!-- To Aya -->
                 <TextView
                     android:id="@+id/toAyaLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/to_aya"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:layout_marginEnd="12dp"
-                    android:minWidth="50dp"
-                    android:gravity="center_vertical" />
+                    android:textColor="#2C5F2D"
+                    android:layout_marginEnd="4dp" />
 
-                <Spinner
-                    android:id="@+id/toAyaSpinner"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:background="@android:drawable/btn_dropdown" />
-            </LinearLayout>
-
-            <!-- Repeat Mode Selection -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
-
-                <TextView
-                    android:id="@+id/repeatModeLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/repeat_mode"
+                <EditText
+                    android:id="@+id/toAyaInput"
+                    android:layout_width="52dp"
+                    android:layout_height="36dp"
+                    android:inputType="number"
+                    android:text="7"
                     android:textSize="14sp"
-                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:background="@android:drawable/edit_text"
+                    android:padding="4dp"
                     android:layout_marginEnd="12dp" />
-
-                <Spinner
-                    android:id="@+id/repeatModeSpinner"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:drawable/btn_dropdown" />
-            </LinearLayout>
-
-            <!-- Repeat Count Selection + Teacher Mode -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
 
                 <TextView
                     android:id="@+id/repeatCountLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/repeat_count"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:layout_marginEnd="12dp" />
+                    android:textColor="#2C5F2D"
+                    android:layout_marginEnd="4dp" />
 
                 <Spinner
                     android:id="@+id/repeatCountSpinner"
-                    android:layout_width="80dp"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:background="@android:drawable/btn_dropdown" />
 
@@ -212,93 +248,58 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/times"
-                    android:textSize="14sp"
-                    android:layout_marginStart="12dp" />
+                    android:textSize="12sp"
+                    android:textColor="#2C5F2D"
+                    android:layout_marginStart="4dp" />
+            </LinearLayout>
 
-                <!-- Spacer -->
-                <View
+            <!-- Row 4: Repeat Mode + Teacher Mode + Start/Stop -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <Spinner
+                    android:id="@+id/repeatModeSpinner"
                     android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1" />
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/btn_dropdown"
+                    android:layout_marginEnd="4dp" />
 
                 <CheckBox
                     android:id="@+id/teacherModeCheckbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/teacher_mode"
-                    android:textSize="14sp"
-                    android:textColor="#2C5F2D" />
-            </LinearLayout>
-
-            <!-- Control Buttons -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="16dp">
-
-                <Button
-                    android:id="@+id/startButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/start_recitation"
+                    android:textSize="11sp"
+                    android:textColor="#2C5F2D"
                     android:layout_marginEnd="4dp" />
 
                 <Button
+                    android:id="@+id/startButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="@string/start_recitation"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="4dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:minWidth="0dp" />
+
+                <Button
                     android:id="@+id/stopButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
                     android:text="@string/stop_recitation"
+                    android:textSize="12sp"
                     android:enabled="false"
-                    android:layout_marginStart="4dp" />
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:minWidth="0dp" />
             </LinearLayout>
 
-            <!-- Now Playing Status -->
-            <TextView
-                android:id="@+id/nowPlayingLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/now_playing"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/currentAyaInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="16sp"
-                android:textColor="#4CAF50"
-                android:layout_marginBottom="8dp" />
-
-            <!-- Current Aya Text Display -->
-            <TextView
-                android:id="@+id/ayaTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="24sp"
-                android:textAlignment="center"
-                android:gravity="center"
-                android:padding="16dp"
-                android:background="#F5F5F5"
-                android:layout_marginBottom="16dp"
-                android:minHeight="100dp" />
-
-            <!-- Aya Image Preview -->
-            <ImageView
-                android:id="@+id/ayaImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:visibility="gone" />
-
-            
         </LinearLayout>
-    </ScrollView>
+    </LinearLayout>
 </LinearLayout>
