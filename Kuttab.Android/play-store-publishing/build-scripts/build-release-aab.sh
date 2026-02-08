@@ -40,9 +40,12 @@ if [ -f "$AAB_PATH" ]; then
     echo "✅ Build successful!"
     echo "AAB location: $AAB_PATH"
     
+    # Get version from csproj
+    APP_VERSION=$(grep '<ApplicationDisplayVersion>' Kuttab.Android.csproj | sed 's/.*>\(.*\)<.*/\1/')
+    
     # Copy to publishing folder
-    cp "$AAB_PATH" "play-store-publishing/com.kuttab.app-v0.88.aab"
-    echo "✅ Copied to: play-store-publishing/com.kuttab.app-v0.88.aab"
+    cp "$AAB_PATH" "play-store-publishing/com.kuttab.app-v${APP_VERSION}.aab"
+    echo "✅ Copied to: play-store-publishing/com.kuttab.app-v${APP_VERSION}.aab"
     
     # Show file size
     SIZE=$(du -h "$AAB_PATH" | cut -f1)

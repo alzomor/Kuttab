@@ -3,8 +3,8 @@ using Android.Content;
 using Android.OS;
 using System;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace Kuttab.Android.Services;
 
@@ -48,7 +48,7 @@ public class SimpleUpdateService
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
-                var releaseInfo = JsonConvert.DeserializeObject<GitHubRelease>(json);
+                var releaseInfo = JsonSerializer.Deserialize<GitHubRelease>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 
                 var currentVersion = GetCurrentVersion();
                 var latestVersion = ParseVersion(releaseInfo.TagName);
@@ -135,11 +135,17 @@ public class SimpleUpdateService
 
 public class GitHubRelease
 {
-    public string TagName { get; set; }
-    public string Name { get; set; }
-    public string Body { get; set; }
-    public string HtmlUrl { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("tag_name")]
+    public string TagName { get; set; } = string.Empty;
+    [System.Text.Json.Serialization.JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+    [System.Text.Json.Serialization.JsonPropertyName("body")]
+    public string Body { get; set; } = string.Empty;
+    [System.Text.Json.Serialization.JsonPropertyName("html_url")]
+    public string HtmlUrl { get; set; } = string.Empty;
+    [System.Text.Json.Serialization.JsonPropertyName("prerelease")]
     public bool Prerelease { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("published_at")]
     public DateTime PublishedAt { get; set; }
 }
 

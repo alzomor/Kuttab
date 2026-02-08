@@ -7,8 +7,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationId>com.kuttab.app</ApplicationId>
-    <ApplicationVersion>88</ApplicationVersion>
-    <ApplicationDisplayVersion>0.88</ApplicationDisplayVersion>
+    <ApplicationVersion>89</ApplicationVersion>
+    <ApplicationDisplayVersion>0.89</ApplicationDisplayVersion>
     <!-- Build for ARM32, ARM64, and x86 to support all Android devices and emulators -->
     <RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
@@ -23,8 +23,7 @@
   <!-- Release-only optimizations for smaller APK -->
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
-    <RunAOTCompilation>true</RunAOTCompilation>
-    <EnableLLVM>true</EnableLLVM>
+    <RunAOTCompilation>false</RunAOTCompilation>
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <DebugSymbols>false</DebugSymbols>

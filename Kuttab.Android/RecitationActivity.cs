@@ -512,12 +512,12 @@ public class RecitationActivity : AppCompatActivity
                 await _searchService.LoadQuranTextAsync();
             }
             
-            // Display 1st aya of the default selected surah
-            DisplayDefaultAya();
+            // Display 1st aya of the default selected surah (must run on UI thread)
+            RunOnUiThread(() => DisplayDefaultAya());
         }
         catch (Exception ex)
         {
-            ShowError($"Failed to load Quran data: {ex.Message}");
+            RunOnUiThread(() => ShowError($"Failed to load Quran data: {ex.Message}"));
         }
     }
     

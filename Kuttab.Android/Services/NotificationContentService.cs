@@ -61,7 +61,7 @@ public class NotificationContentService
                 var json = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"{TAG}: Received JSON length: {json.Length} characters");
                 
-                var notifications = Newtonsoft.Json.JsonConvert.DeserializeObject<List<NotificationContent>>(json);
+                var notifications = System.Text.Json.JsonSerializer.Deserialize<List<NotificationContent>>(json, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 
                 if (notifications != null)
                 {
