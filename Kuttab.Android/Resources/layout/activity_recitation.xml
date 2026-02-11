@@ -35,9 +35,8 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:fillViewport="true"
+            android:layout_height="wrap_content"
+            android:fillViewport="false"
             android:background="#F5F5DC">
 
             <LinearLayout
@@ -96,7 +95,8 @@
         <LinearLayout
             android:id="@+id/tajweedRulesPanelContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:visibility="gone">
 
@@ -116,10 +116,11 @@
 
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxHeight="200dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:background="#FAFAFA"
-                android:fillViewport="false">
+                android:fillViewport="false"
+                android:scrollbars="vertical">
 
                 <LinearLayout
                     android:id="@+id/tajweedRulesContainer"
