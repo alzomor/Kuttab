@@ -92,6 +92,44 @@
             </LinearLayout>
         </ScrollView>
 
+        <!-- Tajweed Rules Panel -->
+        <LinearLayout
+            android:id="@+id/tajweedRulesPanelContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tajweedRulesTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tajweed Rules"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#2C5F2D"
+                android:background="#E8F5E9"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxHeight="200dp"
+                android:background="#FAFAFA"
+                android:fillViewport="false">
+
+                <LinearLayout
+                    android:id="@+id/tajweedRulesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp" />
+            </ScrollView>
+        </LinearLayout>
+
         <!-- Bottom Controls Panel -->
         <LinearLayout
             android:id="@+id/bottomControlsContainer"

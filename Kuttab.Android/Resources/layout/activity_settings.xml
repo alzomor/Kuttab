@@ -294,6 +294,70 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Tajweed Rule Selection Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/tajweedRuleSelectionCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:elevation="4dp"
+            android:radius="12dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/tajweedRuleSelectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tajweed Rules Selection"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#2C5F2D"
+                    android:layout_marginBottom="6dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <Button
+                        android:id="@+id/selectAllRulesButton"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_weight="1"
+                        android:text="Select All"
+                        android:textSize="12sp"
+                        android:textColor="#FFFFFF"
+                        android:background="#2C5F2D"
+                        android:layout_marginEnd="4dp" />
+
+                    <Button
+                        android:id="@+id/deselectAllRulesButton"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_weight="1"
+                        android:text="Deselect All"
+                        android:textSize="12sp"
+                        android:textColor="#FFFFFF"
+                        android:background="#8B7355"
+                        android:layout_marginStart="4dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/tajweedRuleCheckboxContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
         <!-- Display Settings Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"

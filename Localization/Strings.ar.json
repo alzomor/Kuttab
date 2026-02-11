@@ -186,5 +186,9 @@
   "RuleExplanation": "شرح القاعدة",
   "UnsavedChangesTitle": "تغييرات غير محفوظة",
   "UnsavedChangesMessage": "لديك تغييرات غير محفوظة. هل تريد الحفظ قبل المغادرة؟",
-  "DiscardChanges": "تجاهل"
+  "DiscardChanges": "تجاهل",
+  "TajweedRulesSelection": "أحكام التجويد",
+  "SelectAllRules": "تحديد الكل",
+  "DeselectAllRules": "إلغاء تحديد الكل",
+  "NoTajweedRulesFound": "لم يتم العثور على أحكام تجويد في هذه الآية"
 }

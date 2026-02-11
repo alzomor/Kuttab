@@ -187,5 +187,9 @@
   "ShowTajweedRules": "Tadschuid-Regel Erklärungen anzeigen",
   "UnsavedChangesTitle": "Ungespeicherte Änderungen",
   "UnsavedChangesMessage": "Sie haben ungespeicherte Änderungen. Möchten Sie vor dem Verlassen speichern?",
-  "DiscardChanges": "Verwerfen"
+  "DiscardChanges": "Verwerfen",
+  "TajweedRulesSelection": "Tadschuid-Regeln",
+  "SelectAllRules": "Alle auswählen",
+  "DeselectAllRules": "Alle abwählen",
+  "NoTajweedRulesFound": "Keine Tadschuid-Regeln in dieser Aya gefunden"
 }

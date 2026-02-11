@@ -29,3 +29,16 @@ public class RulesContainer
     [JsonPropertyName("rules")]
     public List<TajweedRule> Rules { get; set; } = new();
 }
+
+public class TajweedRuleMatch
+{
+    public string RuleName { get; set; } = string.Empty;
+    public string GroupName { get; set; } = string.Empty;
+    public int MatchStart { get; set; }
+    public int MatchLength { get; set; }
+    public string MatchedText { get; set; } = string.Empty;
+    public string SurroundingText { get; set; } = string.Empty;
+    public int SurroundingStart { get; set; }
+    public int HighlightStartInSurrounding { get; set; }
+    public int HighlightLengthInSurrounding { get; set; }
+}

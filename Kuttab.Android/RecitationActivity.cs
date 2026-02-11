@@ -41,6 +41,37 @@ public class RecitationActivity : AppCompatActivity
     private ImageView? _ayaImage;
     private CheckBox? _teacherModeCheckbox;
     
+    // Tajweed rules panel
+    private LinearLayout? _tajweedRulesPanelContainer;
+    private TextView? _tajweedRulesTitle;
+    private LinearLayout? _tajweedRulesContainer;
+    private bool _showTajweedRules = true;
+    private List<string>? _selectedTajweedRules;
+    
+    // Color map for tajweed rule groups
+    private static readonly Dictionary<string, int> GroupColors = new()
+    {
+        { "lam", unchecked((int)0xFF1565C0) },           // blue
+        { "noon_tanween", unchecked((int)0xFF2E7D32) },   // green
+        { "meem_sakinah", unchecked((int)0xFF00838F) },    // teal
+        { "noon_meem_mushaddad", unchecked((int)0xFF6A1B9A) }, // purple
+        { "qalqalah", unchecked((int)0xFFE65100) },       // deep orange
+        { "mad", unchecked((int)0xFF8E24AA) },             // purple
+        { "waqf", unchecked((int)0xFFEF6C00) },            // orange
+        { "tafkhim_tarqiq", unchecked((int)0xFFC62828) },  // red
+    };
+    
+    private static readonly Dictionary<string, int> GroupHighlightColors = new()
+    {
+        { "lam", unchecked((int)0x401565C0) },
+        { "noon_tanween", unchecked((int)0x402E7D32) },
+        { "meem_sakinah", unchecked((int)0x4000838F) },
+        { "noon_meem_mushaddad", unchecked((int)0x406A1B9A) },
+        { "qalqalah", unchecked((int)0x40E65100) },
+        { "mad", unchecked((int)0x408E24AA) },
+        { "waqf", unchecked((int)0x40EF6C00) },
+        { "tafkhim_tarqiq", unchecked((int)0x40C62828) },
+    };
         
     // Labels for dynamic language update
     private TextView? _titleTextView;
@@ -189,6 +220,9 @@ public class RecitationActivity : AppCompatActivity
         _ayaTextView = FindViewById<TextView>(Resource.Id.ayaTextView);
         _ayaImage = FindViewById<ImageView>(Resource.Id.ayaImage);
         _teacherModeCheckbox = FindViewById<CheckBox>(Resource.Id.teacherModeCheckbox);
+        _tajweedRulesPanelContainer = FindViewById<LinearLayout>(Resource.Id.tajweedRulesPanelContainer);
+        _tajweedRulesTitle = FindViewById<TextView>(Resource.Id.tajweedRulesTitle);
+        _tajweedRulesContainer = FindViewById<LinearLayout>(Resource.Id.tajweedRulesContainer);
         
                 
         // Labels for dynamic language update
@@ -233,6 +267,23 @@ public class RecitationActivity : AppCompatActivity
         if (_pictureService != null)
         {
             _pictureService.UseRemoteSource = useRemoteImages;
+        }
+        
+        // Load tajweed rules settings
+        _showTajweedRules = prefs?.GetBoolean("ShowTajweedRules", true) ?? true;
+        var savedRules = prefs?.GetStringSet("SelectedTajweedRules", null);
+        _selectedTajweedRules = savedRules != null ? new List<string>(savedRules) : null; // null = all rules
+        
+        // Update tajweed panel visibility
+        if (_tajweedRulesPanelContainer != null)
+        {
+            _tajweedRulesPanelContainer.Visibility = _showTajweedRules ? ViewStates.Visible : ViewStates.Gone;
+        }
+        
+        // Update tajweed rules title
+        if (_tajweedRulesTitle != null && _localizationService != null)
+        {
+            _tajweedRulesTitle.Text = _localizationService["TajweedRulesSelection"] ?? "Tajweed Rules";
         }
     }
     
@@ -510,6 +561,7 @@ public class RecitationActivity : AppCompatActivity
             if (_searchService != null)
             {
                 await _searchService.LoadQuranTextAsync();
+                await _searchService.LoadRulesAsync();
             }
             
             // Display 1st aya of the default selected surah (must run on UI thread)
@@ -529,6 +581,103 @@ public class RecitationActivity : AppCompatActivity
         if (_currentAyaInfo != null)
             _currentAyaInfo.Text = $"{SurahInfo.GetSurahName(_selectedSurah)} - 1";
         ShowAyaImage(_selectedSurah, 1);
+        DisplayTajweedRules(ayaText);
+    }
+    
+    private void DisplayTajweedRules(string ayaText)
+    {
+        if (_tajweedRulesContainer == null || _tajweedRulesPanelContainer == null)
+            return;
+        
+        _tajweedRulesContainer.RemoveAllViews();
+        
+        if (!_showTajweedRules || string.IsNullOrWhiteSpace(ayaText) || _searchService == null)
+        {
+            _tajweedRulesPanelContainer.Visibility = ViewStates.Gone;
+            return;
+        }
+        
+        try
+        {
+            var matches = _searchService.SearchAyaForRules(ayaText, _selectedTajweedRules);
+            
+            if (matches.Count == 0)
+            {
+                _tajweedRulesPanelContainer.Visibility = ViewStates.Gone;
+                return;
+            }
+            
+            _tajweedRulesPanelContainer.Visibility = ViewStates.Visible;
+            
+            var languageCode = _localizationService?.CurrentLanguage ?? "ar";
+            
+            foreach (var match in matches)
+            {
+                var entryLayout = new LinearLayout(this)
+                {
+                    Orientation = Orientation.Vertical
+                };
+                entryLayout.SetPadding(8, 6, 8, 6);
+                
+                // Get group color
+                var groupColor = GroupColors.TryGetValue(match.GroupName, out var gc) ? gc : unchecked((int)0xFF555555);
+                var highlightColor = GroupHighlightColors.TryGetValue(match.GroupName, out var hc) ? hc : unchecked((int)0x40555555);
+                
+                // Arabic text with highlighted match
+                var arabicTextView = new TextView(this);
+                arabicTextView.TextDirection = global::Android.Views.TextDirection.Rtl;
+                arabicTextView.Gravity = global::Android.Views.GravityFlags.Right;
+                arabicTextView.TextAlignment = global::Android.Views.TextAlignment.ViewEnd;
+                arabicTextView.SetTextSize(global::Android.Util.ComplexUnitType.Sp, 18);
+                
+                var spannable = new SpannableString(match.SurroundingText);
+                var hlStart = match.HighlightStartInSurrounding;
+                var hlEnd = hlStart + match.HighlightLengthInSurrounding;
+                
+                // Clamp to valid range
+                if (hlStart < 0) hlStart = 0;
+                if (hlEnd > match.SurroundingText.Length) hlEnd = match.SurroundingText.Length;
+                
+                if (hlStart < hlEnd)
+                {
+                    spannable.SetSpan(
+                        new global::Android.Text.Style.BackgroundColorSpan(new Color(highlightColor)),
+                        hlStart, hlEnd, SpanTypes.ExclusiveExclusive);
+                    spannable.SetSpan(
+                        new global::Android.Text.Style.ForegroundColorSpan(new Color(groupColor)),
+                        hlStart, hlEnd, SpanTypes.ExclusiveExclusive);
+                }
+                
+                arabicTextView.TextFormatted = spannable;
+                entryLayout.AddView(arabicTextView);
+                
+                // Rule name label (localized)
+                var ruleNameView = new TextView(this);
+                var localizedName = RuleNameTranslator.GetLocalizedName(match.RuleName, languageCode);
+                ruleNameView.Text = localizedName;
+                ruleNameView.SetTextSize(global::Android.Util.ComplexUnitType.Sp, 12);
+                ruleNameView.SetTextColor(new Color(groupColor));
+                ruleNameView.SetTypeface(null, TypefaceStyle.Bold);
+                ruleNameView.SetPadding(0, 2, 0, 0);
+                entryLayout.AddView(ruleNameView);
+                
+                // Separator line
+                var separator = new View(this);
+                separator.SetBackgroundColor(Color.ParseColor("#E0E0E0"));
+                var sepParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MatchParent, 1);
+                sepParams.TopMargin = 4;
+                sepParams.BottomMargin = 4;
+                separator.LayoutParameters = sepParams;
+                
+                _tajweedRulesContainer.AddView(entryLayout);
+                _tajweedRulesContainer.AddView(separator);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error displaying tajweed rules: {ex.Message}");
+        }
     }
     
     private void OnReciterSelected(object? sender, AdapterView.ItemSelectedEventArgs e)
@@ -709,6 +858,9 @@ public class RecitationActivity : AppCompatActivity
                 var ayaText = GetAyaText(_currentSurah, _currentAya);
                 if (_ayaTextView != null)
                     _ayaTextView.Text = ayaText;
+                
+                // Display tajweed rules for current aya
+                DisplayTajweedRules(ayaText);
             }
         });
     }

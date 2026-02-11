@@ -36,6 +36,14 @@ public class SettingsActivity : AppCompatActivity
     private Button? _saveButton;
     private Button? _cancelButton;
     
+    // Tajweed rule selection
+    private global::AndroidX.CardView.Widget.CardView? _tajweedRuleSelectionCard;
+    private TextView? _tajweedRuleSelectionTitle;
+    private Button? _selectAllRulesButton;
+    private Button? _deselectAllRulesButton;
+    private LinearLayout? _tajweedRuleCheckboxContainer;
+    private List<(CheckBox checkbox, string ruleName)> _ruleCheckboxes = new();
+    
     // Text views for dynamic language update
     private TextView? _languageSettingsTitle;
     private TextView? _displaySettingsTitle;
@@ -132,6 +140,11 @@ public class SettingsActivity : AppCompatActivity
         _useRemoteImagesCheckBox = FindViewById<CheckBox>(Resource.Id.useRemoteImagesCheckBox);
         _enableRecordingCheckBox = FindViewById<CheckBox>(Resource.Id.enableRecordingCheckBox);
         _showTajweedRulesCheckBox = FindViewById<CheckBox>(Resource.Id.showTajweedRulesCheckBox);
+        _tajweedRuleSelectionCard = FindViewById<global::AndroidX.CardView.Widget.CardView>(Resource.Id.tajweedRuleSelectionCard);
+        _tajweedRuleSelectionTitle = FindViewById<TextView>(Resource.Id.tajweedRuleSelectionTitle);
+        _selectAllRulesButton = FindViewById<Button>(Resource.Id.selectAllRulesButton);
+        _deselectAllRulesButton = FindViewById<Button>(Resource.Id.deselectAllRulesButton);
+        _tajweedRuleCheckboxContainer = FindViewById<LinearLayout>(Resource.Id.tajweedRuleCheckboxContainer);
         _saveButton = FindViewById<Button>(Resource.Id.saveButton);
         _cancelButton = FindViewById<Button>(Resource.Id.cancelButton);
         
@@ -180,6 +193,9 @@ public class SettingsActivity : AppCompatActivity
         
         // Setup Quran text spinner
         SetupQuranTextSpinner();
+        
+        // Setup tajweed rule checkboxes
+        SetupTajweedRuleCheckboxes();
     }
     
     private void SetupQuranTextSpinner()
@@ -243,6 +259,82 @@ public class SettingsActivity : AppCompatActivity
             var adapter = new ArrayAdapter<string>(this, global::Android.Resource.Layout.SimpleSpinnerItem, _surahDisplayNames);
             adapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
             _endSurahSpinner.Adapter = adapter;
+        }
+    }
+    
+    private void SetupTajweedRuleCheckboxes()
+    {
+        if (_tajweedRuleCheckboxContainer == null) return;
+        
+        _ruleCheckboxes.Clear();
+        _tajweedRuleCheckboxContainer.RemoveAllViews();
+        
+        try
+        {
+            var fileService = new Services.AndroidFileService(this);
+            var searchService = new QuranSearchService(fileService);
+            // Load rules synchronously for settings page
+            searchService.LoadRulesAsync().GetAwaiter().GetResult();
+            var rules = searchService.GetRules();
+            
+            var languageCode = _localizationService?.CurrentLanguage ?? "ar";
+            string? lastGroup = null;
+            
+            foreach (var rule in rules)
+            {
+                // Add group header if group changed
+                if (rule.Group != lastGroup)
+                {
+                    lastGroup = rule.Group;
+                    var groupHeader = new TextView(this);
+                    var groupDisplayName = GetGroupDisplayName(rule.Group ?? "");
+                    groupHeader.Text = groupDisplayName;
+                    groupHeader.SetTextSize(global::Android.Util.ComplexUnitType.Sp, 13);
+                    groupHeader.SetTypeface(null, global::Android.Graphics.TypefaceStyle.Bold);
+                    groupHeader.SetTextColor(global::Android.Graphics.Color.ParseColor("#2C5F2D"));
+                    groupHeader.SetPadding(0, 12, 0, 4);
+                    _tajweedRuleCheckboxContainer.AddView(groupHeader);
+                }
+                
+                var checkbox = new CheckBox(this);
+                var localizedName = RuleNameTranslator.GetLocalizedName(rule.Name, languageCode);
+                checkbox.Text = localizedName;
+                checkbox.SetTextSize(global::Android.Util.ComplexUnitType.Sp, 13);
+                checkbox.Checked = true; // Default all selected
+                checkbox.SetPadding(0, 0, 0, 0);
+                checkbox.CheckedChange += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
+                
+                _tajweedRuleCheckboxContainer.AddView(checkbox);
+                _ruleCheckboxes.Add((checkbox, rule.Name));
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error setting up tajweed rule checkboxes: {ex.Message}");
+        }
+    }
+    
+    private string GetGroupDisplayName(string group)
+    {
+        return group switch
+        {
+            "lam" => "━━ Lam / اللام ━━",
+            "noon_tanween" => "━━ Noon & Tanween / النون والتنوين ━━",
+            "meem_sakinah" => "━━ Meem Sakinah / الميم الساكنة ━━",
+            "noon_meem_mushaddad" => "━━ Noon & Meem Mushaddad / النون والميم المشددتين ━━",
+            "qalqalah" => "━━ Qalqalah / القلقلة ━━",
+            "mad" => "━━ Madd / المد ━━",
+            "waqf" => "━━ Waqf / الوقف ━━",
+            "tafkhim_tarqiq" => "━━ Tafkhim & Tarqiq / التفخيم والترقيق ━━",
+            _ => $"━━ {group} ━━"
+        };
+    }
+    
+    private void UpdateTajweedRuleCardVisibility(bool showTajweed)
+    {
+        if (_tajweedRuleSelectionCard != null)
+        {
+            _tajweedRuleSelectionCard.Visibility = showTajweed ? ViewStates.Visible : ViewStates.Gone;
         }
     }
 
@@ -352,6 +444,25 @@ public class SettingsActivity : AppCompatActivity
 
         // Update visibility based on search domain
         UpdateSearchDomainVisibility(searchDomainType);
+        
+        // Load selected tajweed rules and update card visibility
+        var savedRules = prefs?.GetStringSet("SelectedTajweedRules", null);
+        if (savedRules != null)
+        {
+            foreach (var (checkbox, ruleName) in _ruleCheckboxes)
+            {
+                checkbox.Checked = savedRules.Contains(ruleName);
+            }
+        }
+        else
+        {
+            // Default: all selected
+            foreach (var (checkbox, _) in _ruleCheckboxes)
+            {
+                checkbox.Checked = true;
+            }
+        }
+        UpdateTajweedRuleCardVisibility(showTajweedRules);
     }
 
     private void SetupEventHandlers()
@@ -384,7 +495,23 @@ public class SettingsActivity : AppCompatActivity
         if (_enableRecordingCheckBox != null)
             _enableRecordingCheckBox.CheckedChange += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
         if (_showTajweedRulesCheckBox != null)
-            _showTajweedRulesCheckBox.CheckedChange += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
+            _showTajweedRulesCheckBox.CheckedChange += (s, e) => 
+            { 
+                if (_initialLoadComplete) _hasUnsavedChanges = true;
+                UpdateTajweedRuleCardVisibility(e.IsChecked);
+            };
+        if (_selectAllRulesButton != null)
+            _selectAllRulesButton.Click += (s, e) => 
+            {
+                foreach (var (checkbox, _) in _ruleCheckboxes) checkbox.Checked = true;
+                if (_initialLoadComplete) _hasUnsavedChanges = true;
+            };
+        if (_deselectAllRulesButton != null)
+            _deselectAllRulesButton.Click += (s, e) => 
+            {
+                foreach (var (checkbox, _) in _ruleCheckboxes) checkbox.Checked = false;
+                if (_initialLoadComplete) _hasUnsavedChanges = true;
+            };
         if (_singleSurahSpinner != null)
             _singleSurahSpinner.ItemSelected += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
         if (_startSurahSpinner != null)
@@ -585,6 +712,15 @@ public class SettingsActivity : AppCompatActivity
                 editor.PutBoolean("UseRemoteImages", _useRemoteImagesCheckBox?.Checked ?? false);
                 editor.PutBoolean("RecordingEnabled", _enableRecordingCheckBox?.Checked ?? true);
                 editor.PutBoolean("ShowTajweedRules", _showTajweedRulesCheckBox?.Checked ?? true);
+                
+                // Save selected tajweed rules
+                var selectedRules = new HashSet<string>();
+                foreach (var (checkbox, ruleName) in _ruleCheckboxes)
+                {
+                    if (checkbox.Checked)
+                        selectedRules.Add(ruleName);
+                }
+                editor.PutStringSet("SelectedTajweedRules", selectedRules as ICollection<string>);
                 
                 // Save reciter selection
                 var selectedReciterIndex = _reciterSpinner?.SelectedItemPosition ?? 2; // Default to Husary

@@ -240,4 +240,128 @@ public class QuranSearchService
     {
         return SearchByRuleName(pattern, startSurah, endSurah);
     }
+
+    public List<TajweedRuleMatch> SearchAyaForRules(string ayaText, List<string>? selectedRuleNames = null)
+    {
+        var results = new List<TajweedRuleMatch>();
+        if (string.IsNullOrWhiteSpace(ayaText) || _rules.Count == 0)
+            return results;
+
+        var rulesToSearch = selectedRuleNames != null && selectedRuleNames.Count > 0
+            ? _rules.Where(r => selectedRuleNames.Contains(r.Name)).ToList()
+            : _rules;
+
+        foreach (var rule in rulesToSearch)
+        {
+            foreach (var ruleCase in rule.Cases)
+            {
+                try
+                {
+                    var regex = new Regex(ruleCase.Regex, RegexOptions.CultureInvariant);
+                    var regexMatches = regex.Matches(ayaText);
+
+                    foreach (Match match in regexMatches)
+                    {
+                        // Apply Idgham Bighunnah exceptions
+                        if (rule.Name == "إدغام النون الساكنة والتنوين - بغنة")
+                        {
+                            var wordStart = ayaText.LastIndexOf(' ', match.Index) + 1;
+                            if (wordStart < 0) wordStart = 0;
+                            var nextSpace = ayaText.IndexOf(' ', match.Index + match.Length);
+                            if (nextSpace < 0) nextSpace = ayaText.Length;
+                            var word = ayaText.Substring(wordStart, nextSpace - wordStart);
+                            if (IdghamBighunnahExceptions.Any(ex => word.Contains(ex)))
+                                continue;
+                        }
+
+                        // Apply Lam Mufakhkham filter
+                        if (rule.Name == "لام لفظ الجلالة المفخمة")
+                        {
+                            if (!AllahFilter.IsLamMufakhkham(ayaText, match.Index + 1))
+                                continue;
+                        }
+
+                        // Extract surrounding words
+                        var surroundingStart = match.Index;
+                        var surroundingEnd = match.Index + match.Length;
+
+                        // Expand to include the word before
+                        if (surroundingStart > 0)
+                        {
+                            // Go back to find start of current word
+                            int pos = surroundingStart - 1;
+                            while (pos >= 0 && ayaText[pos] == ' ') pos--;
+                            // Now find start of that word
+                            while (pos >= 0 && ayaText[pos] != ' ') pos--;
+                            surroundingStart = pos + 1;
+                        }
+
+                        // Expand to include the word after
+                        if (surroundingEnd < ayaText.Length)
+                        {
+                            int pos = surroundingEnd;
+                            while (pos < ayaText.Length && ayaText[pos] == ' ') pos++;
+                            // Now find end of that word
+                            while (pos < ayaText.Length && ayaText[pos] != ' ') pos++;
+                            surroundingEnd = pos;
+                        }
+
+                        var surroundingText = ayaText.Substring(surroundingStart, surroundingEnd - surroundingStart);
+                        var highlightStartInSurrounding = match.Index - surroundingStart;
+
+                        results.Add(new TajweedRuleMatch
+                        {
+                            RuleName = rule.Name,
+                            GroupName = rule.Group ?? string.Empty,
+                            MatchStart = match.Index,
+                            MatchLength = match.Length,
+                            MatchedText = match.Value,
+                            SurroundingText = surroundingText,
+                            SurroundingStart = surroundingStart,
+                            HighlightStartInSurrounding = highlightStartInSurrounding,
+                            HighlightLengthInSurrounding = match.Length
+                        });
+                    }
+
+                    // Fallback for single literal character patterns
+                    if (regexMatches.Count == 0 && !string.IsNullOrEmpty(ruleCase.Regex) && ruleCase.Regex.Length == 1)
+                    {
+                        var ch = ruleCase.Regex[0];
+                        for (int i = 0; i < ayaText.Length; i++)
+                        {
+                            if (ayaText[i] == ch)
+                            {
+                                var sStart = i;
+                                var sEnd = i + 1;
+                                if (sStart > 0) { int p = sStart - 1; while (p >= 0 && ayaText[p] == ' ') p--; while (p >= 0 && ayaText[p] != ' ') p--; sStart = p + 1; }
+                                if (sEnd < ayaText.Length) { int p = sEnd; while (p < ayaText.Length && ayaText[p] == ' ') p++; while (p < ayaText.Length && ayaText[p] != ' ') p++; sEnd = p; }
+                                var surrounding = ayaText.Substring(sStart, sEnd - sStart);
+
+                                results.Add(new TajweedRuleMatch
+                                {
+                                    RuleName = rule.Name,
+                                    GroupName = rule.Group ?? string.Empty,
+                                    MatchStart = i,
+                                    MatchLength = 1,
+                                    MatchedText = ayaText.Substring(i, 1),
+                                    SurroundingText = surrounding,
+                                    SurroundingStart = sStart,
+                                    HighlightStartInSurrounding = i - sStart,
+                                    HighlightLengthInSurrounding = 1
+                                });
+                            }
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+            }
+        }
+
+        // Sort by position of occurrence in the aya
+        results.Sort((a, b) => a.MatchStart.CompareTo(b.MatchStart));
+        return results;
+    }
 }
