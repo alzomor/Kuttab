@@ -191,5 +191,6 @@
   "TajweedRulesSelection": "Tajweed Rules",
   "SelectAllRules": "Select All",
   "DeselectAllRules": "Deselect All",
-  "NoTajweedRulesFound": "No tajweed rules found in this aya"
+  "NoTajweedRulesFound": "No tajweed rules found in this aya",
+  "EnableRecording": "Enable Recording Feature"
 }

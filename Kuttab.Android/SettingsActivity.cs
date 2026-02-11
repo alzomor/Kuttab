@@ -43,6 +43,7 @@ public class SettingsActivity : AppCompatActivity
     private Button? _deselectAllRulesButton;
     private LinearLayout? _tajweedRuleCheckboxContainer;
     private List<(CheckBox checkbox, string ruleName)> _ruleCheckboxes = new();
+    private List<(CheckBox groupCheckbox, LinearLayout rulesLayout, List<CheckBox> childCheckboxes, string groupName)> _ruleGroups = new();
     
     // Text views for dynamic language update
     private TextView? _languageSettingsTitle;
@@ -112,15 +113,15 @@ public class SettingsActivity : AppCompatActivity
         // Initialize reciter options
         _reciterOptions = new List<ReciterOption>
         {
-            new ReciterOption { FolderName = "Abdul_Basit_Murattal_192kbps", DisplayNameResId = Resource.String.reciter_abdul_basit },
-            new ReciterOption { FolderName = "Ayman_Sowaid_64kbps", DisplayNameResId = Resource.String.reciter_ayman_sowaid },
-            new ReciterOption { FolderName = "Husary_128kbps", DisplayNameResId = Resource.String.reciter_husary },
-            new ReciterOption { FolderName = "Husary_Muallim_128kbps", DisplayNameResId = Resource.String.reciter_husary_muallim },
-            new ReciterOption { FolderName = "Menshawi_32kbps", DisplayNameResId = Resource.String.reciter_menshawi },
-            new ReciterOption { FolderName = "Mohammad_al_Tablaway_128kbps", DisplayNameResId = Resource.String.reciter_tablaway },
-            new ReciterOption { FolderName = "Mustafa_Ismail_48kbps", DisplayNameResId = Resource.String.reciter_mustafa_ismail },
-            new ReciterOption { FolderName = "Muhammad_Ayyoub_128kbps", DisplayNameResId = Resource.String.reciter_ayyoub },
-            new ReciterOption { FolderName = "mahmoud_ali_al_banna_32kbps", DisplayNameResId = Resource.String.reciter_banna }
+            new ReciterOption { FolderName = "Abdul_Basit_Murattal_192kbps", DisplayNameResId = Resource.String.reciter_abdul_basit, DisplayKey = "ReciterAbdulBasit" },
+            new ReciterOption { FolderName = "Ayman_Sowaid_64kbps", DisplayNameResId = Resource.String.reciter_ayman_sowaid, DisplayKey = "ReciterAymanSowaid" },
+            new ReciterOption { FolderName = "Husary_128kbps", DisplayNameResId = Resource.String.reciter_husary, DisplayKey = "ReciterHusary" },
+            new ReciterOption { FolderName = "Husary_Muallim_128kbps", DisplayNameResId = Resource.String.reciter_husary_muallim, DisplayKey = "ReciterHusaryMuallim" },
+            new ReciterOption { FolderName = "Menshawi_32kbps", DisplayNameResId = Resource.String.reciter_menshawi, DisplayKey = "ReciterMenshawi" },
+            new ReciterOption { FolderName = "Mohammad_al_Tablaway_128kbps", DisplayNameResId = Resource.String.reciter_tablaway, DisplayKey = "ReciterTablaway" },
+            new ReciterOption { FolderName = "Mustafa_Ismail_48kbps", DisplayNameResId = Resource.String.reciter_mustafa_ismail, DisplayKey = "ReciterMustafaIsmail" },
+            new ReciterOption { FolderName = "Muhammad_Ayyoub_128kbps", DisplayNameResId = Resource.String.reciter_ayyoub, DisplayKey = "ReciterAyyoub" },
+            new ReciterOption { FolderName = "mahmoud_ali_al_banna_32kbps", DisplayNameResId = Resource.String.reciter_banna, DisplayKey = "ReciterBanna" }
         };
     }
 
@@ -222,7 +223,9 @@ public class SettingsActivity : AppCompatActivity
     {
         if (_reciterSpinner == null) return;
         
-        var reciterNames = _reciterOptions.Select(r => GetString(r.DisplayNameResId)).ToList();
+        var reciterNames = _reciterOptions.Select(r => 
+            _localizationService != null ? _localizationService[r.DisplayKey] : GetString(r.DisplayNameResId)
+        ).ToList();
         var adapter = new ArrayAdapter<string>(this, global::Android.Resource.Layout.SimpleSpinnerItem, reciterNames);
         adapter.SetDropDownViewResource(global::Android.Resource.Layout.SimpleSpinnerDropDownItem);
         _reciterSpinner.Adapter = adapter;
@@ -267,45 +270,142 @@ public class SettingsActivity : AppCompatActivity
         if (_tajweedRuleCheckboxContainer == null) return;
         
         _ruleCheckboxes.Clear();
+        _ruleGroups.Clear();
         _tajweedRuleCheckboxContainer.RemoveAllViews();
         
         try
         {
             var fileService = new Services.AndroidFileService(this);
-            var searchService = new QuranSearchService(fileService);
-            // Load rules synchronously for settings page
-            searchService.LoadRulesAsync().GetAwaiter().GetResult();
-            var rules = searchService.GetRules();
+            var jsonContent = fileService.ReadAllText("rules.json");
+            var rulesContainer = System.Text.Json.JsonSerializer.Deserialize(jsonContent, Kuttab.Core.KuttabJsonContext.Default.RulesContainer);
+            var rules = rulesContainer?.Rules ?? new List<Kuttab.Core.Models.TajweedRule>();
             
             var languageCode = _localizationService?.CurrentLanguage ?? "ar";
-            string? lastGroup = null;
+            var isRtl = languageCode == "ar";
+            var layoutDir = isRtl ? LayoutDirection.Rtl : LayoutDirection.Ltr;
             
+            // Group rules by their group field
+            var grouped = new List<(string group, List<Kuttab.Core.Models.TajweedRule> rules)>();
+            string? currentGroup = null;
+            List<Kuttab.Core.Models.TajweedRule>? currentList = null;
             foreach (var rule in rules)
             {
-                // Add group header if group changed
-                if (rule.Group != lastGroup)
+                if (rule.Group != currentGroup)
                 {
-                    lastGroup = rule.Group;
-                    var groupHeader = new TextView(this);
-                    var groupDisplayName = GetGroupDisplayName(rule.Group ?? "");
-                    groupHeader.Text = groupDisplayName;
-                    groupHeader.SetTextSize(global::Android.Util.ComplexUnitType.Sp, 13);
-                    groupHeader.SetTypeface(null, global::Android.Graphics.TypefaceStyle.Bold);
-                    groupHeader.SetTextColor(global::Android.Graphics.Color.ParseColor("#2C5F2D"));
-                    groupHeader.SetPadding(0, 12, 0, 4);
-                    _tajweedRuleCheckboxContainer.AddView(groupHeader);
+                    currentGroup = rule.Group;
+                    currentList = new List<Kuttab.Core.Models.TajweedRule>();
+                    grouped.Add((currentGroup ?? "", currentList));
+                }
+                currentList?.Add(rule);
+            }
+            
+            foreach (var (group, groupRules) in grouped)
+            {
+                // Group header row: checkbox + expand/collapse arrow
+                var headerLayout = new LinearLayout(this)
+                {
+                    Orientation = Orientation.Horizontal
+                };
+                headerLayout.SetGravity(global::Android.Views.GravityFlags.CenterVertical);
+                headerLayout.SetPadding(0, 8, 0, 4);
+                headerLayout.SetBackgroundColor(global::Android.Graphics.Color.ParseColor("#E8F5E9"));
+                headerLayout.LayoutDirection = layoutDir;
+                var headerParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MatchParent, LinearLayout.LayoutParams.WrapContent);
+                headerParams.BottomMargin = 4;
+                headerLayout.LayoutParameters = headerParams;
+                
+                // Group checkbox (selects/deselects all rules in this group)
+                var groupCheckbox = new CheckBox(this);
+                groupCheckbox.Text = GetGroupDisplayName(group);
+                groupCheckbox.SetTextSize(global::Android.Util.ComplexUnitType.Sp, 13);
+                groupCheckbox.SetTypeface(null, global::Android.Graphics.TypefaceStyle.Bold);
+                groupCheckbox.SetTextColor(global::Android.Graphics.Color.ParseColor("#2C5F2D"));
+                groupCheckbox.Checked = true;
+                var cbParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WrapContent, 1f);
+                groupCheckbox.LayoutParameters = cbParams;
+                headerLayout.AddView(groupCheckbox);
+                
+                // Expand/collapse arrow
+                var arrowView = new TextView(this);
+                arrowView.Text = "▼";
+                arrowView.SetTextSize(global::Android.Util.ComplexUnitType.Sp, 14);
+                arrowView.SetPadding(8, 0, 12, 0);
+                headerLayout.AddView(arrowView);
+                
+                _tajweedRuleCheckboxContainer.AddView(headerLayout);
+                
+                // Rules container (collapsible)
+                var rulesLayout = new LinearLayout(this)
+                {
+                    Orientation = Orientation.Vertical,
+                    Visibility = ViewStates.Gone // Start collapsed
+                };
+                rulesLayout.LayoutDirection = layoutDir;
+                rulesLayout.SetPadding(isRtl ? 0 : 32, 0, isRtl ? 32 : 0, 0);
+                
+                var childCheckboxes = new List<CheckBox>();
+                
+                foreach (var rule in groupRules)
+                {
+                    var checkbox = new CheckBox(this);
+                    var localizedName = RuleNameTranslator.GetLocalizedName(rule.Name, languageCode);
+                    checkbox.Text = localizedName;
+                    checkbox.SetTextSize(global::Android.Util.ComplexUnitType.Sp, 12);
+                    checkbox.Checked = true;
+                    checkbox.SetPadding(0, 0, 0, 0);
+                    
+                    // Update group checkbox when individual rule changes
+                    var capturedGroupCheckbox = groupCheckbox;
+                    var capturedChildCheckboxes = childCheckboxes;
+                    checkbox.CheckedChange += (s, e) => 
+                    { 
+                        if (_initialLoadComplete) _hasUnsavedChanges = true;
+                        // Update group checkbox: checked if all children checked, unchecked if any unchecked
+                        var allChecked = capturedChildCheckboxes.All(c => c.Checked);
+                        if (capturedGroupCheckbox.Checked != allChecked)
+                        {
+                            capturedGroupCheckbox.Tag = "skip"; // Prevent recursive update
+                            capturedGroupCheckbox.Checked = allChecked;
+                            capturedGroupCheckbox.Tag = null;
+                        }
+                    };
+                    
+                    rulesLayout.AddView(checkbox);
+                    childCheckboxes.Add(checkbox);
+                    _ruleCheckboxes.Add((checkbox, rule.Name));
                 }
                 
-                var checkbox = new CheckBox(this);
-                var localizedName = RuleNameTranslator.GetLocalizedName(rule.Name, languageCode);
-                checkbox.Text = localizedName;
-                checkbox.SetTextSize(global::Android.Util.ComplexUnitType.Sp, 13);
-                checkbox.Checked = true; // Default all selected
-                checkbox.SetPadding(0, 0, 0, 0);
-                checkbox.CheckedChange += (s, e) => { if (_initialLoadComplete) _hasUnsavedChanges = true; };
+                _tajweedRuleCheckboxContainer.AddView(rulesLayout);
                 
-                _tajweedRuleCheckboxContainer.AddView(checkbox);
-                _ruleCheckboxes.Add((checkbox, rule.Name));
+                // Group checkbox toggles all children
+                var capturedRulesLayout = rulesLayout;
+                var capturedChildren = childCheckboxes;
+                groupCheckbox.CheckedChange += (s, e) =>
+                {
+                    if (_initialLoadComplete) _hasUnsavedChanges = true;
+                    if ((string?)groupCheckbox.Tag == "skip") return;
+                    foreach (var child in capturedChildren)
+                        child.Checked = e.IsChecked;
+                };
+                
+                // Click header to expand/collapse
+                var capturedArrow = arrowView;
+                headerLayout.Click += (s, e) =>
+                {
+                    if (capturedRulesLayout.Visibility == ViewStates.Visible)
+                    {
+                        capturedRulesLayout.Visibility = ViewStates.Gone;
+                        capturedArrow.Text = "▼";
+                    }
+                    else
+                    {
+                        capturedRulesLayout.Visibility = ViewStates.Visible;
+                        capturedArrow.Text = "▲";
+                    }
+                };
+                
+                _ruleGroups.Add((groupCheckbox, rulesLayout, childCheckboxes, group));
             }
         }
         catch (Exception ex)
@@ -393,6 +493,8 @@ public class SettingsActivity : AppCompatActivity
         if (_enableRecordingCheckBox != null)
         {
             _enableRecordingCheckBox.Checked = recordingEnabled;
+            if (_localizationService != null)
+                _enableRecordingCheckBox.Text = _localizationService["EnableRecording"];
         }
         
         // Load show Tajweed rules setting
@@ -400,6 +502,19 @@ public class SettingsActivity : AppCompatActivity
         if (_showTajweedRulesCheckBox != null)
         {
             _showTajweedRulesCheckBox.Checked = showTajweedRules;
+            if (_localizationService != null)
+                _showTajweedRulesCheckBox.Text = _localizationService["ShowTajweedRules"];
+        }
+        
+        // Localize tajweed rules selection card labels
+        if (_localizationService != null)
+        {
+            if (_tajweedRuleSelectionTitle != null)
+                _tajweedRuleSelectionTitle.Text = _localizationService["TajweedRulesSelection"];
+            if (_selectAllRulesButton != null)
+                _selectAllRulesButton.Text = _localizationService["SelectAllRules"];
+            if (_deselectAllRulesButton != null)
+                _deselectAllRulesButton.Text = _localizationService["DeselectAllRules"];
         }
         
         // Load reciter selection
@@ -462,6 +577,13 @@ public class SettingsActivity : AppCompatActivity
                 checkbox.Checked = true;
             }
         }
+        // Sync group checkboxes with child states
+        foreach (var (gc, _, children, _) in _ruleGroups)
+        {
+            gc.Tag = "skip";
+            gc.Checked = children.All(c => c.Checked);
+            gc.Tag = null;
+        }
         UpdateTajweedRuleCardVisibility(showTajweedRules);
     }
 
@@ -503,12 +625,14 @@ public class SettingsActivity : AppCompatActivity
         if (_selectAllRulesButton != null)
             _selectAllRulesButton.Click += (s, e) => 
             {
+                foreach (var (gc, _, _, _) in _ruleGroups) { gc.Tag = "skip"; gc.Checked = true; gc.Tag = null; }
                 foreach (var (checkbox, _) in _ruleCheckboxes) checkbox.Checked = true;
                 if (_initialLoadComplete) _hasUnsavedChanges = true;
             };
         if (_deselectAllRulesButton != null)
             _deselectAllRulesButton.Click += (s, e) => 
             {
+                foreach (var (gc, _, _, _) in _ruleGroups) { gc.Tag = "skip"; gc.Checked = false; gc.Tag = null; }
                 foreach (var (checkbox, _) in _ruleCheckboxes) checkbox.Checked = false;
                 if (_initialLoadComplete) _hasUnsavedChanges = true;
             };
@@ -614,7 +738,35 @@ public class SettingsActivity : AppCompatActivity
         
         // Update reciter label
         if (_selectReciterLabel != null)
-            _selectReciterLabel.Text = GetString(Resource.String.select_reciter_label);
+            _selectReciterLabel.Text = _localizationService["SelectReciterLabel"];
+        
+        // Update checkboxes with localized text
+        if (_enableRecordingCheckBox != null)
+            _enableRecordingCheckBox.Text = _localizationService["EnableRecording"];
+        if (_showTajweedRulesCheckBox != null)
+            _showTajweedRulesCheckBox.Text = _localizationService["ShowTajweedRules"];
+        
+        // Update tajweed rules selection card
+        if (_tajweedRuleSelectionTitle != null)
+            _tajweedRuleSelectionTitle.Text = _localizationService["TajweedRulesSelection"];
+        if (_selectAllRulesButton != null)
+            _selectAllRulesButton.Text = _localizationService["SelectAllRules"];
+        if (_deselectAllRulesButton != null)
+            _deselectAllRulesButton.Text = _localizationService["DeselectAllRules"];
+        
+        // Re-setup tajweed rule checkboxes with new language (names + RTL)
+        var savedCheckedRules = new HashSet<string>();
+        foreach (var (cb, rn) in _ruleCheckboxes)
+            if (cb.Checked) savedCheckedRules.Add(rn);
+        SetupTajweedRuleCheckboxes();
+        foreach (var (cb, rn) in _ruleCheckboxes)
+            cb.Checked = savedCheckedRules.Contains(rn);
+        foreach (var (gc, _, children, _) in _ruleGroups)
+        {
+            gc.Tag = "skip";
+            gc.Checked = children.All(c => c.Checked);
+            gc.Tag = null;
+        }
         
         // Update reciter spinner with localized names
         SetupReciterSpinner();
@@ -819,6 +971,7 @@ public class ReciterOption
 {
     public string FolderName { get; set; } = string.Empty;
     public int DisplayNameResId { get; set; }
+    public string DisplayKey { get; set; } = string.Empty;
 }
 
 public class QuranTextOption

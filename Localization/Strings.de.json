@@ -189,5 +189,6 @@
   "TajweedRulesSelection": "Tadschuid-Regeln",
   "SelectAllRules": "Alle auswählen",
   "DeselectAllRules": "Alle abwählen",
-  "NoTajweedRulesFound": "Keine Tadschuid-Regeln in dieser Aya gefunden"
+  "NoTajweedRulesFound": "Keine Tadschuid-Regeln in dieser Aya gefunden",
+  "EnableRecording": "Aufnahmefunktion aktivieren"
 }

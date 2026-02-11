@@ -190,5 +190,6 @@
   "TajweedRulesSelection": "أحكام التجويد",
   "SelectAllRules": "تحديد الكل",
   "DeselectAllRules": "إلغاء تحديد الكل",
-  "NoTajweedRulesFound": "لم يتم العثور على أحكام تجويد في هذه الآية"
+  "NoTajweedRulesFound": "لم يتم العثور على أحكام تجويد في هذه الآية",
+  "EnableRecording": "تفعيل خاصية التسجيل"
 }
