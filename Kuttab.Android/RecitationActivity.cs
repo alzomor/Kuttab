@@ -654,6 +654,19 @@ public class RecitationActivity : AppCompatActivity
                 // Rule name label (localized)
                 var ruleNameView = new TextView(this);
                 var localizedName = RuleNameTranslator.GetLocalizedName(match.RuleName, languageCode);
+                // Remove "ال" prefix from all words in Arabic rule names
+                if (languageCode == "ar")
+                {
+                    var words = localizedName.Split(' ');
+                    for (int i = 0; i < words.Length; i++)
+                    {
+                        if (words[i].StartsWith("ال"))
+                        {
+                            words[i] = words[i].Substring(2);
+                        }
+                    }
+                    localizedName = string.Join(" ", words);
+                }
                 ruleNameView.Text = localizedName;
                 ruleNameView.SetTextSize(global::Android.Util.ComplexUnitType.Sp, 12);
                 ruleNameView.SetTextColor(new Color(groupColor));
