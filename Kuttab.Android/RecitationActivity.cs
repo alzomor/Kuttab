@@ -576,12 +576,59 @@ public class RecitationActivity : AppCompatActivity
     private void DisplayDefaultAya()
     {
         var ayaText = GetAyaText(_selectedSurah, 1);
-        if (_ayaTextView != null)
-            _ayaTextView.Text = ayaText;
+        DisplayAyaWithTajweedColors(ayaText);
         if (_currentAyaInfo != null)
             _currentAyaInfo.Text = $"{SurahInfo.GetSurahName(_selectedSurah)} - 1";
         ShowAyaImage(_selectedSurah, 1);
         DisplayTajweedRules(ayaText);
+    }
+    
+    private void DisplayAyaWithTajweedColors(string ayaText)
+    {
+        if (_ayaTextView == null) return;
+        
+        if (!_showTajweedRules || string.IsNullOrWhiteSpace(ayaText) || _searchService == null)
+        {
+            _ayaTextView.Text = ayaText;
+            return;
+        }
+        
+        try
+        {
+            var matches = _searchService.SearchAyaForRules(ayaText, _selectedTajweedRules);
+            
+            if (matches.Count == 0)
+            {
+                _ayaTextView.Text = ayaText;
+                return;
+            }
+            
+            var spannable = new SpannableString(ayaText);
+            
+            foreach (var match in matches)
+            {
+                var start = match.MatchStart;
+                var end = start + match.MatchLength;
+                if (start < 0 || end > ayaText.Length || start >= end) continue;
+                
+                var textColor = GroupColors.TryGetValue(match.GroupName, out var tc) ? tc : unchecked((int)0xFF555555);
+                var bgColor = GroupHighlightColors.TryGetValue(match.GroupName, out var bc) ? bc : unchecked((int)0x40555555);
+                
+                spannable.SetSpan(
+                    new global::Android.Text.Style.ForegroundColorSpan(new Color(textColor)),
+                    start, end, SpanTypes.ExclusiveExclusive);
+                spannable.SetSpan(
+                    new global::Android.Text.Style.BackgroundColorSpan(new Color(bgColor)),
+                    start, end, SpanTypes.ExclusiveExclusive);
+            }
+            
+            _ayaTextView.TextFormatted = spannable;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error coloring aya text: {ex.Message}");
+            _ayaTextView.Text = ayaText;
+        }
     }
     
     private void DisplayTajweedRules(string ayaText)
@@ -884,8 +931,7 @@ public class RecitationActivity : AppCompatActivity
                 
                 // Get and display the Aya text
                 var ayaText = GetAyaText(_currentSurah, _currentAya);
-                if (_ayaTextView != null)
-                    _ayaTextView.Text = ayaText;
+                DisplayAyaWithTajweedColors(ayaText);
                 
                 // Display tajweed rules for current aya
                 DisplayTajweedRules(ayaText);
