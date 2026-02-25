@@ -26,6 +26,17 @@ public class TajweedRuleActivity : AppCompatActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+        
+        // Handle edge-to-edge on Android 15+ (SDK 35)
+        if (Window != null)
+        {
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+            {
+                Window.SetStatusBarColor(global::Android.Graphics.Color.ParseColor("#0D3F13"));
+                Window.SetNavigationBarColor(global::Android.Graphics.Color.ParseColor("#1B5E20"));
+            }
+        }
+        
         SetContentView(Resource.Layout.activity_tajweed_rule);
 
         InitializeServices();
@@ -78,10 +89,20 @@ public class TajweedRuleActivity : AppCompatActivity
             explanation = GetString(Resource.String.no_explanation_available);
         }
 
-        // Update UI
+        // Update UI with localized text
         if (_ruleTitle != null)
         {
-            _ruleTitle.Text = GetString(Resource.String.tajweed_rule_title);
+            _ruleTitle.Text = _localizationService?["RuleExplanationTitle"] ?? GetString(Resource.String.tajweed_rule_title);
+        }
+        
+        if (_shareButton != null)
+        {
+            _shareButton.Text = _localizationService?["ShareButton"] ?? GetString(Resource.String.share_button);
+        }
+        
+        if (_closeButtonBottom != null)
+        {
+            _closeButtonBottom.Text = _localizationService?["CloseButton"] ?? GetString(Resource.String.close_button);
         }
         
         if (_ruleNameText != null)

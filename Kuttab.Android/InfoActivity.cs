@@ -20,6 +20,16 @@ public class InfoActivity : AppCompatActivity
     {
         base.OnCreate(savedInstanceState);
         
+        // Handle edge-to-edge on Android 15+ (SDK 35)
+        if (Window != null)
+        {
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+            {
+                Window.SetStatusBarColor(global::Android.Graphics.Color.ParseColor("#0D3F13"));
+                Window.SetNavigationBarColor(global::Android.Graphics.Color.ParseColor("#1B5E20"));
+            }
+        }
+        
         // Initialize localization service and apply language setting
         var fileService = new AndroidFileService(this);
         _localizationService = new LocalizationService(fileService);

@@ -191,5 +191,7 @@
   "SelectAllRules": "تحديد الكل",
   "DeselectAllRules": "إلغاء تحديد الكل",
   "NoTajweedRulesFound": "لم يتم العثور على أحكام تجويد في هذه الآية",
-  "EnableRecording": "تفعيل خاصية التسجيل"
+  "EnableRecording": "تفعيل خاصية التسجيل",
+  "ShareButton": "📤 مشاركة",
+  "RuleExplanationTitle": "قاعدة التجويد"
 }

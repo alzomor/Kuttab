@@ -192,5 +192,7 @@
   "SelectAllRules": "Alle auswählen",
   "DeselectAllRules": "Alle abwählen",
   "NoTajweedRulesFound": "Keine Tadschuid-Regeln in dieser Aya gefunden",
-  "EnableRecording": "Aufnahmefunktion aktivieren"
+  "EnableRecording": "Aufnahmefunktion aktivieren",
+  "ShareButton": "📤 Teilen",
+  "RuleExplanationTitle": "Tadschuid-Regel"
 }

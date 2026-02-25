@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F5F5DC"
+    android:fitsSystemWindows="true"
     android:layoutDirection="locale">
 
     <!-- Header -->
@@ -112,6 +113,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_margin="16dp"
+        android:paddingBottom="16dp"
         android:gravity="center">
 
         <Button

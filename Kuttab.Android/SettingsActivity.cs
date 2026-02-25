@@ -75,6 +75,17 @@ public class SettingsActivity : AppCompatActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+        
+        // Handle edge-to-edge on Android 15+ (SDK 35)
+        if (Window != null)
+        {
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+            {
+                Window.SetStatusBarColor(global::Android.Graphics.Color.ParseColor("#0D3F13"));
+                Window.SetNavigationBarColor(global::Android.Graphics.Color.ParseColor("#1B5E20"));
+            }
+        }
+        
         SetContentView(Resource.Layout.activity_settings);
 
         // Enable back button in action bar
