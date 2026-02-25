@@ -193,5 +193,11 @@
   "NoTajweedRulesFound": "لم يتم العثور على أحكام تجويد في هذه الآية",
   "EnableRecording": "تفعيل خاصية التسجيل",
   "ShareButton": "📤 مشاركة",
-  "RuleExplanationTitle": "قاعدة التجويد"
+  "RuleExplanationTitle": "قاعدة التجويد",
+  "ShareAya": "📤 مشاركة الآية",
+  "ShareAyaChooser": "مشاركة الآية عبر",
+  "ShareAppInfo": "📤 مشاركة التطبيق",
+  "ShareDonationInfo": "📤 مشاركة معلومات التبرع",
+  "ShareAppInfoChooser": "مشاركة التطبيق عبر",
+  "ShareDonationChooser": "مشاركة معلومات التبرع عبر"
 }

@@ -192,5 +192,11 @@
   "NoTajweedRulesFound": "No tajweed rules found in this aya",
   "EnableRecording": "Enable Recording Feature",
   "ShareButton": "📤 Share",
-  "RuleExplanationTitle": "Tajweed Rule"
+  "RuleExplanationTitle": "Tajweed Rule",
+  "ShareAya": "📤 Share Aya",
+  "ShareAyaChooser": "Share Aya via",
+  "ShareAppInfo": "📤 Share App",
+  "ShareDonationInfo": "📤 Share Donation Info",
+  "ShareAppInfoChooser": "Share app via",
+  "ShareDonationChooser": "Share donation info via"
 }

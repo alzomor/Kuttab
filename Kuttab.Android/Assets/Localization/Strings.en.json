@@ -196,5 +196,9 @@
   "ShareButton": "📤 Share",
   "RuleExplanationTitle": "Tajweed Rule",
   "ShareAya": "📤 Share Aya",
-  "ShareAyaChooser": "Share Aya via"
+  "ShareAyaChooser": "Share Aya via",
+  "ShareAppInfo": "📤 Share App",
+  "ShareDonationInfo": "📤 Share Donation Info",
+  "ShareAppInfoChooser": "Share app via",
+  "ShareDonationChooser": "Share donation info via"
 }

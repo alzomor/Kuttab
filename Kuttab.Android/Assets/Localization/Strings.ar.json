@@ -196,5 +196,9 @@
   "ShareButton": "📤 مشاركة",
   "RuleExplanationTitle": "قاعدة التجويد",
   "ShareAya": "📤 مشاركة الآية",
-  "ShareAyaChooser": "مشاركة الآية عبر"
+  "ShareAyaChooser": "مشاركة الآية عبر",
+  "ShareAppInfo": "📤 مشاركة التطبيق",
+  "ShareDonationInfo": "📤 مشاركة معلومات التبرع",
+  "ShareAppInfoChooser": "مشاركة التطبيق عبر",
+  "ShareDonationChooser": "مشاركة معلومات التبرع عبر"
 }

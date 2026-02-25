@@ -19,6 +19,7 @@ public class DonateActivity : AppCompatActivity
     private const string AssociationUrl = "https://bbfverein.de/";
     private const string Iban = "DE11 6805 0101 0014 3501 24";
     private const string PaymentReference = "Spende BBF-Bauprojekt | über die App Kuttab";
+    private const string AccountHolderName = "Bildungs- und Begegnungsverein Freiburg e.V.";
 
     private LocalizationService? _localizationService;
 
@@ -29,6 +30,8 @@ public class DonateActivity : AppCompatActivity
     private Button? _paypalButton;
     private Button? _copyIbanButton;
     private Button? _copyReferenceButton;
+    private Button? _copyAccountHolderButton;
+    private Button? _shareDonationButton;
     private TextView? _associationLink;
 
     // Text views for localization
@@ -115,6 +118,8 @@ public class DonateActivity : AppCompatActivity
         _paypalButton = FindViewById<Button>(Resource.Id.paypalButton);
         _copyIbanButton = FindViewById<Button>(Resource.Id.copyIbanButton);
         _copyReferenceButton = FindViewById<Button>(Resource.Id.copyReferenceButton);
+        _copyAccountHolderButton = FindViewById<Button>(Resource.Id.copyAccountHolderButton);
+        _shareDonationButton = FindViewById<Button>(Resource.Id.shareDonationInfoButton);
         _associationLink = FindViewById<TextView>(Resource.Id.associationLink);
 
         // Localized text views
@@ -145,6 +150,16 @@ public class DonateActivity : AppCompatActivity
 
         if (_associationLink != null)
             _associationLink.Click += OnAssociationLinkClick;
+        
+        if (_copyAccountHolderButton != null)
+            _copyAccountHolderButton.Click += (s, e) =>
+            {
+                CopyToClipboard("AccountHolder", AccountHolderName);
+                ShowToast(GetString(Resource.String.copied_to_clipboard));
+            };
+        
+        if (_shareDonationButton != null)
+            _shareDonationButton.Click += (s, e) => ShareDonationInfo();
     }
 
     private void UpdateLocalizedText()
@@ -201,6 +216,12 @@ public class DonateActivity : AppCompatActivity
 
         if (_copyReferenceButton != null)
             _copyReferenceButton.Text = _localizationService.CopyButton;
+        
+        if (_copyAccountHolderButton != null)
+            _copyAccountHolderButton.Text = _localizationService.CopyButton;
+        
+        if (_shareDonationButton != null)
+            _shareDonationButton.Text = _localizationService.ShareDonationInfo;
 
         // Update action bar title
         if (SupportActionBar != null)
@@ -266,6 +287,53 @@ public class DonateActivity : AppCompatActivity
         {
             _taxDeductionNote.TextAlignment = textAlignment;
             _taxDeductionNote.Gravity = gravity;
+        }
+    }
+
+    private void ShareDonationInfo()
+    {
+        try
+        {
+            var loc = _localizationService;
+            var remaining = _totalCost - _currentDonations;
+            
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("💚 " + (loc?.DonateTitle ?? "Support Kuttab"));
+            sb.AppendLine();
+            sb.AppendLine(string.Format(
+                loc?.DonateSubtitle ?? "Total: {0} EUR | Collected: {1} EUR | Needed: {2} EUR",
+                _totalCost.ToString("N0"), _currentDonations.ToString("N0"), remaining.ToString("N0")));
+            sb.AppendLine();
+            sb.AppendLine("━━━━━━━━━━━━━━━━━━━━");
+            sb.AppendLine();
+            sb.AppendLine("🏦 " + (loc?.DonateViaBankTransfer ?? "Bank Transfer"));
+            sb.AppendLine($"{loc?.AccountHolder ?? "Account Holder:"} {AccountHolderName}");
+            sb.AppendLine($"IBAN: {Iban}");
+            sb.AppendLine($"{loc?.PaymentReference ?? "Payment Reference:"} {PaymentReference}");
+            sb.AppendLine();
+            sb.AppendLine(loc?.DonateViaPayPal ?? "PayPal");
+            sb.AppendLine(PayPalUrl);
+            sb.AppendLine();
+            sb.AppendLine("━━━━━━━━━━━━━━━━━━━━");
+            sb.AppendLine();
+            sb.AppendLine(loc?.TaxDeductionNote ?? "");
+            sb.AppendLine();
+            sb.AppendLine("📱 Kuttab - Quran Tajweed Trainer");
+            sb.AppendLine("https://play.google.com/store/apps/details?id=com.kuttab.app");
+            
+            var shareIntent = new Intent(Intent.ActionSend);
+            shareIntent.SetType("text/plain");
+            shareIntent.PutExtra(Intent.ExtraText, sb.ToString());
+            shareIntent.PutExtra(Intent.ExtraSubject, loc?.DonateTitle ?? "Support Kuttab");
+            
+            var chooserTitle = loc?.ShareDonationChooser ?? "Share donation info via";
+            var chooserIntent = Intent.CreateChooser(shareIntent, chooserTitle);
+            if (chooserIntent != null)
+                StartActivity(chooserIntent);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error sharing donation info: {ex.Message}");
         }
     }
 

@@ -196,5 +196,9 @@
   "ShareButton": "📤 Teilen",
   "RuleExplanationTitle": "Tadschuid-Regel",
   "ShareAya": "📤 Vers teilen",
-  "ShareAyaChooser": "Vers teilen über"
+  "ShareAyaChooser": "Vers teilen über",
+  "ShareAppInfo": "📤 App teilen",
+  "ShareDonationInfo": "📤 Spendeninfo teilen",
+  "ShareAppInfoChooser": "App teilen über",
+  "ShareDonationChooser": "Spendeninfo teilen über"
 }

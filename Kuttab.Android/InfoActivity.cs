@@ -60,6 +60,63 @@ public class InfoActivity : AppCompatActivity
             SupportActionBar.SetDisplayHomeAsUpEnabled(true);
             SupportActionBar.SetHomeButtonEnabled(true);
         }
+        
+        // Share button
+        var shareButton = FindViewById<Button>(Resource.Id.shareAppInfoButton);
+        if (shareButton != null)
+        {
+            shareButton.Text = _localizationService?.ShareAppInfo ?? "\uD83D\uDCE4 Share App";
+            shareButton.Click += (s, e) => ShareAppInfo();
+        }
+    }
+    
+    private void ShareAppInfo()
+    {
+        try
+        {
+            var loc = _localizationService;
+            var versionName = "0.0";
+            try
+            {
+                var packageInfo = PackageManager?.GetPackageInfo(PackageName ?? "", 0);
+                versionName = packageInfo?.VersionName ?? "0.0";
+            }
+            catch { }
+            
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine($"\uD83D\uDCD6 {loc?.InfoTitle ?? "Kuttab"}");
+            sb.AppendLine($"v{versionName}");
+            sb.AppendLine();
+            sb.AppendLine(loc?.AppSubtitle ?? "Tajweed Pattern Search Application");
+            sb.AppendLine();
+            sb.AppendLine("\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501");
+            sb.AppendLine();
+            sb.AppendLine("\u2022 " + (loc?.ShowTajweedRules ?? "Tajweed rule highlighting"));
+            sb.AppendLine("\u2022 " + (loc?.SelectTajweedRule ?? "Search Tajweed rules across the full Quran"));
+            sb.AppendLine("\u2022 " + (loc?.OpenRecitation ?? "Recitation mode with audio"));
+            sb.AppendLine("\u2022 " + (loc?.QuranicPageView ?? "Quranic page view"));
+            sb.AppendLine("\u2022 " + (loc?.OnlineAudio ?? "Online audio recitation"));
+            sb.AppendLine();
+            sb.AppendLine("\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501");
+            sb.AppendLine();
+            sb.AppendLine($"\uD83D\uDCE7 {loc?.ContactEmail ?? "Contact:"} {loc?.ContactEmailText ?? "almanar.backup@gmail.com"}");
+            sb.AppendLine();
+            sb.AppendLine("\uD83D\uDCF1 https://play.google.com/store/apps/details?id=com.kuttab.app");
+            
+            var shareIntent = new Intent(Intent.ActionSend);
+            shareIntent.SetType("text/plain");
+            shareIntent.PutExtra(Intent.ExtraText, sb.ToString());
+            shareIntent.PutExtra(Intent.ExtraSubject, loc?.InfoTitle ?? "Kuttab");
+            
+            var chooserTitle = loc?.ShareAppInfoChooser ?? "Share app via";
+            var chooserIntent = Intent.CreateChooser(shareIntent, chooserTitle);
+            if (chooserIntent != null)
+                StartActivity(chooserIntent);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error sharing app info: {ex.Message}");
+        }
     }
     
     private void LoadSettings()

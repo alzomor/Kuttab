@@ -155,6 +155,15 @@ public class LocalizationService : ReactiveObject
         this.RaisePropertyChanged(nameof(NoRuleSelected));
         this.RaisePropertyChanged(nameof(NoExplanationAvailable));
         this.RaisePropertyChanged(nameof(ShowTajweedRules));
+        
+        // Share properties
+        this.RaisePropertyChanged(nameof(ShareButton));
+        this.RaisePropertyChanged(nameof(ShareAya));
+        this.RaisePropertyChanged(nameof(ShareAyaChooser));
+        this.RaisePropertyChanged(nameof(ShareAppInfo));
+        this.RaisePropertyChanged(nameof(ShareDonationInfo));
+        this.RaisePropertyChanged(nameof(ShareAppInfoChooser));
+        this.RaisePropertyChanged(nameof(ShareDonationChooser));
     }
 
     private void LoadLanguage(string languageCode)
@@ -288,6 +297,8 @@ public class LocalizationService : ReactiveObject
     public string WindsurfDescription => this["WindsurfDescription"];
     public string AcknowledgmentText => this["AcknowledgmentText"];
     public string CloseButton => this["CloseButton"];
+    public string ContactEmail => this["ContactEmail"];
+    public string ContactEmailText => this["ContactEmailText"];
 
     // Donate window properties
     public string OpenDonate => this["OpenDonate"];
@@ -313,6 +324,15 @@ public class LocalizationService : ReactiveObject
     public string NoRuleSelected => this["NoRuleSelected"];
     public string NoExplanationAvailable => this["NoExplanationAvailable"];
     public string ShowTajweedRules => this["ShowTajweedRules"];
+    
+    // Share properties
+    public string ShareButton => this["ShareButton"];
+    public string ShareAya => this["ShareAya"];
+    public string ShareAyaChooser => this["ShareAyaChooser"];
+    public string ShareAppInfo => this["ShareAppInfo"];
+    public string ShareDonationInfo => this["ShareDonationInfo"];
+    public string ShareAppInfoChooser => this["ShareAppInfoChooser"];
+    public string ShareDonationChooser => this["ShareDonationChooser"];
 
     public bool IsRightToLeft => _currentLanguage == "ar";
 
