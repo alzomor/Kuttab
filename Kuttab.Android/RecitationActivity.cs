@@ -672,6 +672,21 @@ public class RecitationActivity : AppCompatActivity
                 ruleNameView.SetTextColor(new Color(groupColor));
                 ruleNameView.SetTypeface(null, TypefaceStyle.Bold);
                 ruleNameView.SetPadding(0, 2, 0, 0);
+                
+                // Make rule name clickable to show explanation
+                ruleNameView.Clickable = true;
+                ruleNameView.Focusable = true;
+                var ruleName = match.RuleName; // Capture for closure
+                ruleNameView.Click += (s, e) =>
+                {
+                    var intent = new Intent(this, typeof(TajweedRuleActivity));
+                    intent.PutExtra("ArabicRuleName", ruleName);
+                    StartActivity(intent);
+                };
+                
+                // Add underline to indicate it's clickable
+                ruleNameView.PaintFlags = ruleNameView.PaintFlags | global::Android.Graphics.PaintFlags.UnderlineText;
+                
                 entryLayout.AddView(ruleNameView);
                 
                 // Separator line
