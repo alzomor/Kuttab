@@ -16,6 +16,7 @@ public class SimpleNotificationService
     
     private readonly Context _context;
     private readonly NotificationManager _notificationManager;
+    private int _notificationIdCounter = 100;
 
     public SimpleNotificationService(Context context)
     {
@@ -120,7 +121,7 @@ public class SimpleNotificationService
                 _context,
                 1,
                 intent,
-                PendingIntentFlags.UpdateCurrent);
+                PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
 
             var notificationBuilder = new NotificationCompat.Builder(_context, CHANNEL_ID_UPDATES)
                 .SetSmallIcon(Resource.Drawable.ic_notification)
@@ -156,11 +157,13 @@ public class SimpleNotificationService
             }
             intent.AddFlags(ActivityFlags.ClearTop);
 
+            var notificationId = _notificationIdCounter++;
+            
             var pendingIntent = PendingIntent.GetActivity(
                 _context,
-                0,
+                notificationId,
                 intent,
-                PendingIntentFlags.UpdateCurrent);
+                PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
 
             var notificationBuilder = new NotificationCompat.Builder(_context, CHANNEL_ID_FEATURES)
                 .SetSmallIcon(Resource.Drawable.ic_notification)
@@ -171,7 +174,7 @@ public class SimpleNotificationService
                 .SetPriority(NotificationCompat.PriorityDefault)
                 .SetStyle(new NotificationCompat.BigTextStyle().BigText(message));
 
-            _notificationManager.Notify(2, notificationBuilder.Build());
+            _notificationManager.Notify(notificationId, notificationBuilder.Build());
         }
         catch (Exception ex)
         {
@@ -189,11 +192,13 @@ public class SimpleNotificationService
             var intent = new Intent(_context, typeof(MainActivity));
             intent.AddFlags(ActivityFlags.ClearTop);
 
+            var notificationId = _notificationIdCounter++;
+            
             var pendingIntent = PendingIntent.GetActivity(
                 _context,
-                0,
+                notificationId,
                 intent,
-                PendingIntentFlags.UpdateCurrent);
+                PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
 
             var notificationBuilder = new NotificationCompat.Builder(_context, CHANNEL_ID_GENERAL)
                 .SetSmallIcon(Resource.Drawable.ic_notification)
@@ -203,7 +208,7 @@ public class SimpleNotificationService
                 .SetContentIntent(pendingIntent)
                 .SetPriority(NotificationCompat.PriorityDefault);
 
-            _notificationManager.Notify(3, notificationBuilder.Build());
+            _notificationManager.Notify(notificationId, notificationBuilder.Build());
         }
         catch (Exception ex)
         {
@@ -215,7 +220,7 @@ public class SimpleNotificationService
     {
         var intent = new Intent(Intent.ActionView);
         intent.SetData(global::Android.Net.Uri.Parse(downloadUrl));
-        return PendingIntent.GetActivity(_context, 2, intent, PendingIntentFlags.UpdateCurrent);
+        return PendingIntent.GetActivity(_context, 2, intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
     }
 
     private PendingIntent CreateDismissIntent(string version)
@@ -223,7 +228,7 @@ public class SimpleNotificationService
         var intent = new Intent(_context, typeof(UpdateDismissReceiver));
         intent.SetAction("DISMISS_UPDATE");
         intent.PutExtra("version", version);
-        return PendingIntent.GetBroadcast(_context, 3, intent, PendingIntentFlags.UpdateCurrent);
+        return PendingIntent.GetBroadcast(_context, 3, intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable);
     }
 
     public void CancelNotification(int notificationId)

@@ -164,6 +164,19 @@ public class NotificationContentService
                 return false;
             }
             
+            // Check DaysOfWeek filter
+            if (notification.Schedule.DaysOfWeek != null && notification.Schedule.DaysOfWeek.Count > 0)
+            {
+                var todayName = now.DayOfWeek.ToString().ToLower();
+                Console.WriteLine($"{TAG}: - - Day of week check: today is {todayName}, allowed: [{string.Join(", ", notification.Schedule.DaysOfWeek)}]");
+                if (!notification.Schedule.DaysOfWeek.Contains(todayName))
+                {
+                    Console.WriteLine($"{TAG}: - Skipped: not a scheduled day of week");
+                    return false;
+                }
+                Console.WriteLine($"{TAG}: - day of week matches ✓");
+            }
+            
             Console.WriteLine($"{TAG}: - schedule valid ✓");
         }
         else
