@@ -17,6 +17,7 @@ public class AyaAdapter : RecyclerView.Adapter
     private int _selectedPosition = -1;
     private int _playingPosition = -1;
     public event EventHandler<int>? ItemClick;
+    public event EventHandler<int>? ItemLongClick;
     private LocalizationService? _localization;
     private bool _isRtl = false;
     private int _fontSize = 18;
@@ -101,7 +102,7 @@ public class AyaAdapter : RecyclerView.Adapter
             .Inflate(Resource.Layout.item_aya, parent, false);
         if (view == null)
             throw new InvalidOperationException("Failed to inflate item_aya layout");
-        return new AyaViewHolder(view, OnItemClick, this);
+        return new AyaViewHolder(view, OnItemClick, OnItemLongClick, this);
     }
     
     public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
@@ -130,6 +131,11 @@ public class AyaAdapter : RecyclerView.Adapter
         
         ItemClick?.Invoke(this, position);
     }
+    
+    private void OnItemLongClick(int position)
+    {
+        ItemLongClick?.Invoke(this, position);
+    }
 }
 
 public class AyaViewHolder : RecyclerView.ViewHolder
@@ -140,7 +146,7 @@ public class AyaViewHolder : RecyclerView.ViewHolder
     private readonly View _itemView;
     private readonly AyaAdapter _adapter;
     
-    public AyaViewHolder(View itemView, Action<int> clickListener, AyaAdapter adapter) : base(itemView)
+    public AyaViewHolder(View itemView, Action<int> clickListener, Action<int> longClickListener, AyaAdapter adapter) : base(itemView)
     {
         _itemView = itemView;
         _adapter = adapter;
@@ -152,6 +158,7 @@ public class AyaViewHolder : RecyclerView.ViewHolder
             ?? throw new InvalidOperationException("matchedPart not found");
         
         itemView.Click += (s, e) => clickListener(AdapterPosition);
+        itemView.LongClick += (s, e) => longClickListener(AdapterPosition);
     }
     
     public void Bind(QuranAya aya)

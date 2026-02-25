@@ -194,5 +194,7 @@
   "NoTajweedRulesFound": "Keine Tadschuid-Regeln in dieser Aya gefunden",
   "EnableRecording": "Aufnahmefunktion aktivieren",
   "ShareButton": "📤 Teilen",
-  "RuleExplanationTitle": "Tadschuid-Regel"
+  "RuleExplanationTitle": "Tadschuid-Regel",
+  "ShareAya": "📤 Vers teilen",
+  "ShareAyaChooser": "Vers teilen über"
 }

@@ -306,6 +306,7 @@ public class MainActivity : AppCompatActivity
             _recyclerView.SetLayoutManager(new LinearLayoutManager(this));
             _adapter = new AyaAdapter();
             _adapter.ItemClick += OnAyaItemClick;
+            _adapter.ItemLongClick += OnAyaItemLongClick;
             _recyclerView.SetAdapter(_adapter);
             // Initialize adapter localization if services are ready
             UpdateAdapterLocalization();
@@ -523,6 +524,37 @@ public class MainActivity : AppCompatActivity
                 ShowAyaImage(_searchResults[position]);
             }
             UpdateRecordingVisibility();
+        }
+        catch { /* no-op */ }
+    }
+    
+    private void OnAyaItemLongClick(object? sender, int position)
+    {
+        try
+        {
+            if (position < 0 || position >= _searchResults.Count) return;
+            var aya = _searchResults[position];
+            
+            var surahName = SurahInfo.GetSurahName(aya.SurahNumber);
+            var surahLabel = _localizationService?["Surah"] ?? "Surah";
+            var ayaLabel = _localizationService?["Aya"] ?? "Aya";
+            
+            var shareText = new System.Text.StringBuilder();
+            shareText.AppendLine($"{surahLabel}: {surahName} ({aya.SurahNumber}) - {ayaLabel}: {aya.AyaNumber}");
+            shareText.AppendLine();
+            shareText.AppendLine(aya.Text);
+            shareText.AppendLine();
+            shareText.AppendLine("📱 Shared from Kuttab - Quran Learning App");
+            
+            var shareIntent = new Intent(Intent.ActionSend);
+            shareIntent.SetType("text/plain");
+            shareIntent.PutExtra(Intent.ExtraText, shareText.ToString());
+            shareIntent.PutExtra(Intent.ExtraSubject, $"{surahName} ({aya.SurahNumber}:{aya.AyaNumber})");
+            
+            var chooserTitle = _localizationService?["ShareAyaChooser"] ?? "Share Aya via";
+            var chooserIntent = Intent.CreateChooser(shareIntent, chooserTitle);
+            if (chooserIntent != null)
+                StartActivity(chooserIntent);
         }
         catch { /* no-op */ }
     }

@@ -240,6 +240,15 @@ public class RecitationActivity : AppCompatActivity
             _stopButton.Click += OnStopClick;
         if (_teacherModeCheckbox != null)
             _teacherModeCheckbox.CheckedChange += (s, e) => _teacherModeEnabled = e.IsChecked;
+        
+        // Long-press on aya text to share
+        if (_ayaTextView != null)
+        {
+            _ayaTextView.LongClick += (s, e) =>
+            {
+                ShareCurrentAya();
+            };
+        }
     }
     
     private void LoadSettings()
@@ -571,6 +580,33 @@ public class RecitationActivity : AppCompatActivity
         {
             RunOnUiThread(() => ShowError($"Failed to load Quran data: {ex.Message}"));
         }
+    }
+    
+    private void ShareCurrentAya()
+    {
+        var ayaText = _ayaTextView?.Text;
+        if (string.IsNullOrWhiteSpace(ayaText)) return;
+        
+        var surahName = SurahInfo.GetSurahName(_currentSurah);
+        var surahLabel = _localizationService?["Surah"] ?? "Surah";
+        var ayaLabel = _localizationService?["Aya"] ?? "Aya";
+        
+        var shareText = new System.Text.StringBuilder();
+        shareText.AppendLine($"{surahLabel}: {surahName} ({_currentSurah}) - {ayaLabel}: {_currentAya}");
+        shareText.AppendLine();
+        shareText.AppendLine(ayaText);
+        shareText.AppendLine();
+        shareText.AppendLine("📱 Shared from Kuttab - Quran Learning App");
+        
+        var shareIntent = new Intent(Intent.ActionSend);
+        shareIntent.SetType("text/plain");
+        shareIntent.PutExtra(Intent.ExtraText, shareText.ToString());
+        shareIntent.PutExtra(Intent.ExtraSubject, $"{surahName} ({_currentSurah}:{_currentAya})");
+        
+        var chooserTitle = _localizationService?["ShareAyaChooser"] ?? "Share Aya via";
+        var chooserIntent = Intent.CreateChooser(shareIntent, chooserTitle);
+        if (chooserIntent != null)
+            StartActivity(chooserIntent);
     }
     
     private void DisplayDefaultAya()
