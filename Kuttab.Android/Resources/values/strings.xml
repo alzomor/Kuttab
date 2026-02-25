@@ -158,4 +158,5 @@
     <string name="tajweed_rule_title">Tajweed Rule</string>
     <string name="no_rule_selected">Please select a Tajweed rule first</string>
     <string name="no_explanation_available">No explanation available for this rule</string>
+    <string name="share_button">📤 Share</string>
 </resources>

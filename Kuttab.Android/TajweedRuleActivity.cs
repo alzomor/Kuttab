@@ -17,6 +17,7 @@ public class TajweedRuleActivity : AppCompatActivity
     private TextView? _ruleExplanationText;
     private Button? _closeButton;
     private Button? _closeButtonBottom;
+    private Button? _shareButton;
     
     private LocalizationService? _localizationService;
     private string _arabicRuleName = string.Empty;
@@ -54,6 +55,7 @@ public class TajweedRuleActivity : AppCompatActivity
         _ruleExplanationText = FindViewById<TextView>(Resource.Id.ruleExplanationText);
         _closeButton = FindViewById<Button>(Resource.Id.closeButton);
         _closeButtonBottom = FindViewById<Button>(Resource.Id.closeButtonBottom);
+        _shareButton = FindViewById<Button>(Resource.Id.shareButton);
     }
 
     private void LoadRuleData()
@@ -111,6 +113,65 @@ public class TajweedRuleActivity : AppCompatActivity
         if (_closeButtonBottom != null)
         {
             _closeButtonBottom.Click += (s, e) => Finish();
+        }
+        
+        if (_shareButton != null)
+        {
+            _shareButton.Click += (s, e) => ShareRule();
+        }
+    }
+
+    private void ShareRule()
+    {
+        if (string.IsNullOrEmpty(_arabicRuleName))
+            return;
+
+        // Get localized rule name
+        var localizedRuleName = RuleNameTranslator.GetLocalizedName(_arabicRuleName, _languageCode);
+        
+        // Get rule explanation
+        var explanation = TajweedRulesExplanation.GetExplanation(_arabicRuleName, _languageCode);
+        
+        // Build share text
+        var shareText = new System.Text.StringBuilder();
+        
+        // Add rule name
+        if (_languageCode == "ar")
+        {
+            shareText.AppendLine(_arabicRuleName);
+        }
+        else
+        {
+            shareText.AppendLine(localizedRuleName);
+            shareText.AppendLine(_arabicRuleName);
+        }
+        
+        shareText.AppendLine();
+        shareText.AppendLine("━━━━━━━━━━━━━━━━━━━━");
+        shareText.AppendLine();
+        
+        // Add explanation
+        if (!string.IsNullOrEmpty(explanation))
+        {
+            shareText.AppendLine(explanation);
+        }
+        
+        shareText.AppendLine();
+        shareText.AppendLine("━━━━━━━━━━━━━━━━━━━━");
+        shareText.AppendLine();
+        shareText.AppendLine("📱 Shared from Kuttab - Quran Learning App");
+        
+        // Create share intent
+        var shareIntent = new Intent(Intent.ActionSend);
+        shareIntent.SetType("text/plain");
+        shareIntent.PutExtra(Intent.ExtraText, shareText.ToString());
+        shareIntent.PutExtra(Intent.ExtraSubject, localizedRuleName);
+        
+        // Show share chooser
+        var chooserIntent = Intent.CreateChooser(shareIntent, _localizationService?["ShareRule"] ?? "Share Rule");
+        if (chooserIntent != null)
+        {
+            StartActivity(chooserIntent);
         }
     }
 
