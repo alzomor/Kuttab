@@ -30,9 +30,11 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:text="🕌"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:padding="0dp"
             android:layout_centerVertical="true"
             android:layout_toStartOf="@+id/recitationButton"
             android:layout_marginEnd="8dp" />
@@ -42,9 +44,11 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:text="🎧"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:padding="0dp"
             android:layout_centerVertical="true"
             android:layout_toStartOf="@+id/infoButton"
             android:layout_marginEnd="8dp" />
@@ -54,9 +58,11 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:text="ℹ️"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:padding="0dp"
             android:layout_centerVertical="true"
             android:layout_toStartOf="@+id/settingsButton"
             android:layout_marginEnd="8dp" />
@@ -66,9 +72,11 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:text="⚙️"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:padding="0dp"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true" />
     </RelativeLayout>
@@ -135,8 +143,13 @@
     <Button
         android:id="@+id/ruleButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:text="@string/rule_explanation"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:background="@drawable/btn_android_green"
         android:layout_marginBottom="4dp"
         android:visibility="gone" />
 
@@ -204,47 +217,51 @@
 
                 <Button
                     android:id="@+id/playButton"
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:text="▶️"
-                    android:layout_marginEnd="2dp"
+                    android:layout_marginEnd="4dp"
                     android:enabled="false"
                     android:textSize="16sp"
                     android:gravity="center"
-                    android:padding="0dp" />
+                    android:padding="0dp"
+                    android:background="@drawable/btn_android_icon" />
 
                 <Button
                     android:id="@+id/playRepeatButton"
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:text="🔁"
-                    android:layout_marginEnd="2dp"
+                    android:layout_marginEnd="4dp"
                     android:enabled="false"
                     android:textSize="16sp"
                     android:gravity="center"
-                    android:padding="0dp" />
+                    android:padding="0dp"
+                    android:background="@drawable/btn_android_icon" />
 
                 <Button
                     android:id="@+id/playAllButton"
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:text="📋"
-                    android:layout_marginEnd="2dp"
+                    android:layout_marginEnd="4dp"
                     android:enabled="false"
                     android:textSize="16sp"
                     android:gravity="center"
-                    android:padding="0dp" />
+                    android:padding="0dp"
+                    android:background="@drawable/btn_android_icon" />
 
                 <Button
                     android:id="@+id/stopButton"
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:text="⏹️"
                     android:enabled="false"
                     android:textSize="16sp"
                     android:gravity="center"
                     android:padding="0dp"
-                    android:layout_marginEnd="0dp" />
+                    android:layout_marginEnd="0dp"
+                    android:background="@drawable/btn_android_icon" />
 
             </LinearLayout>
         </LinearLayout>
@@ -277,46 +294,50 @@
 
                 <Button
                     android:id="@+id/recordButton"
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:text="🎤"
-                    android:layout_marginEnd="2dp"
+                    android:layout_marginEnd="4dp"
                     android:textSize="16sp"
                     android:gravity="center"
-                    android:padding="0dp" />
+                    android:padding="0dp"
+                    android:background="@drawable/btn_android_icon" />
 
                 <Button
                     android:id="@+id/stopRecordingButton"
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:text="⏹️"
-                    android:layout_marginEnd="2dp"
+                    android:layout_marginEnd="4dp"
                     android:enabled="false"
                     android:textSize="16sp"
                     android:gravity="center"
-                    android:padding="0dp" />
+                    android:padding="0dp"
+                    android:background="@drawable/btn_android_icon" />
 
                 <Button
                     android:id="@+id/playRecordingButton"
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:text="▶️"
-                    android:layout_marginEnd="2dp"
+                    android:layout_marginEnd="4dp"
                     android:enabled="false"
                     android:textSize="16sp"
                     android:gravity="center"
-                    android:padding="0dp" />
+                    android:padding="0dp"
+                    android:background="@drawable/btn_android_icon" />
 
                 <Button
                     android:id="@+id/deleteRecordingButton"
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:text="🗑️"
                     android:textSize="16sp"
                     android:enabled="false"
                     android:gravity="center"
                     android:padding="0dp"
-                    android:layout_marginEnd="0dp" />
+                    android:layout_marginEnd="0dp"
+                    android:background="@drawable/btn_android_icon" />
 
             </LinearLayout>
         </LinearLayout>

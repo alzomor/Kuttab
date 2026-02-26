@@ -331,23 +331,27 @@
                     <Button
                         android:id="@+id/selectAllRulesButton"
                         android:layout_width="0dp"
-                        android:layout_height="36dp"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
                         android:text="Select All"
                         android:textSize="12sp"
                         android:textColor="#FFFFFF"
-                        android:background="#2C5F2D"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:background="@drawable/btn_android_green"
                         android:layout_marginEnd="4dp" />
 
                     <Button
                         android:id="@+id/deselectAllRulesButton"
                         android:layout_width="0dp"
-                        android:layout_height="36dp"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
                         android:text="Deselect All"
                         android:textSize="12sp"
                         android:textColor="#FFFFFF"
-                        android:background="#8B7355"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:background="@drawable/btn_android_tan"
                         android:layout_marginStart="4dp" />
                 </LinearLayout>
 
@@ -443,27 +447,28 @@
             <Button
                 android:id="@+id/saveButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:text="@string/save_settings"
                 android:textColor="#FFFFFF"
-                android:background="#2C5F2D"
-                android:minHeight="48dp"
-                android:textStyle="bold" />
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="@drawable/btn_android_green" />
 
             <Button
                 android:id="@+id/cancelButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="@string/close_button"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
-                android:background="#8B7355"
-                android:layout_marginStart="8dp"
-                android:minHeight="48dp" />
+                android:gravity="center"
+                android:background="@drawable/btn_android_tan"
+                android:layout_marginStart="8dp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

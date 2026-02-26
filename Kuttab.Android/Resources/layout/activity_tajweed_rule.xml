@@ -32,9 +32,11 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:text="✕"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:padding="0dp"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true" />
     </RelativeLayout>
@@ -119,26 +121,28 @@
         <Button
             android:id="@+id/shareButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:text="@string/share_button"
             android:textColor="#FFFFFF"
-            android:background="#4CAF50"
-            android:layout_marginEnd="8dp"
-            android:minHeight="48dp"
-            android:textStyle="bold" />
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:background="@drawable/btn_android_share"
+            android:layout_marginEnd="8dp" />
 
         <Button
             android:id="@+id/closeButtonBottom"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:text="@string/close_button"
             android:textColor="#FFFFFF"
-            android:background="#2C5F2D"
-            android:layout_marginStart="8dp"
-            android:minHeight="48dp"
-            android:textStyle="bold" />
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:background="@drawable/btn_android_green"
+            android:layout_marginStart="8dp" />
     </LinearLayout>
 
 </LinearLayout>
