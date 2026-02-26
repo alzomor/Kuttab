@@ -101,6 +101,8 @@
                     android:paddingStart="40dp"
                     android:paddingEnd="40dp"
                     android:background="@drawable/btn_android_paypal"
+                    android:stateListAnimator="@null"
+                    android:elevation="0dp"
                     android:layout_gravity="center_horizontal" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -173,7 +175,9 @@
                             android:gravity="center"
                             android:paddingStart="12dp"
                             android:paddingEnd="12dp"
-                            android:background="@drawable/btn_android_copy" />
+                            android:background="@drawable/btn_android_copy"
+                            android:stateListAnimator="@null"
+                            android:elevation="0dp" />
                     </LinearLayout>
 
                     <!-- IBAN -->
@@ -210,7 +214,9 @@
                             android:gravity="center"
                             android:paddingStart="12dp"
                             android:paddingEnd="12dp"
-                            android:background="@drawable/btn_android_copy" />
+                            android:background="@drawable/btn_android_copy"
+                            android:stateListAnimator="@null"
+                            android:elevation="0dp" />
                     </LinearLayout>
 
                     <!-- BIC -->
@@ -265,7 +271,9 @@
                             android:gravity="center"
                             android:paddingStart="12dp"
                             android:paddingEnd="12dp"
-                            android:background="@drawable/btn_android_copy" />
+                            android:background="@drawable/btn_android_copy"
+                            android:stateListAnimator="@null"
+                            android:elevation="0dp" />
                     </LinearLayout>
 
                     <!-- Translations -->
@@ -402,6 +410,8 @@
             android:textStyle="bold"
             android:gravity="center"
             android:background="@drawable/btn_android_green"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
             android:layout_marginBottom="16dp" />
 
     </LinearLayout>

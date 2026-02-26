@@ -404,6 +404,8 @@
             android:textStyle="bold"
             android:gravity="center"
             android:background="@drawable/btn_android_green"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
             android:layout_marginBottom="16dp" />
 
     </LinearLayout>
