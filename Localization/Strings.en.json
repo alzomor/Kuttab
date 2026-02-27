@@ -198,5 +198,17 @@
   "ShareAppInfo": "📤 Share App",
   "ShareDonationInfo": "📤 Share Donation Info",
   "ShareAppInfoChooser": "Share app via",
-  "ShareDonationChooser": "Share donation info via"
+  "ShareDonationChooser": "Share donation info via",
+
+  "HifzMode": "📖 Hifz Mode",
+  "OpenHifz": "Hifz",
+  "HifzStatus": "Status:",
+  "HifzHeard": "Heard:",
+  "HifzListening": "🎤 Listening...",
+  "HifzStopped": "Stopped",
+  "HifzAyaComplete": "Aya {0} complete!",
+  "HifzSessionComplete": "✅ Session complete! Well done!",
+  "HifzNoSpeechEngine": "Speech recognition not available. Please install Google Voice Typing.",
+  "HifzMicPermissionDenied": "Microphone permission is required for Hifz mode.",
+  "HifzWrongWord": "Try again"
 }

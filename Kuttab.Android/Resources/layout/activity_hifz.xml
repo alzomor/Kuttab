@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:background="#0D3F13">
+
+    <!-- Green Header Bar -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#4CAF50"
+        android:padding="8dp"
+        android:elevation="4dp">
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hifz Mode"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_centerInParent="true" />
+
+    </RelativeLayout>
+
+    <!-- Main Content Area -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#F5F5DC">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:background="#F5F5DC">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Surah Selector -->
+                <TextView
+                    android:id="@+id/surahLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Surah:"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="4dp" />
+
+                <Spinner
+                    android:id="@+id/surahSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@android:drawable/btn_dropdown" />
+
+                <!-- Aya Range Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/fromAyaLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="From Aya:"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#333333"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="4dp" />
+
+                    <EditText
+                        android:id="@+id/fromAyaInput"
+                        android:layout_width="60dp"
+                        android:layout_height="40dp"
+                        android:inputType="number"
+                        android:text="1"
+                        android:gravity="center"
+                        android:textSize="14sp"
+                        android:background="@android:drawable/edit_text"
+                        android:layout_marginEnd="16dp" />
+
+                    <TextView
+                        android:id="@+id/toAyaLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="To Aya:"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#333333"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="4dp" />
+
+                    <EditText
+                        android:id="@+id/toAyaInput"
+                        android:layout_width="60dp"
+                        android:layout_height="40dp"
+                        android:inputType="number"
+                        android:text="7"
+                        android:gravity="center"
+                        android:textSize="14sp"
+                        android:background="@android:drawable/edit_text" />
+                </LinearLayout>
+
+                <!-- Status / Current Aya Info -->
+                <TextView
+                    android:id="@+id/statusLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status"
+                    android:textSize="12sp"
+                    android:textColor="#666666"
+                    android:layout_marginBottom="2dp" />
+
+                <TextView
+                    android:id="@+id/currentAyaInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#1B5E20"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Progress Bar -->
+                <ProgressBar
+                    android:id="@+id/wordProgressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressTint="#4CAF50"
+                    android:progressBackgroundTint="#E0E0E0"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/progressText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0 / 0"
+                    android:textSize="12sp"
+                    android:textColor="#666666"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Aya Text Display Area -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#FFFFFF"
+                    android:padding="16dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/ayaTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="28sp"
+                        android:textColor="#333333"
+                        android:textDirection="rtl"
+                        android:textAlignment="viewStart"
+                        android:lineSpacingMultiplier="1.6"
+                        android:gravity="right"
+                        android:minHeight="100dp" />
+
+                </LinearLayout>
+
+                <!-- Recognized Text (debug/feedback) with wrong word indicator -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/recognizedTextLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Heard:"
+                            android:textSize="11sp"
+                            android:textColor="#999999"
+                            android:layout_marginBottom="2dp" />
+
+                        <TextView
+                            android:id="@+id/recognizedTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textSize="14sp"
+                            android:textColor="#666666"
+                            android:textDirection="rtl"
+                            android:textAlignment="viewStart"
+                            android:gravity="right"
+                            android:minHeight="24dp" />
+
+                    </LinearLayout>
+
+                    <!-- Red balloon indicator for wrong word -->
+                    <View
+                        android:id="@+id/wrongWordIndicator"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="8dp"
+                        android:background="@android:drawable/presence_busy"
+                        android:visibility="invisible" />
+
+                </RelativeLayout>
+
+                <!-- Tajweed Rules Panel -->
+                <LinearLayout
+                    android:id="@+id/tajweedRulesPanelContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#FAFAFA"
+                    android:padding="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tajweedRulesTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tajweed Rules"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#1B5E20"
+                        android:layout_marginBottom="4dp" />
+
+                    <LinearLayout
+                        android:id="@+id/tajweedRulesContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Bottom Control Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="12dp"
+            android:background="#E8F5E9"
+            android:elevation="4dp">
+
+            <!-- Mic Button -->
+            <Button
+                android:id="@+id/micButton"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:text="🎤"
+                android:textSize="28sp"
+                android:background="@android:drawable/btn_default"
+                android:layout_marginEnd="16dp" />
+
+            <!-- Stop Button -->
+            <Button
+                android:id="@+id/stopButton"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:text="⏹️"
+                android:textSize="28sp"
+                android:background="@android:drawable/btn_default"
+                android:enabled="false"
+                android:layout_marginEnd="16dp" />
+
+            <!-- Reset Button -->
+            <Button
+                android:id="@+id/resetButton"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:text="🔄"
+                android:textSize="28sp"
+                android:background="@android:drawable/btn_default" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

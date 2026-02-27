@@ -164,6 +164,19 @@ public class LocalizationService : ReactiveObject
         this.RaisePropertyChanged(nameof(ShareDonationInfo));
         this.RaisePropertyChanged(nameof(ShareAppInfoChooser));
         this.RaisePropertyChanged(nameof(ShareDonationChooser));
+        
+        // Hifz properties
+        this.RaisePropertyChanged(nameof(HifzMode));
+        this.RaisePropertyChanged(nameof(OpenHifz));
+        this.RaisePropertyChanged(nameof(HifzStatus));
+        this.RaisePropertyChanged(nameof(HifzHeard));
+        this.RaisePropertyChanged(nameof(HifzListening));
+        this.RaisePropertyChanged(nameof(HifzStopped));
+        this.RaisePropertyChanged(nameof(HifzAyaComplete));
+        this.RaisePropertyChanged(nameof(HifzSessionComplete));
+        this.RaisePropertyChanged(nameof(HifzNoSpeechEngine));
+        this.RaisePropertyChanged(nameof(HifzMicPermissionDenied));
+        this.RaisePropertyChanged(nameof(HifzWrongWord));
     }
 
     private void LoadLanguage(string languageCode)
@@ -333,6 +346,19 @@ public class LocalizationService : ReactiveObject
     public string ShareDonationInfo => this["ShareDonationInfo"];
     public string ShareAppInfoChooser => this["ShareAppInfoChooser"];
     public string ShareDonationChooser => this["ShareDonationChooser"];
+
+    // Hifz properties
+    public string HifzMode => this["HifzMode"];
+    public string OpenHifz => this["OpenHifz"];
+    public string HifzStatus => this["HifzStatus"];
+    public string HifzHeard => this["HifzHeard"];
+    public string HifzListening => this["HifzListening"];
+    public string HifzStopped => this["HifzStopped"];
+    public string HifzAyaComplete => this["HifzAyaComplete"];
+    public string HifzSessionComplete => this["HifzSessionComplete"];
+    public string HifzNoSpeechEngine => this["HifzNoSpeechEngine"];
+    public string HifzMicPermissionDenied => this["HifzMicPermissionDenied"];
+    public string HifzWrongWord => this["HifzWrongWord"];
 
     public bool IsRightToLeft => _currentLanguage == "ar";
 

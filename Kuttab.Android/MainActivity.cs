@@ -50,6 +50,7 @@ public class MainActivity : AppCompatActivity
     private Button? _infoButton;
     private Button? _recitationButton;
     private Button? _donateButton;
+    private Button? _hifzButton;
     private Button? _ruleButton;
         private bool _showTajweedRules = true;
     private Button? _playButton;
@@ -240,6 +241,7 @@ public class MainActivity : AppCompatActivity
         _infoButton = FindViewById<Button>(Resource.Id.infoButton);
         _recitationButton = FindViewById<Button>(Resource.Id.recitationButton);
         _donateButton = FindViewById<Button>(Resource.Id.donateButton);
+        _hifzButton = FindViewById<Button>(Resource.Id.hifzButton);
         _ruleButton = FindViewById<Button>(Resource.Id.ruleButton);
         _playButton = FindViewById<Button>(Resource.Id.playButton);
         _playRepeatButton = FindViewById<Button>(Resource.Id.playRepeatButton);
@@ -269,6 +271,8 @@ public class MainActivity : AppCompatActivity
             _recitationButton.Click += OnRecitationClick;
         if (_donateButton != null)
             _donateButton.Click += OnDonateClick;
+        if (_hifzButton != null)
+            _hifzButton.Click += OnHifzClick;
         if (_ruleButton != null)
             _ruleButton.Click += OnRuleClick;
         if (_playButton != null)
@@ -1082,6 +1086,12 @@ public class MainActivity : AppCompatActivity
     private void OnDonateClick(object? sender, EventArgs e)
     {
         var intent = new Intent(this, typeof(DonateActivity));
+        StartActivity(intent);
+    }
+
+    private void OnHifzClick(object? sender, EventArgs e)
+    {
+        var intent = new Intent(this, typeof(HifzActivity));
         StartActivity(intent);
     }
     

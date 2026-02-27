@@ -198,5 +198,17 @@
   "ShareAppInfo": "📤 App teilen",
   "ShareDonationInfo": "📤 Spendeninfo teilen",
   "ShareAppInfoChooser": "App teilen über",
-  "ShareDonationChooser": "Spendeninfo teilen über"
+  "ShareDonationChooser": "Spendeninfo teilen über",
+
+  "HifzMode": "📖 Hifz-Modus",
+  "OpenHifz": "Hifz",
+  "HifzStatus": "Status:",
+  "HifzHeard": "Gehört:",
+  "HifzListening": "🎤 Hört zu...",
+  "HifzStopped": "Gestoppt",
+  "HifzAyaComplete": "Aya {0} abgeschlossen!",
+  "HifzSessionComplete": "✅ Sitzung abgeschlossen! Gut gemacht!",
+  "HifzNoSpeechEngine": "Spracherkennung nicht verfügbar. Bitte installieren Sie Google Spracheingabe.",
+  "HifzMicPermissionDenied": "Mikrofonberechtigung ist für den Hifz-Modus erforderlich.",
+  "HifzWrongWord": "Versuche es nochmal"
 }
