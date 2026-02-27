@@ -518,7 +518,9 @@ public class HifzActivity : AppCompatActivity
 
         if (matched > 0)
         {
+            int oldIndex = _currentWordIndex;
             _currentWordIndex += matched;
+            global::Android.Util.Log.Debug("Hifz", $"Word index: {oldIndex} + {matched} = {_currentWordIndex} (total words: {_currentAyaWords.Count})");
             _lastRecognizedWordCount = allRecognizedWords.Count;
             VibrateCorrect();
             DisplayAyaProgress();
@@ -527,7 +529,12 @@ public class HifzActivity : AppCompatActivity
             // Check if aya is complete
             if (_currentWordIndex >= _currentAyaWords.Count)
             {
+                global::Android.Util.Log.Debug("Hifz", $"Aya complete check: {_currentWordIndex} >= {_currentAyaWords.Count} - calling OnAyaComplete");
                 OnAyaComplete();
+            }
+            else
+            {
+                global::Android.Util.Log.Debug("Hifz", $"Aya not complete yet: {_currentWordIndex} < {_currentAyaWords.Count}");
             }
         }
         else if (newWords.Count > 0)
@@ -581,8 +588,10 @@ public class HifzActivity : AppCompatActivity
 
     private void LoadCurrentAya()
     {
+        global::Android.Util.Log.Debug("Hifz", $"LoadCurrentAya: Surah {_selectedSurah}, Aya {_currentAya}");
         _currentAyaFullText = GetAyaText(_selectedSurah, _currentAya);
         _currentAyaWords = QuranWordMatcher.TokenizeWords(_currentAyaFullText);
+        global::Android.Util.Log.Debug("Hifz", $"Loaded Aya text: '{_currentAyaFullText}' -> {_currentAyaWords.Count} words");
 
         if (_currentAyaInfo != null)
         {
