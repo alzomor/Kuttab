@@ -157,7 +157,33 @@
                     android:gravity="center"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Aya Text Display Area -->
+                <!-- Completed Aya History (scrollable) -->
+                <ScrollView
+                    android:id="@+id/completedAyaScrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxHeight="200dp"
+                    android:background="#F0FFF0"
+                    android:padding="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/completedAyaHistory"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="20sp"
+                        android:textColor="#1B5E20"
+                        android:layoutDirection="rtl"
+                        android:textDirection="rtl"
+                        android:textAlignment="gravity"
+                        android:lineSpacingMultiplier="1.4"
+                        android:gravity="right|start" />
+
+                </ScrollView>
+
+                <!-- Current Aya Text Display Area -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -174,10 +200,11 @@
                         android:text=""
                         android:textSize="28sp"
                         android:textColor="#333333"
+                        android:layoutDirection="rtl"
                         android:textDirection="rtl"
-                        android:textAlignment="viewStart"
+                        android:textAlignment="gravity"
                         android:lineSpacingMultiplier="1.6"
-                        android:gravity="right"
+                        android:gravity="right|start"
                         android:minHeight="100dp" />
 
                 </LinearLayout>
@@ -209,9 +236,10 @@
                             android:text=""
                             android:textSize="14sp"
                             android:textColor="#666666"
+                            android:layoutDirection="rtl"
                             android:textDirection="rtl"
-                            android:textAlignment="viewStart"
-                            android:gravity="right"
+                            android:textAlignment="gravity"
+                            android:gravity="right|start"
                             android:minHeight="24dp" />
 
                     </LinearLayout>

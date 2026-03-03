@@ -151,8 +151,11 @@ public class QuranWordMatcher
         // Fuzzy match using Levenshtein distance
         var distance = LevenshteinDistance(normRecognized, normExpected);
 
-        // Scale threshold by word length for very short words
-        var effectiveMax = normExpected.Length <= 2 ? 1 : maxDistance;
+        // Scale threshold by word length to avoid false matches
+        // Short words (<=2 chars): max 1 edit
+        // Medium words (<=5 chars): max 1 edit (prevents الرحيم matching الرحمن)
+        // Longer words: use full maxDistance
+        var effectiveMax = normExpected.Length <= 5 ? 1 : maxDistance;
 
         return distance <= effectiveMax;
     }
@@ -161,11 +164,6 @@ public class QuranWordMatcher
     /// Try to match recognized text against the expected words starting from a given position.
     /// Returns the number of newly matched words.
     /// </summary>
-    /// <param name="recognizedText">Full ASR recognized text</param>
-    /// <param name="expectedWords">List of expected (original) Quran words</param>
-    /// <param name="currentWordIndex">Current position in the expected words</param>
-    /// <param name="maxDistance">Fuzzy matching threshold</param>
-    /// <returns>Number of words matched from currentWordIndex</returns>
     public static int MatchRecognizedText(string recognizedText, List<string> expectedWords,
         int currentWordIndex, int maxDistance = 2)
     {
@@ -176,16 +174,10 @@ public class QuranWordMatcher
         if (recognizedWords.Count == 0)
             return 0;
 
-        // Speech recognizer sends cumulative text (e.g. "بسم الله" then "بسم الله الرحمن").
-        // We need to find the NEW words that match starting from currentWordIndex.
-        // Strategy: try matching recognized words against expected words starting from currentWordIndex.
-        // Skip recognized words that match already-revealed words (before currentWordIndex).
-
         int matched = 0;
         int recStartIdx = 0;
 
         // Skip recognized words that match already-completed words
-        // This handles cumulative partial results where old words are repeated
         for (int i = 0; i < recognizedWords.Count && recStartIdx < recognizedWords.Count; i++)
         {
             if (i >= currentWordIndex) break;
@@ -195,12 +187,11 @@ public class QuranWordMatcher
             }
             else
             {
-                // Recognized words don't align with previous words — try from beginning
                 break;
             }
         }
 
-        // Now match remaining recognized words against expected words from currentWordIndex
+        // Match remaining recognized words against expected words from currentWordIndex
         for (int r = recStartIdx; r < recognizedWords.Count; r++)
         {
             var nextExpectedIdx = currentWordIndex + matched;
@@ -233,5 +224,57 @@ public class QuranWordMatcher
         }
 
         return matched;
+    }
+
+    /// <summary>
+    /// Match recognized words against expected words starting from a given expected index.
+    /// Returns the total number of expected words matched (absolute position, not relative).
+    /// Works with cumulative ASR text within a single recognition cycle.
+    /// Also works with fresh recognition cycles by passing startFromExpectedIndex.
+    /// </summary>
+    public static int CountMatchedFromStart(string recognizedText, List<string> expectedWords, 
+        int maxDistance = 2, int startFromExpectedIndex = 0)
+    {
+        if (string.IsNullOrWhiteSpace(recognizedText) || expectedWords == null || expectedWords.Count == 0)
+            return startFromExpectedIndex;
+
+        var recognizedWords = TokenizeWords(recognizedText);
+        if (recognizedWords.Count == 0)
+            return startFromExpectedIndex;
+
+        int expectedIdx = startFromExpectedIndex;
+
+        for (int r = 0; r < recognizedWords.Count; r++)
+        {
+            if (expectedIdx >= expectedWords.Count)
+                break;
+
+            if (IsWordMatch(recognizedWords[r], expectedWords[expectedIdx], maxDistance))
+            {
+                expectedIdx++;
+            }
+            else
+            {
+                // Try lookahead — ASR might merge/skip words
+                bool foundAhead = false;
+                for (int lookahead = 1; lookahead <= 2 && expectedIdx + lookahead < expectedWords.Count; lookahead++)
+                {
+                    if (IsWordMatch(recognizedWords[r], expectedWords[expectedIdx + lookahead], maxDistance))
+                    {
+                        expectedIdx += lookahead + 1;
+                        foundAhead = true;
+                        break;
+                    }
+                }
+
+                if (!foundAhead)
+                {
+                    // Unrecognized word — skip it (ASR noise)
+                    // Don't break — allow continuing to match subsequent words
+                }
+            }
+        }
+
+        return expectedIdx;
     }
 }

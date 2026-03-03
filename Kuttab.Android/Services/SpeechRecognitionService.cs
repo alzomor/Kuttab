@@ -18,7 +18,7 @@ public class SpeechRecognitionService : Java.Lang.Object, IRecognitionListener, 
     private bool _shouldRestart;
     private string _languageCode = "ar";
     private int _consecutiveErrors = 0;
-    private const int MAX_CONSECUTIVE_ERRORS = 3;
+    private const int MAX_CONSECUTIVE_ERRORS = 15;
 
     public bool IsListening => _isListening;
 
@@ -182,6 +182,7 @@ public class SpeechRecognitionService : Java.Lang.Object, IRecognitionListener, 
     {
         if (partialResults == null) return;
 
+        _consecutiveErrors = 0; // partial result means engine is working
         var matches = partialResults.GetStringArrayList(SpeechRecognizer.ResultsRecognition);
         if (matches != null && matches.Count > 0)
         {
@@ -230,13 +231,14 @@ public class SpeechRecognitionService : Java.Lang.Object, IRecognitionListener, 
                 }
                 break;
             case SpeechRecognizerError.Client:
-            case SpeechRecognizerError.Server:
             case SpeechRecognizerError.InsufficientPermissions:
                 // Fatal — speech engine not available or not permitted
                 _shouldRestart = false;
                 SpeechEngineNotAvailable?.Invoke(this, EventArgs.Empty);
                 break;
+            case SpeechRecognizerError.Server:
             default:
+                // Transient errors (including ServerDisconnected) — just restart
                 ErrorOccurred?.Invoke(this, $"Speech recognition error: {error}");
                 RestartListening();
                 break;

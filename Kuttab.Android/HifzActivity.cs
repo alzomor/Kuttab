@@ -17,6 +17,7 @@ using Kuttab.Core.Models;
 using Kuttab.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using LocalizationService = Kuttab.Core.Services.LocalizationService;
 
 namespace Kuttab.Android;
@@ -57,6 +58,8 @@ public class HifzActivity : AppCompatActivity
     private TextView? _tajweedRulesTitle;
     private LinearLayout? _tajweedRulesContainer;
     private View? _wrongWordIndicator;
+    private ScrollView? _completedAyaScrollView;
+    private TextView? _completedAyaHistory;
 
     // State
     private int _selectedSurah = 1;
@@ -70,8 +73,8 @@ public class HifzActivity : AppCompatActivity
     private bool _showTajweedRules = true;
     private List<string>? _selectedTajweedRules;
     private string _lastProcessedText = "";
-    private int _lastRecognizedWordCount = 0;
     private long _lastWrongVibrationTime = 0;
+    private StringBuilder _completedAyaText = new();
     private Handler? _idleTimeoutHandler;
     private Java.Lang.Runnable? _idleTimeoutRunnable;
     private const int IDLE_TIMEOUT_MS = 60000; // 1 minute
@@ -167,6 +170,8 @@ public class HifzActivity : AppCompatActivity
         _tajweedRulesTitle = FindViewById<TextView>(Resource.Id.tajweedRulesTitle);
         _tajweedRulesContainer = FindViewById<LinearLayout>(Resource.Id.tajweedRulesContainer);
         _wrongWordIndicator = FindViewById<View>(Resource.Id.wrongWordIndicator);
+        _completedAyaScrollView = FindViewById<ScrollView>(Resource.Id.completedAyaScrollView);
+        _completedAyaHistory = FindViewById<TextView>(Resource.Id.completedAyaHistory);
 
         if (_micButton != null)
             _micButton.Click += OnMicClick;
@@ -352,6 +357,9 @@ public class HifzActivity : AppCompatActivity
         StopHifzSession();
         _currentWordIndex = 0;
         _lastProcessedText = "";
+        _completedAyaText.Clear();
+        if (_completedAyaHistory != null) _completedAyaHistory.Text = "";
+        if (_completedAyaScrollView != null) _completedAyaScrollView.Visibility = global::Android.Views.ViewStates.Gone;
         ValidateAyaInputs();
         _currentAya = _fromAya;
         LoadCurrentAya();
@@ -436,8 +444,6 @@ public class HifzActivity : AppCompatActivity
 
             ResetIdleTimeout();
             ProcessRecognizedText(text);
-            // Reset word counter — next recognition cycle starts fresh
-            _lastRecognizedWordCount = 0;
         });
     }
 
@@ -484,72 +490,43 @@ public class HifzActivity : AppCompatActivity
             return;
         _lastProcessedText = recognizedText;
 
-        // Speech recognizer sends cumulative partial results:
-        // "بسم" -> "بسم الله" -> "بسم الله الرحمن" -> "بسم الله الرحمن الرحيم"
-        // Extract only the NEW words we haven't processed yet
-        var allRecognizedWords = QuranWordMatcher.TokenizeWords(recognizedText);
-        
-        // Detect new recognition cycle: if word count dropped, recognizer restarted
-        if (allRecognizedWords.Count < _lastRecognizedWordCount)
+        try
         {
-            global::Android.Util.Log.Debug("Hifz", $"New recognition cycle detected (words: {allRecognizedWords.Count} < lastCount: {_lastRecognizedWordCount})");
-            _lastRecognizedWordCount = 0;
-        }
+            // Try two matching strategies and take the best result:
+            // 1) From position 0: handles cumulative text within a single recognition cycle
+            //    e.g. "بسم" -> "بسم الله" -> "بسم الله الرحمن"
+            // 2) From _currentWordIndex: handles new recognition cycles after restart
+            //    e.g. after ServerDisconnected, ASR sends fresh text for remaining words
+            int fromStart = QuranWordMatcher.CountMatchedFromStart(
+                recognizedText, _currentAyaWords, 2, 0);
+            int fromCurrent = QuranWordMatcher.CountMatchedFromStart(
+                recognizedText, _currentAyaWords, 2, _currentWordIndex);
+            int totalMatched = Math.Max(fromStart, fromCurrent);
 
-        if (allRecognizedWords.Count <= _lastRecognizedWordCount)
-            return; // No new words
+            global::Android.Util.Log.Debug("Hifz", $"Recognized: '{recognizedText}' | fromStart={fromStart}, fromCurrent={fromCurrent}, currentIdx={_currentWordIndex}/{_currentAyaWords.Count}");
 
-        // Get only the new words added since last processing
-        var newWords = allRecognizedWords.GetRange(
-            _lastRecognizedWordCount,
-            allRecognizedWords.Count - _lastRecognizedWordCount);
-        
-        var newText = string.Join(" ", newWords);
-        
-        global::Android.Util.Log.Debug("Hifz", $"Full: '{recognizedText}' NewWords: '{newText}'");
-        global::Android.Util.Log.Debug("Hifz", $"Word index: {_currentWordIndex}/{_currentAyaWords.Count}, lastRecCount: {_lastRecognizedWordCount}");
-        if (_currentWordIndex < _currentAyaWords.Count)
-            global::Android.Util.Log.Debug("Hifz", $"Expected: '{_currentAyaWords[_currentWordIndex]}'");
-
-        int matched = QuranWordMatcher.MatchRecognizedText(
-            newText, _currentAyaWords, _currentWordIndex, 2);
-
-        global::Android.Util.Log.Debug("Hifz", $"Matched: {matched} words");
-
-        if (matched > 0)
-        {
-            int oldIndex = _currentWordIndex;
-            _currentWordIndex += matched;
-            global::Android.Util.Log.Debug("Hifz", $"Word index: {oldIndex} + {matched} = {_currentWordIndex} (total words: {_currentAyaWords.Count})");
-            _lastRecognizedWordCount = allRecognizedWords.Count;
-            VibrateCorrect();
-            DisplayAyaProgress();
-            UpdateProgress();
-
-            // Check if aya is complete
-            if (_currentWordIndex >= _currentAyaWords.Count)
+            if (totalMatched > _currentWordIndex)
             {
-                global::Android.Util.Log.Debug("Hifz", $"Aya complete check: {_currentWordIndex} >= {_currentAyaWords.Count} - calling OnAyaComplete");
-                OnAyaComplete();
-            }
-            else
-            {
-                global::Android.Util.Log.Debug("Hifz", $"Aya not complete yet: {_currentWordIndex} < {_currentAyaWords.Count}");
+                // New words matched!
+                int newlyMatched = totalMatched - _currentWordIndex;
+                _currentWordIndex = totalMatched;
+                global::Android.Util.Log.Debug("Hifz", $"Advanced to word {_currentWordIndex} (+{newlyMatched})");
+
+                VibrateCorrect();
+                DisplayAyaProgress();
+                UpdateProgress();
+
+                // Check if aya is complete
+                if (_currentWordIndex >= _currentAyaWords.Count)
+                {
+                    global::Android.Util.Log.Debug("Hifz", $"Aya {_currentAya} complete! ({_currentWordIndex}/{_currentAyaWords.Count})");
+                    OnAyaComplete();
+                }
             }
         }
-        else if (newWords.Count > 0)
+        catch (Exception ex)
         {
-            // New words detected but didn't match — update count to avoid re-checking
-            _lastRecognizedWordCount = allRecognizedWords.Count;
-            
-            // Wrong word — vibrate and show visual indicator (debounced)
-            var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            if (now - _lastWrongVibrationTime > 2000) // Max once per 2 seconds
-            {
-                _lastWrongVibrationTime = now;
-                VibrateWrong();
-                ShowWrongWordIndicator();
-            }
+            global::Android.Util.Log.Debug("Hifz", $"Exception in ProcessRecognizedText: {ex.Message}");
         }
     }
 
@@ -561,17 +538,26 @@ public class HifzActivity : AppCompatActivity
             _localizationService?.HifzAyaComplete ?? "Aya {0} complete!",
             _currentAya));
 
+        // Add completed Aya to history display
+        if (_completedAyaText.Length > 0)
+            _completedAyaText.AppendLine();
+        _completedAyaText.Append($"﴿{_currentAya}﴾ {_currentAyaFullText}");
+        if (_completedAyaHistory != null)
+        {
+            _completedAyaHistory.Text = _completedAyaText.ToString();
+        }
+        if (_completedAyaScrollView != null)
+        {
+            _completedAyaScrollView.Visibility = global::Android.Views.ViewStates.Visible;
+            _completedAyaScrollView.Post(() => _completedAyaScrollView.FullScroll(global::Android.Views.FocusSearchDirection.Down));
+        }
+
         // Move to next aya
         if (_currentAya < _toAya)
         {
             _currentAya++;
             _currentWordIndex = 0;
             _lastProcessedText = "";
-            // NOTE: Do NOT reset _lastRecognizedWordCount here!
-            // The speech recognizer is still in the same recognition cycle,
-            // so cumulative text still contains Aya 1's words. Resetting would
-            // cause those old words to be re-extracted as "new" for Aya 2.
-            // It resets naturally when final result arrives (new cycle starts).
             LoadCurrentAya();
             global::Android.Util.Log.Debug("Hifz", $"Loaded next aya {_currentAya}, words: {_currentAyaWords.Count}");
         }
