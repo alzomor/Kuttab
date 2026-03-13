@@ -130,6 +130,24 @@ public class QuranWordMatcher
     }
 
     /// <summary>
+    /// Returns the Levenshtein distance between a recognized and expected word after normalization.
+    /// Returns int.MaxValue if either word is empty after normalization.
+    /// </summary>
+    public static int GetMatchDistance(string recognized, string expected)
+    {
+        var normRecognized = Normalize(recognized);
+        var normExpected = Normalize(expected);
+
+        if (string.IsNullOrEmpty(normRecognized) || string.IsNullOrEmpty(normExpected))
+            return int.MaxValue;
+
+        if (normRecognized == normExpected)
+            return 0;
+
+        return LevenshteinDistance(normRecognized, normExpected);
+    }
+
+    /// <summary>
     /// Check if a recognized word matches an expected word using normalized fuzzy matching.
     /// </summary>
     /// <param name="recognized">The ASR-recognized word</param>

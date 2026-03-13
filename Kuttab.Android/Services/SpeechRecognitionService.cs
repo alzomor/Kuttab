@@ -22,8 +22,8 @@ public class SpeechRecognitionService : Java.Lang.Object, IRecognitionListener, 
 
     public bool IsListening => _isListening;
 
-    public event EventHandler<string>? PartialResultReceived;
-    public event EventHandler<string>? FinalResultReceived;
+    public event EventHandler<List<string>>? PartialResultReceived;
+    public event EventHandler<List<string>>? FinalResultReceived;
     public event EventHandler<string>? ErrorOccurred;
     public event EventHandler? ListeningStarted;
     public event EventHandler? ListeningStopped;
@@ -85,6 +85,7 @@ public class SpeechRecognitionService : Java.Lang.Object, IRecognitionListener, 
     public void StopListening()
     {
         _shouldRestart = false;
+        _consecutiveErrors = 0;
         var wasListening = _isListening;
         _isListening = false;
 
@@ -167,10 +168,17 @@ public class SpeechRecognitionService : Java.Lang.Object, IRecognitionListener, 
         var matches = results.GetStringArrayList(SpeechRecognizer.ResultsRecognition);
         if (matches != null && matches.Count > 0)
         {
-            var bestResult = matches[0];
-            if (!string.IsNullOrWhiteSpace(bestResult))
+            // Pass all alternatives (up to 3) to the matching logic
+            var alternatives = new List<string>();
+            for (int i = 0; i < Math.Min(3, matches.Count); i++)
             {
-                FinalResultReceived?.Invoke(this, bestResult);
+                var result = matches[i];
+                if (!string.IsNullOrWhiteSpace(result))
+                    alternatives.Add(result);
+            }
+            if (alternatives.Count > 0)
+            {
+                FinalResultReceived?.Invoke(this, alternatives);
             }
         }
 
@@ -186,10 +194,17 @@ public class SpeechRecognitionService : Java.Lang.Object, IRecognitionListener, 
         var matches = partialResults.GetStringArrayList(SpeechRecognizer.ResultsRecognition);
         if (matches != null && matches.Count > 0)
         {
-            var bestResult = matches[0];
-            if (!string.IsNullOrWhiteSpace(bestResult))
+            // Pass all alternatives (up to 3) to the matching logic
+            var alternatives = new List<string>();
+            for (int i = 0; i < Math.Min(3, matches.Count); i++)
             {
-                PartialResultReceived?.Invoke(this, bestResult);
+                var result = matches[i];
+                if (!string.IsNullOrWhiteSpace(result))
+                    alternatives.Add(result);
+            }
+            if (alternatives.Count > 0)
+            {
+                PartialResultReceived?.Invoke(this, alternatives);
             }
         }
     }

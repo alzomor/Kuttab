@@ -85,6 +85,9 @@ public class HifzActivity : AppCompatActivity
     private Java.Lang.Runnable? _idleTimeoutRunnable;
     private const int IDLE_TIMEOUT_MS = 60000;
     private bool _engineErrorShown = false;
+    private bool _sessionIntentionallyStopped = false;
+    private int _consecutiveMisses = 0; // how many recognized words in a row didn't match next expected
+    private int _lastRecWordCount = 0; // how many words from the last cumulative ASR result were already processed
 
     // Quran text cache: "surah|aya" -> text
     private Dictionary<string, string> _quranTextCache = new();
@@ -388,6 +391,8 @@ public class HifzActivity : AppCompatActivity
     {
         StopHifzSession();
         _lastProcessedText = "";
+        _lastRecWordCount = 0;
+        _consecutiveMisses = 0;
         LoadPageAyas(_currentPage);
         DisplayPage();
         UpdateProgress();
@@ -407,8 +412,12 @@ public class HifzActivity : AppCompatActivity
 
     private void StartHifzSession()
     {
+        _engineErrorShown = false;
+        _sessionIntentionallyStopped = false;
         _isActive = true;
         _lastProcessedText = "";
+        _lastRecWordCount = 0;
+        _consecutiveMisses = 0;
 
         foreach (var aya in _pageAyas)
             if (aya.InRange)
@@ -431,6 +440,7 @@ public class HifzActivity : AppCompatActivity
 
     private void StopHifzSession()
     {
+        _sessionIntentionallyStopped = true;
         _isActive = false;
         _speechService?.StopListening();
         if (_setupPanel != null) _setupPanel.Visibility = ViewStates.Visible;
@@ -447,14 +457,28 @@ public class HifzActivity : AppCompatActivity
 
     // ── Speech Callbacks ─────────────────────────────────────
 
-    private void OnSpeechPartialResult(object? sender, string text)
+    private void OnSpeechPartialResult(object? sender, List<string> alternatives)
     {
-        RunOnUiThread(() => { if (!_isActive) return; if (_recognizedTextView != null) _recognizedTextView.Text = text; ResetIdleTimeout(); ProcessRecognizedText(text); });
+        RunOnUiThread(() => 
+        { 
+            if (!_isActive) return; 
+            if (_recognizedTextView != null) _recognizedTextView.Text = alternatives[0]; 
+            ResetIdleTimeout(); 
+            ProcessRecognizedTextWithAlternatives(alternatives); 
+        });
     }
 
-    private void OnSpeechFinalResult(object? sender, string text)
+    private void OnSpeechFinalResult(object? sender, List<string> alternatives)
     {
-        RunOnUiThread(() => { if (!_isActive) return; if (_recognizedTextView != null) _recognizedTextView.Text = text; ResetIdleTimeout(); ProcessRecognizedText(text); _lastProcessedText = ""; });
+        RunOnUiThread(() => 
+        { 
+            if (!_isActive) return; 
+            if (_recognizedTextView != null) _recognizedTextView.Text = alternatives[0]; 
+            ResetIdleTimeout(); 
+            ProcessRecognizedTextWithAlternatives(alternatives); 
+            _lastProcessedText = ""; 
+            _lastRecWordCount = 0; 
+        });
     }
 
     private void OnSpeechError(object? sender, string error)
@@ -466,10 +490,12 @@ public class HifzActivity : AppCompatActivity
     {
         RunOnUiThread(() =>
         {
+            global::Android.Util.Log.Debug("Hifz", "SpeechEngineNotAvailable event received (suppressed dialog)");
+            // Just stop cleanly — never show the install dialog
+            // ServerDisconnected errors are transient and don't mean the engine is missing
             StopIdleTimeout(); _isActive = false; _speechService?.StopListening();
             if (_setupPanel != null) _setupPanel.Visibility = ViewStates.Visible;
             UpdateButtonStates(); UpdateStatus(_localizationService?.HifzStopped ?? "Stopped");
-            if (!_engineErrorShown) { _engineErrorShown = true; PromptInstallSpeechEngine(); }
         });
     }
 
@@ -487,6 +513,31 @@ public class HifzActivity : AppCompatActivity
     }
 
     // ── Word Matching with Skip Support ─────────────────────
+
+    private void ProcessRecognizedTextWithAlternatives(List<string> alternatives)
+    {
+        if (alternatives == null || alternatives.Count == 0) return;
+
+        // Try each alternative until one produces a match
+        int initialWordIdx = _currentWordIdx;
+        int initialAyaIdx = _currentAyaIdx;
+        
+        foreach (var alternative in alternatives)
+        {
+            // Try this alternative
+            ProcessRecognizedText(alternative);
+            
+            // If we made progress, stop trying alternatives
+            if (_currentWordIdx > initialWordIdx || _currentAyaIdx > initialAyaIdx)
+            {
+                global::Android.Util.Log.Debug("Hifz", $"Alternative matched: '{alternative}' (tried {alternatives.IndexOf(alternative) + 1}/{alternatives.Count})");
+                return;
+            }
+        }
+        
+        // No alternative produced a match
+        global::Android.Util.Log.Debug("Hifz", $"No alternative matched from {alternatives.Count} options");
+    }
 
     private void ProcessRecognizedText(string recognizedText)
     {
@@ -507,10 +558,18 @@ public class HifzActivity : AppCompatActivity
             var recognizedWords = QuranWordMatcher.TokenizeWords(recognizedText);
             if (recognizedWords.Count == 0) return;
 
+            // ASR sends cumulative partial results: "بسم" -> "بسم الله" -> "بسم الله الرحمن"
+            // Only process NEW words to avoid re-matching already-processed words
+            int startFrom = _lastRecWordCount;
+            if (recognizedWords.Count < _lastRecWordCount)
+                startFrom = 0; // new recognition cycle — ASR restarted
+            _lastRecWordCount = recognizedWords.Count;
+
             bool anyProgress = false;
 
-            foreach (var recWord in recognizedWords)
+            for (int ri = startFrom; ri < recognizedWords.Count; ri++)
             {
+                var recWord = recognizedWords[ri];
                 if (_currentAyaIdx >= _pageAyas.Count) break;
                 currentAya = _pageAyas[_currentAyaIdx];
 
@@ -520,7 +579,7 @@ public class HifzActivity : AppCompatActivity
                     currentAya = _pageAyas[_currentAyaIdx];
                 }
 
-                // Strategy 1: Match current expected word
+                // Priority 1: Match the NEXT expected word
                 if (_currentWordIdx < currentAya.Words.Count &&
                     QuranWordMatcher.IsWordMatch(recWord, currentAya.Words[_currentWordIdx], 2))
                 {
@@ -532,58 +591,30 @@ public class HifzActivity : AppCompatActivity
                     continue;
                 }
 
-                // Strategy 2: Lookahead within current aya (skip 1-3 words)
-                bool foundInAya = false;
-                int maxLook = Math.Min(3, currentAya.Words.Count - _currentWordIdx - 1);
-                for (int ahead = 1; ahead <= maxLook; ahead++)
+                // Priority 2: Recovery - check if recognized word matches any of the next 2-3 words
+                // This handles ASR mistakes (missed first word, wrong word detection)
+                bool foundAhead = false;
+                int lookAhead = Math.Min(3, currentAya.Words.Count - _currentWordIdx);
+                for (int ahead = 1; ahead < lookAhead; ahead++)
                 {
                     int checkIdx = _currentWordIdx + ahead;
-                    if (checkIdx < currentAya.Words.Count &&
-                        QuranWordMatcher.IsWordMatch(recWord, currentAya.Words[checkIdx], 2))
+                    if (QuranWordMatcher.IsWordMatch(recWord, currentAya.Words[checkIdx], 2))
                     {
+                        // Found a match ahead - auto-skip the missed words
                         for (int skip = _currentWordIdx; skip < checkIdx; skip++)
                             currentAya.WordStates[skip] = WordState.Skipped;
-                        VibrateWrongWord();
                         currentAya.WordStates[checkIdx] = WordState.Revealed;
                         _currentWordIdx = checkIdx + 1;
+                        VibrateCorrect();
                         anyProgress = true;
-                        foundInAya = true;
+                        foundAhead = true;
                         if (_currentWordIdx >= currentAya.Words.Count) OnAyaComplete();
                         break;
                     }
                 }
-                if (foundInAya) continue;
-
-                // Strategy 3: Match against next in-range ayahs (detect skipped aya)
-                bool foundLater = false;
-                for (int ayaAhead = 1; ayaAhead <= 3; ayaAhead++)
-                {
-                    int nextIdx = FindNextInRangeAyaIdx(_currentAyaIdx + ayaAhead);
-                    if (nextIdx < 0) break;
-
-                    var nextAya = _pageAyas[nextIdx];
-                    for (int w = 0; w < Math.Min(3, nextAya.Words.Count); w++)
-                    {
-                        if (QuranWordMatcher.IsWordMatch(recWord, nextAya.Words[w], 2))
-                        {
-                            SkipRemainingWords(currentAya);
-                            for (int mid = _currentAyaIdx + 1; mid < nextIdx; mid++)
-                                if (_pageAyas[mid].InRange) SkipAllWords(_pageAyas[mid]);
-                            VibrateMissedAyah();
-
-                            _currentAyaIdx = nextIdx;
-                            _currentWordIdx = 0;
-                            for (int s = 0; s < w; s++) nextAya.WordStates[s] = WordState.Skipped;
-                            nextAya.WordStates[w] = WordState.Revealed;
-                            _currentWordIdx = w + 1;
-                            anyProgress = true;
-                            foundLater = true;
-                            if (_currentWordIdx >= nextAya.Words.Count) OnAyaComplete();
-                            break;
-                        }
-                    }
-                    if (foundLater) break;
-                }
+                if (foundAhead) continue;
+                
+                // No match found - ignore (ASR noise)
             }
 
             if (anyProgress) { DisplayPage(); UpdateProgress(); }
@@ -628,6 +659,8 @@ public class HifzActivity : AppCompatActivity
                 _currentAyaIdx = i;
                 _currentWordIdx = 0;
                 _lastProcessedText = "";
+                _lastRecWordCount = 0;
+                _consecutiveMisses = 0;
                 return true;
             }
         }
