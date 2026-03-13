@@ -8,13 +8,16 @@ using Kuttab.Core.Services;
 using Kuttab.Android.Utils;
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Kuttab.Android;
 
 [Activity(Label = "Donate", Theme = "@style/AppTheme")]
 public class DonateActivity : AppCompatActivity
 {
+    private const string DonationDataUrl = "https://raw.githubusercontent.com/alzomor/Kuttab/AndroidMigration/donation.json";
     private const string PayPalUrl = "https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=ESTNXJLMMQQQS&ssrt=1765056010634";
     private const string AssociationUrl = "https://bbfverein.de/";
     private const string Iban = "DE11 6805 0101 0014 3501 24";
@@ -77,29 +80,79 @@ public class DonateActivity : AppCompatActivity
         InitializeViews();
         SetupEventHandlers();
         UpdateLocalizedText();
+        
+        // Fetch latest donation data from GitHub in background
+        _ = FetchDonationDataFromServerAsync();
     }
 
     private void LoadDonationData()
     {
         try
         {
+            // Try loading cached data from SharedPreferences first
+            var prefs = GetSharedPreferences("KuttabPrefs", FileCreationMode.Private);
+            var cachedTotal = prefs.GetLong("donation_totalCost", 0);
+            var cachedCurrent = prefs.GetLong("donation_currentDonations", 0);
+            if (cachedTotal > 0 && cachedCurrent > 0)
+            {
+                _totalCost = cachedTotal;
+                _currentDonations = cachedCurrent;
+                return;
+            }
+
+            // Fallback to bundled asset
             using var stream = Assets?.Open("donation.json");
             if (stream != null)
             {
                 using var reader = new StreamReader(stream);
                 var json = reader.ReadToEnd();
-                using var doc = JsonDocument.Parse(json);
-                var root = doc.RootElement;
-                
-                if (root.TryGetProperty("totalCost", out var totalCostEl))
-                    _totalCost = totalCostEl.GetInt64();
-                if (root.TryGetProperty("currentDonations", out var currentEl))
-                    _currentDonations = currentEl.GetInt64();
+                ParseDonationJson(json);
             }
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error loading donation data: {ex.Message}");
+        }
+    }
+
+    private void ParseDonationJson(string json)
+    {
+        using var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
+        if (root.TryGetProperty("totalCost", out var totalCostEl))
+            _totalCost = totalCostEl.GetInt64();
+        if (root.TryGetProperty("currentDonations", out var currentEl))
+            _currentDonations = currentEl.GetInt64();
+    }
+
+    private async Task FetchDonationDataFromServerAsync()
+    {
+        try
+        {
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "Kuttab-App");
+            client.Timeout = TimeSpan.FromSeconds(10);
+            var response = await client.GetAsync(DonationDataUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                ParseDonationJson(json);
+
+                // Cache the values
+                var prefs = GetSharedPreferences("KuttabPrefs", FileCreationMode.Private);
+                var editor = prefs.Edit();
+                editor.PutLong("donation_totalCost", _totalCost);
+                editor.PutLong("donation_currentDonations", _currentDonations);
+                editor.Apply();
+
+                // Update UI on main thread
+                RunOnUiThread(() => UpdateLocalizedText());
+                System.Diagnostics.Debug.WriteLine($"Donation data updated from server: {_currentDonations}/{_totalCost}");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error fetching donation data from server: {ex.Message}");
         }
     }
 

@@ -40,8 +40,8 @@ public class NotificationContentService
             Console.WriteLine($"{TAG}: Current time: {new DateTime(1970, 1, 1).AddMilliseconds(currentTime):yyyy-MM-dd HH:mm:ss} UTC");
             Console.WriteLine($"{TAG}: Time since last check: {timeSinceLastCheck.TotalHours:F2} hours");
 
-            // Check every 6 hours unless forced
-            if (!forceCheck && timeSinceLastCheck.TotalHours < 6)
+            // Check every 1 hour unless forced
+            if (!forceCheck && timeSinceLastCheck.TotalHours < 1)
             {
                 Console.WriteLine($"{TAG}: Skipping check - only {timeSinceLastCheck.TotalHours:F2} hours since last check");
                 return;
