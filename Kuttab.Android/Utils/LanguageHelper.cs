@@ -5,7 +5,7 @@ namespace Kuttab.Android.Utils;
 
 public static class LanguageHelper
 {
-    private static readonly string[] SupportedLanguages = { "ar", "en", "de" };
+    private static readonly string[] SupportedLanguages = { "ar", "en", "de", "es", "tr", "fr", "ja" };
     
     /// <summary>
     /// Gets the system language with fallback to English if not supported

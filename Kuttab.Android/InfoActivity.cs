@@ -75,38 +75,42 @@ public class InfoActivity : AppCompatActivity
         try
         {
             var loc = _localizationService;
-            var versionName = "0.0";
+            var versionName = "0.93";
             try
             {
                 var packageInfo = PackageManager?.GetPackageInfo(PackageName ?? "", 0);
-                versionName = packageInfo?.VersionName ?? "0.0";
+                versionName = packageInfo?.VersionName ?? "0.93";
             }
             catch { }
             
             var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"\uD83D\uDCD6 {loc?.InfoTitle ?? "Kuttab"}");
-            sb.AppendLine($"v{versionName}");
+            sb.AppendLine($"📖 Kuttab v{versionName}");
+            sb.AppendLine("Kuttab Tajweed Trainer");
             sb.AppendLine();
-            sb.AppendLine(loc?.AppSubtitle ?? "Tajweed Pattern Search Application");
+            sb.AppendLine("━━━━━━━━━━━━━━━━━━━━");
             sb.AppendLine();
-            sb.AppendLine("\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501");
+            sb.AppendLine("✨ Features:");
+            sb.AppendLine("• Show Tajweed rule explanations");
+            sb.AppendLine("• Find all matching Ayat to Tajweed rules in selected range");
+            sb.AppendLine("• Select and listen to Ayah/Ayat from list of reciters");
+            sb.AppendLine("• Listen to single Ayah, repeat it, or play all matching Ayat");
+            sb.AppendLine("• Record Ayah with your voice and compare to selected reciter");
+            sb.AppendLine("• Listen to Quran with color-highlighted Tajweed rules");
+            sb.AppendLine("• View explanation for each rule and matching letters");
+            sb.AppendLine("• Hifz mode with speech recognition for memorization practice");
             sb.AppendLine();
-            sb.AppendLine("\u2022 " + (loc?.ShowTajweedRules ?? "Tajweed rule highlighting"));
-            sb.AppendLine("\u2022 " + (loc?.SelectTajweedRule ?? "Search Tajweed rules across the full Quran"));
-            sb.AppendLine("\u2022 " + (loc?.OpenRecitation ?? "Recitation mode with audio"));
-            sb.AppendLine("\u2022 " + (loc?.QuranicPageView ?? "Quranic page view"));
-            sb.AppendLine("\u2022 " + (loc?.OnlineAudio ?? "Online audio recitation"));
+            sb.AppendLine("🕌 Support:");
+            sb.AppendLine("• Donate to BBF Islamic Center building project in Freiburg im Breisgau");
             sb.AppendLine();
-            sb.AppendLine("\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501");
+            sb.AppendLine("━━━━━━━━━━━━━━━━━━━━");
             sb.AppendLine();
-            sb.AppendLine($"\uD83D\uDCE7 {loc?.ContactEmail ?? "Contact:"} {loc?.ContactEmailText ?? "almanar.backup@gmail.com"}");
-            sb.AppendLine();
-            sb.AppendLine("\uD83D\uDCF1 https://play.google.com/store/apps/details?id=com.kuttab.app");
+            sb.AppendLine("📧 Contact: almanar.backup@gmail.com");
+            sb.AppendLine("📱 https://play.google.com/store/apps/details?id=com.kuttab.app");
             
             var shareIntent = new Intent(Intent.ActionSend);
             shareIntent.SetType("text/plain");
             shareIntent.PutExtra(Intent.ExtraText, sb.ToString());
-            shareIntent.PutExtra(Intent.ExtraSubject, loc?.InfoTitle ?? "Kuttab");
+            shareIntent.PutExtra(Intent.ExtraSubject, $"Kuttab v{versionName}");
             
             var chooserTitle = loc?.ShareAppInfoChooser ?? "Share app via";
             var chooserIntent = Intent.CreateChooser(shareIntent, chooserTitle);

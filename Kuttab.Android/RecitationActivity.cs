@@ -145,6 +145,27 @@ public class RecitationActivity : AppCompatActivity
         SetupSpinners();
         LoadQuranData();
     }
+
+        // Restore state from orientation change or previous session
+        if (savedInstanceState != null)
+        {
+            _selectedSurah = savedInstanceState.GetInt("selectedSurah", 1);
+            _fromAya = savedInstanceState.GetInt("fromAya", 1);
+            _toAya = savedInstanceState.GetInt("toAya", 7);
+            _currentSurah = savedInstanceState.GetInt("currentSurah", 1);
+            _currentAya = savedInstanceState.GetInt("currentAya", 1);
+        }
+        else
+        {
+            // Restore last session state
+            var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
+            _selectedSurah = prefs?.GetInt("LastRecitationSurah", 1) ?? 1;
+            _fromAya = prefs?.GetInt("LastRecitationFromAya", 1) ?? 1;
+            _toAya = prefs?.GetInt("LastRecitationToAya", 7) ?? 7;
+        }
+        
+        // Update UI with restored state
+        RestoreUIState();
     
     private void InitializeServices()
     {
@@ -1199,6 +1220,45 @@ public class RecitationActivity : AppCompatActivity
             LoadSettings();
             
             // Update reciter spinner selection
+
+    protected override void OnSaveInstanceState(Bundle outState)
+    {
+        base.OnSaveInstanceState(outState);
+        
+        // Save current state for orientation changes
+        outState.PutInt("selectedSurah", _selectedSurah);
+        outState.PutInt("fromAya", _fromAya);
+        outState.PutInt("toAya", _toAya);
+        outState.PutInt("currentSurah", _currentSurah);
+        outState.PutInt("currentAya", _currentAya);
+        
+        // Also save to SharedPreferences for when returning to activity
+        var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
+        var editor = prefs?.Edit();
+        editor?.PutInt("LastRecitationSurah", _selectedSurah);
+        editor?.PutInt("LastRecitationFromAya", _fromAya);
+        editor?.PutInt("LastRecitationToAya", _toAya);
+        editor?.Apply();
+    }
+    
+    private void RestoreUIState()
+    {
+        // Update spinners and inputs with restored state
+        if (_surahSpinner != null && _selectedSurah > 0 && _selectedSurah <= 114)
+        {
+            _surahSpinner.SetSelection(_selectedSurah - 1);
+        }
+        
+        if (_fromAyaInput != null)
+        {
+            _fromAyaInput.Text = _fromAya.ToString();
+        }
+        
+        if (_toAyaInput != null)
+        {
+            _toAyaInput.Text = _toAya.ToString();
+        }
+    }
             for (int i = 0; i < _reciters.Count; i++)
             {
                 if (_reciters[i].FolderKey == _selectedReciter)

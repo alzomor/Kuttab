@@ -592,7 +592,20 @@ public class MainActivity : AppCompatActivity
         if (_searchResults.Count > 0)
         {
             _isPlayingSequence = true;
-            _currentPlayingIndex = 0;
+            // Resume from last played position if stopped mid-sequence, otherwise start from beginning
+            if (_currentPlayingIndex < 0 || _currentPlayingIndex >= _searchResults.Count)
+            {
+                _currentPlayingIndex = 0;
+            }
+            // If stopped mid-sequence, resume from next ayah
+            else if (!(_audioService?.IsPlaying ?? false))
+            {
+                _currentPlayingIndex++; // Move to next ayah after last played
+                if (_currentPlayingIndex >= _searchResults.Count)
+                {
+                    _currentPlayingIndex = 0; // Restart if we were at the end
+                }
+            }
             HighlightAndScrollToPlayingAya();
             PlayCurrentAya(false);
         }
