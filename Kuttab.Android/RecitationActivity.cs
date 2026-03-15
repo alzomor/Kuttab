@@ -1220,7 +1220,19 @@ public class RecitationActivity : AppCompatActivity
             LoadSettings();
             
             // Update reciter spinner selection
-
+            for (int i = 0; i < _reciters.Count; i++)
+            {
+                if (_reciters[i].FolderKey == _selectedReciter)
+                {
+                    _reciterSpinner?.SetSelection(i);
+                    break;
+                }
+            }
+            
+            Toast.MakeText(this, "Settings applied", ToastLength.Short)?.Show();
+        }
+    }
+    
     protected override void OnSaveInstanceState(Bundle outState)
     {
         base.OnSaveInstanceState(outState);
@@ -1257,18 +1269,6 @@ public class RecitationActivity : AppCompatActivity
         if (_toAyaInput != null)
         {
             _toAyaInput.Text = _toAya.ToString();
-        }
-    }
-            for (int i = 0; i < _reciters.Count; i++)
-            {
-                if (_reciters[i].FolderKey == _selectedReciter)
-                {
-                    _reciterSpinner?.SetSelection(i);
-                    break;
-                }
-            }
-            
-            Toast.MakeText(this, "Settings applied", ToastLength.Short)?.Show();
         }
     }
     
