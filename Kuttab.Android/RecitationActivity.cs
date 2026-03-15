@@ -144,8 +144,7 @@ public class RecitationActivity : AppCompatActivity
         LoadSettings();
         SetupSpinners();
         LoadQuranData();
-    }
-
+        
         // Restore state from orientation change or previous session
         if (savedInstanceState != null)
         {
@@ -166,6 +165,7 @@ public class RecitationActivity : AppCompatActivity
         
         // Update UI with restored state
         RestoreUIState();
+    }
     
     private void InitializeServices()
     {
@@ -1233,6 +1233,14 @@ public class RecitationActivity : AppCompatActivity
         }
     }
     
+    private void ShowError(string message)
+    {
+        RunOnUiThread(() =>
+        {
+            Toast.MakeText(this, message, ToastLength.Long)?.Show();
+        });
+    }
+    
     protected override void OnSaveInstanceState(Bundle outState)
     {
         base.OnSaveInstanceState(outState);
@@ -1270,14 +1278,6 @@ public class RecitationActivity : AppCompatActivity
         {
             _toAyaInput.Text = _toAya.ToString();
         }
-    }
-    
-    private void ShowError(string message)
-    {
-        RunOnUiThread(() =>
-        {
-            Toast.MakeText(this, message, ToastLength.Long)?.Show();
-        });
     }
     
     protected override void OnDestroy()
