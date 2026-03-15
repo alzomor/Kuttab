@@ -340,7 +340,11 @@ public class LocalizationService : ReactiveObject
     {
         new LanguageOption { Code = "ar", Name = "العربية", IsRightToLeft = true },
         new LanguageOption { Code = "en", Name = "English", IsRightToLeft = false },
-        new LanguageOption { Code = "de", Name = "Deutsch", IsRightToLeft = false }
+        new LanguageOption { Code = "de", Name = "Deutsch", IsRightToLeft = false },
+        new LanguageOption { Code = "es", Name = "Español", IsRightToLeft = false },
+        new LanguageOption { Code = "tr", Name = "Türkçe", IsRightToLeft = false },
+        new LanguageOption { Code = "fr", Name = "Français", IsRightToLeft = false },
+        new LanguageOption { Code = "ja", Name = "日本語", IsRightToLeft = false }
     };
 }
 
