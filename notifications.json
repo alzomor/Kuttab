@@ -98,5 +98,19 @@
       "endTime": "2026-03-20T23:59:59Z"
     },
     "createdAt": "2026-03-13T09:00:00Z"
+  },
+  {
+    "id": "ramadan_last_week_2026_de",
+    "title": "🌙 Weniger als eine Woche bis zum Ende des Ramadan!",
+    "message": "Nutzen Sie die verbleibenden Tage des Ramadan, um so viel Thawab wie möglich zu sammeln!\n\nKuttab kann Ihnen helfen:\n\n📖 Tajweed-Regeln lernen & verbessern\n🎧 Quran hören und Tajweed-Regeln in jeder Ayah prüfen\n🕌 Für das Bauprojekt des BBF Islamischen Zentrums Freiburg spenden\n🤝 Kuttab mit Familie und Freunden teilen — die App teilen bedeutet Thawab teilen!\n\nJeder Moment in diesen gesegneten Tagen zählt. Möge Allah es von uns allen annehmen. 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["de"],
+    "schedule": {
+      "startTime": "2026-03-13T00:00:00Z",
+      "endTime": "2026-03-20T23:59:59Z"
+    },
+    "createdAt": "2026-03-15T09:00:00Z"
   }
 ]

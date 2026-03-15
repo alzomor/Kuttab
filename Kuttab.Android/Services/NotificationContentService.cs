@@ -190,9 +190,25 @@ public class NotificationContentService
 
     private bool MatchesTargetAudience(List<string> targetAudience)
     {
-        // For now, show to all users
-        // In future, you could check user preferences, language, etc.
-        return targetAudience.Contains("all") || targetAudience.Count == 0;
+        // Check if notification targets all users
+        if (targetAudience.Contains("all") || targetAudience.Count == 0)
+            return true;
+        
+        // Check language-specific targeting
+        try
+        {
+            var prefs = _context.GetSharedPreferences("KuttabPrefs", FileCreationMode.Private);
+            var currentLanguage = prefs.GetString("app_language", "en");
+            
+            // Match language codes (de for German, en for English, etc.)
+            return targetAudience.Contains(currentLanguage);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"{TAG}: Error checking language preference: {ex.Message}");
+            // Fallback to showing to all if language check fails
+            return true;
+        }
     }
 
     private void ShowContentNotification(NotificationContent notification)
