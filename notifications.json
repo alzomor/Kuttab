@@ -92,7 +92,7 @@
     "type": "announcement",
     "actionUrl": "",
     "isActive": true,
-    "targetAudience": ["all"],
+    "targetAudience": ["en"],
     "schedule": {
       "startTime": "2026-03-13T00:00:00Z",
       "endTime": "2026-03-20T23:59:59Z"
@@ -107,6 +107,20 @@
     "actionUrl": "",
     "isActive": true,
     "targetAudience": ["de"],
+    "schedule": {
+      "startTime": "2026-03-13T00:00:00Z",
+      "endTime": "2026-03-20T23:59:59Z"
+    },
+    "createdAt": "2026-03-15T09:00:00Z"
+  },
+  {
+    "id": "ramadan_last_week_2026_ar",
+    "title": "🌙 أقل من أسبوع على نهاية رمضان!",
+    "message": "استغل الأيام المتبقية من رمضان للحصول على أكبر قدر من الثواب!\n\nيمكن لتطبيق كُتّاب مساعدتك:\n\n📖 تعلم وتحسين قواعد التجويد\n🎧 الاستماع للقرآن مع التحقق من قواعد التجويد في كل آية\n🕌 التبرع لمشروع بناء مركز BBF الإسلامي في فرايبورغ عبر التطبيق\n🤝 مشاركة تطبيق كُتّاب مع الأهل والأصدقاء — مشاركة التطبيق تعني مشاركة الثواب!\n\nكل لحظة في هذه الأيام المباركة يهمها. تقبل الله منا ومنكم جميعاً. 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["ar"],
     "schedule": {
       "startTime": "2026-03-13T00:00:00Z",
       "endTime": "2026-03-20T23:59:59Z"
