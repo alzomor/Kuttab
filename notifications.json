@@ -126,5 +126,47 @@
       "endTime": "2026-03-20T23:59:59Z"
     },
     "createdAt": "2026-03-15T09:00:00Z"
+  },
+  {
+    "id": "eid_al_fitr_2026_en",
+    "title": "🌟 Eid Mubarak! 🌟",
+    "message": "We wish you and your families a blessed Eid El-Fitr!\n\nMay Allah accept your fasting, prayers, and good deeds during Ramadan. May this Eid bring joy, peace, and blessings to you and your loved ones.\n\nContinue your Quranic journey with Kuttab and perfect your Tajweed throughout the year!\n\nEid Mubarak from the Kuttab team! 🕌✨",
+    "type": "celebration",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["en"],
+    "schedule": {
+      "startTime": "2026-03-20T00:00:00Z",
+      "endTime": "2026-03-23T23:59:59Z"
+    },
+    "createdAt": "2026-03-20T08:00:00Z"
+  },
+  {
+    "id": "eid_al_fitr_2026_de",
+    "title": "🌟 Eid Mubarak! 🌟",
+    "message": "Wir wünschen Ihnen und Ihren Familien ein gesegnetes Eid El-Fitr!\n\nMöge Allah Ihr Fasten, Ihre Gebete und Ihre guten Taten während des Ramadan annehmen. Möge dieses Eid Freude, Frieden und Segen für Sie und Ihre Liebsten bringen.\n\nSetzen Sie Ihre Quran-Reise mit Kuttab fort und perfektionieren Sie Ihr Tajweed das ganze Jahr über!\n\nEid Mubarak vom Kuttab-Team! 🕌✨",
+    "type": "celebration",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["de"],
+    "schedule": {
+      "startTime": "2026-03-20T00:00:00Z",
+      "endTime": "2026-03-23T23:59:59Z"
+    },
+    "createdAt": "2026-03-20T08:00:00Z"
+  },
+  {
+    "id": "eid_al_fitr_2026_ar",
+    "title": "🌟 عيدكم مبارك! 🌟",
+    "message": "نتمنى لكم ولأسرتكم عيد الفطر المبارك!\n\nتقبل الله منا ومنكم صيامكم وقيامكم وصالح أعمالكم في رمضان. نسأل الله أن يجعل هذا العيد فرحة وسعادة وبركة لكم ولأحبابكم.\n\nواصلوا رحلتكم مع القرآن وتطبيق كُتّاب، وأتقنوا تجويدكم على مدار العام!\n\nكل عام وأنتم بخير من فريق كُتّاب! 🕌✨",
+    "type": "celebration",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["ar"],
+    "schedule": {
+      "startTime": "2026-03-20T00:00:00Z",
+      "endTime": "2026-03-23T23:59:59Z"
+    },
+    "createdAt": "2026-03-20T08:00:00Z"
   }
 ]
