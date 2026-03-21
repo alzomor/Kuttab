@@ -1356,12 +1356,12 @@ public class RecitationActivity : AppCompatActivity
         }
     }
     
-    public override void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
+    public override void OnConfigurationChanged(global::Android.Content.Res.Configuration newConfig)
     {
         base.OnConfigurationChanged(newConfig);
         
         // Force portrait orientation
-        if (newConfig.Orientation == Android.Content.Res.Orientation.Landscape)
+        if (newConfig.Orientation == global::Android.Content.Res.Orientation.Landscape)
         {
             RequestedOrientation = global::Android.Content.PM.ScreenOrientation.Portrait;
             System.Diagnostics.Debug.WriteLine("🔄 Forced portrait orientation");
