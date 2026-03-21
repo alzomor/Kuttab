@@ -146,6 +146,7 @@ public class RecitationActivity : AppCompatActivity
         LoadQuranData();
         
         // Restore state from orientation change or previous session
+        bool wasPlaying = false;
         if (savedInstanceState != null)
         {
             _selectedSurah = savedInstanceState.GetInt("selectedSurah", 1);
@@ -153,6 +154,12 @@ public class RecitationActivity : AppCompatActivity
             _toAya = savedInstanceState.GetInt("toAya", 7);
             _currentSurah = savedInstanceState.GetInt("currentSurah", 1);
             _currentAya = savedInstanceState.GetInt("currentAya", 1);
+            wasPlaying = savedInstanceState.GetBoolean("isPlaying", false);
+            _playingBasmalah = savedInstanceState.GetBoolean("playingBasmalah", false);
+            _currentRepeat = savedInstanceState.GetInt("currentRepeat", 1);
+            _currentAyaRepeat = savedInstanceState.GetInt("currentAyaRepeat", 1);
+            
+            System.Diagnostics.Debug.WriteLine($"🔄 Restored state: Surah {_currentSurah}, Aya {_currentAya}, Playing {wasPlaying}");
         }
         else
         {
@@ -165,6 +172,27 @@ public class RecitationActivity : AppCompatActivity
         
         // Update UI with restored state
         RestoreUIState();
+        
+        // Resume playback if it was playing before orientation change
+        if (wasPlaying)
+        {
+            // Delay resume to ensure UI is fully restored
+            RunOnUiThread(() =>
+            {
+                new Handler().PostDelayed(() =>
+                {
+                    try
+                    {
+                        System.Diagnostics.Debug.WriteLine("🔄 Resuming playback after orientation change");
+                        StartRecitation();
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"❌ Failed to resume playback: {ex.Message}");
+                    }
+                }, 500); // 500ms delay
+            });
+        }
     }
     
     private void InitializeServices()
@@ -1284,6 +1312,10 @@ public class RecitationActivity : AppCompatActivity
         outState.PutInt("toAya", _toAya);
         outState.PutInt("currentSurah", _currentSurah);
         outState.PutInt("currentAya", _currentAya);
+        outState.PutBoolean("isPlaying", _isPlaying);
+        outState.PutBoolean("playingBasmalah", _playingBasmalah);
+        outState.PutInt("currentRepeat", _currentRepeat);
+        outState.PutInt("currentAyaRepeat", _currentAyaRepeat);
         
         // Also save to SharedPreferences for when returning to activity
         var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
