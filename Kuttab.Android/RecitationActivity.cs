@@ -139,6 +139,9 @@ public class RecitationActivity : AppCompatActivity
         
         SetContentView(Resource.Layout.activity_recitation);
         
+        // Lock orientation to portrait
+        RequestedOrientation = Android.Content.PM.ScreenOrientation.Portrait;
+        
         InitializeServices();
         InitializeViews();
         LoadSettings();

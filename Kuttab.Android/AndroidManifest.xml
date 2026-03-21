@@ -10,6 +10,14 @@
     android:theme="@style/AppTheme"
     android:usesCleartextTraffic="true"
     android:requestLegacyExternalStorage="false">
+    
+    <!-- Recitation Activity - Portrait only -->
+    <activity 
+      android:name=".RecitationActivity"
+      android:screenOrientation="portrait"
+      android:configChanges="orientation|screenSize|keyboardHidden"
+      android:exported="false" />
+      
   </application>
   
   <!-- Internet permissions for streaming audio and images -->
