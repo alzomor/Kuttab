@@ -884,7 +884,7 @@ public class RecitationActivity : AppCompatActivity
         // Also set window flag as backup method
         if (Window != null)
         {
-            Window.AddFlags(Android.Views.WindowManagerFlags.KeepScreenOn);
+            Window.AddFlags(global::Android.Views.WindowManagerFlags.KeepScreenOn);
             System.Diagnostics.Debug.WriteLine("✅ Window flag KeepScreenOn set");
         }
         
@@ -907,7 +907,7 @@ public class RecitationActivity : AppCompatActivity
         // Clear window flag
         if (Window != null)
         {
-            Window.ClearFlags(Android.Views.WindowManagerFlags.KeepScreenOn);
+            Window.ClearFlags(global::Android.Views.WindowManagerFlags.KeepScreenOn);
             System.Diagnostics.Debug.WriteLine("✅ Window flag KeepScreenOn cleared");
         }
         
