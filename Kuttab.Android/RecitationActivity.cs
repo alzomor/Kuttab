@@ -181,7 +181,7 @@ public class RecitationActivity : AppCompatActivity
             var powerManager = (PowerManager?)GetSystemService(PowerService);
             if (powerManager != null)
             {
-                _wakeLock = powerManager.NewWakeLock(WakeLockFlags.ScreenDim, "QuranSearch::RecitationWakeLock");
+                _wakeLock = powerManager.NewWakeLock(WakeLockFlags.ScreenBright | WakeLockFlags.AcquireCausesWakeup, "QuranSearch::RecitationWakeLock");
             }
             
             if (_audioService != null)
