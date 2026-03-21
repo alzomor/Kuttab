@@ -204,11 +204,20 @@ public class RecitationActivity : AppCompatActivity
             if (_wakeLock != null && !_wakeLock.IsHeld)
             {
                 _wakeLock.Acquire();
+                System.Diagnostics.Debug.WriteLine("✅ Wake lock acquired successfully - ScreenBright mode active");
+            }
+            else if (_wakeLock != null && _wakeLock.IsHeld)
+            {
+                System.Diagnostics.Debug.WriteLine("ℹ️ Wake lock already held");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("❌ Wake lock is null");
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to acquire wake lock: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"❌ Failed to acquire wake lock: {ex.Message}");
         }
     }
     
@@ -219,11 +228,20 @@ public class RecitationActivity : AppCompatActivity
             if (_wakeLock != null && _wakeLock.IsHeld)
             {
                 _wakeLock.Release();
+                System.Diagnostics.Debug.WriteLine("✅ Wake lock released successfully");
+            }
+            else if (_wakeLock != null && !_wakeLock.IsHeld)
+            {
+                System.Diagnostics.Debug.WriteLine("ℹ️ Wake lock not held");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("❌ Wake lock is null");
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Failed to release wake lock: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"❌ Failed to release wake lock: {ex.Message}");
         }
     }
     
