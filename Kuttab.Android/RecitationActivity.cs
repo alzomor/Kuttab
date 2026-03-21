@@ -171,6 +171,11 @@ public class RecitationActivity : AppCompatActivity
             _selectedSurah = prefs?.GetInt("LastRecitationSurah", 1) ?? 1;
             _fromAya = prefs?.GetInt("LastRecitationFromAya", 1) ?? 1;
             _toAya = prefs?.GetInt("LastRecitationToAya", 7) ?? 7;
+            _currentSurah = prefs?.GetInt("LastRecitationCurrentSurah", _selectedSurah) ?? _selectedSurah;
+            _currentAya = prefs?.GetInt("LastRecitationCurrentAya", _fromAya) ?? _fromAya;
+            wasPlaying = prefs?.GetBoolean("LastRecitationIsPlaying", false) ?? false;
+            
+            System.Diagnostics.Debug.WriteLine($"🔄 Restored from prefs: Surah {_currentSurah}, Aya {_currentAya}, Playing {wasPlaying}");
         }
         
         // Update UI with restored state
@@ -1326,6 +1331,9 @@ public class RecitationActivity : AppCompatActivity
         editor?.PutInt("LastRecitationSurah", _selectedSurah);
         editor?.PutInt("LastRecitationFromAya", _fromAya);
         editor?.PutInt("LastRecitationToAya", _toAya);
+        editor?.PutInt("LastRecitationCurrentSurah", _currentSurah);
+        editor?.PutInt("LastRecitationCurrentAya", _currentAya);
+        editor?.PutBoolean("LastRecitationIsPlaying", _isPlaying);
         editor?.Apply();
     }
     
@@ -1346,6 +1354,21 @@ public class RecitationActivity : AppCompatActivity
         {
             _toAyaInput.Text = _toAya.ToString();
         }
+    }
+    
+    public override void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
+    {
+        base.OnConfigurationChanged(newConfig);
+        
+        // Force portrait orientation
+        if (newConfig.Orientation == Android.Content.Res.Orientation.Landscape)
+        {
+            RequestedOrientation = global::Android.Content.PM.ScreenOrientation.Portrait;
+            System.Diagnostics.Debug.WriteLine("🔄 Forced portrait orientation");
+        }
+        
+        // Preserve current playback state during configuration change
+        System.Diagnostics.Debug.WriteLine($"🔄 Configuration changed: {_isPlaying}, Surah {_currentSurah}, Aya {_currentAya}");
     }
     
     protected override void OnDestroy()
