@@ -1356,19 +1356,13 @@ public class RecitationActivity : AppCompatActivity
         }
     }
     
-    public override void OnConfigurationChanged(global::Android.Content.Res.Configuration newConfig)
+    protected override void OnResume()
     {
-        base.OnConfigurationChanged(newConfig);
+        base.OnResume();
         
-        // Force portrait orientation
-        if (newConfig.Orientation == global::Android.Content.Res.Orientation.Landscape)
-        {
-            RequestedOrientation = global::Android.Content.PM.ScreenOrientation.Portrait;
-            System.Diagnostics.Debug.WriteLine("🔄 Forced portrait orientation");
-        }
-        
-        // Preserve current playback state during configuration change
-        System.Diagnostics.Debug.WriteLine($"🔄 Configuration changed: {_isPlaying}, Surah {_currentSurah}, Aya {_currentAya}");
+        // Force portrait orientation every time activity resumes
+        RequestedOrientation = global::Android.Content.PM.ScreenOrientation.Portrait;
+        System.Diagnostics.Debug.WriteLine("🔄 OnResume: Forced portrait orientation");
     }
     
     protected override void OnDestroy()
