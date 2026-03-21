@@ -181,7 +181,7 @@ public class RecitationActivity : AppCompatActivity
             var powerManager = (PowerManager?)GetSystemService(PowerService);
             if (powerManager != null)
             {
-                _wakeLock = powerManager.NewWakeLock(WakeLockFlags.ScreenBright | WakeLockFlags.AcquireCausesWakeup, "QuranSearch::RecitationWakeLock");
+                _wakeLock = powerManager.NewWakeLock(WakeLockFlags.ScreenBright | WakeLockFlags.AcquireCausesWakeup | WakeLockFlags.OnAfterRelease, "QuranSearch::RecitationWakeLock");
             }
             
             if (_audioService != null)
@@ -881,6 +881,13 @@ public class RecitationActivity : AppCompatActivity
         // Keep screen on during recitation
         AcquireWakeLock();
         
+        // Also set window flag as backup method
+        if (Window != null)
+        {
+            Window.AddFlags(Android.Views.WindowManagerFlags.KeepScreenOn);
+            System.Diagnostics.Debug.WriteLine("✅ Window flag KeepScreenOn set");
+        }
+        
         // Check if we need Basmalah for the first Aya
         _needsBasmalah = ShouldPlayBasmalah(_currentSurah, _currentAya, true);
         
@@ -896,6 +903,14 @@ public class RecitationActivity : AppCompatActivity
         _currentAyaRepeat = 1;
         _audioService?.StopAsync();
         ReleaseWakeLock();
+        
+        // Clear window flag
+        if (Window != null)
+        {
+            Window.ClearFlags(Android.Views.WindowManagerFlags.KeepScreenOn);
+            System.Diagnostics.Debug.WriteLine("✅ Window flag KeepScreenOn cleared");
+        }
+        
         UpdateButtonStates();
         
         if (_currentAyaInfo != null)
