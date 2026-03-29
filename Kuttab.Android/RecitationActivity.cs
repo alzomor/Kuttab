@@ -1128,7 +1128,29 @@ public class RecitationActivity : AppCompatActivity
         RunOnUiThread(() =>
         {
             UpdateButtonStates();
+            
+            // Save current position when playback state changes
+            SaveCurrentPosition();
         });
+    }
+    
+    private void SaveCurrentPosition()
+    {
+        try
+        {
+            var prefs = GetSharedPreferences("QuranSearchSettings", FileCreationMode.Private);
+            var editor = prefs?.Edit();
+            editor?.PutInt("LastRecitationCurrentSurah", _currentSurah);
+            editor?.PutInt("LastRecitationCurrentAya", _currentAya);
+            editor?.PutBoolean("LastRecitationIsPlaying", _isPlaying);
+            editor?.Apply();
+            
+            System.Diagnostics.Debug.WriteLine($"💾 Saved position: Surah {_currentSurah}, Aya {_currentAya}, Playing {_isPlaying}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Failed to save position: {ex.Message}");
+        }
     }
     
     private void OnAyaPlaybackEnded(object? sender, EventArgs e)
@@ -1203,6 +1225,8 @@ public class RecitationActivity : AppCompatActivity
                 {
                     _currentAya++;
                     _needsBasmalah = ShouldPlayBasmalah(_currentSurah, _currentAya, false);
+                    // Save position after moving to next ayah
+                    SaveCurrentPosition();
                 }
                 else
                 {
@@ -1363,6 +1387,15 @@ public class RecitationActivity : AppCompatActivity
         // Force portrait orientation every time activity resumes
         RequestedOrientation = global::Android.Content.PM.ScreenOrientation.Portrait;
         System.Diagnostics.Debug.WriteLine("🔄 OnResume: Forced portrait orientation");
+    }
+    
+    protected override void OnStart()
+    {
+        base.OnStart();
+        
+        // Force portrait orientation when activity starts
+        RequestedOrientation = global::Android.Content.PM.ScreenOrientation.Portrait;
+        System.Diagnostics.Debug.WriteLine("🔄 OnStart: Forced portrait orientation");
     }
     
     protected override void OnDestroy()

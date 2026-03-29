@@ -15,6 +15,7 @@
     <activity 
       android:name=".RecitationActivity"
       android:screenOrientation="portrait"
+      android:launchMode="singleTop"
       android:exported="false" />
       
   </application>
