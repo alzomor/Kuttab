@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Kuttab.Android;
 
-[Activity(Label = "@string/app_name", MainLauncher = true, Theme = "@style/SplashTheme", ScreenOrientation = ScreenOrientation.Portrait, LaunchMode = LaunchMode.SingleTop)]
+[Activity(Label = "@string/app_name", MainLauncher = true, Theme = "@style/SplashTheme", ScreenOrientation = ScreenOrientation.Portrait, LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.KeyboardHidden)]
 public class MainActivity : AppCompatActivity
 {
     private QuranSearchService? _searchService;
@@ -1500,6 +1500,21 @@ public class MainActivity : AppCompatActivity
         // Force portrait orientation when activity starts
         RequestedOrientation = global::Android.Content.PM.ScreenOrientation.Portrait;
         System.Diagnostics.Debug.WriteLine("🔄 MainActivity OnStart: Forced portrait orientation");
+    }
+    
+    public override void OnConfigurationChanged(global::Android.Content.Res.Configuration newConfig)
+    {
+        base.OnConfigurationChanged(newConfig);
+        
+        // Force portrait orientation if landscape is detected
+        if (newConfig.Orientation == global::Android.Content.Res.Orientation.Landscape)
+        {
+            RequestedOrientation = global::Android.Content.PM.ScreenOrientation.Portrait;
+            System.Diagnostics.Debug.WriteLine("🔄 MainActivity OnConfigurationChanged: Forced portrait orientation");
+        }
+        
+        // Preserve audio playback state during configuration change
+        System.Diagnostics.Debug.WriteLine($"🔄 MainActivity Configuration changed - Audio service state preserved");
     }
 
     protected override void OnDestroy()
