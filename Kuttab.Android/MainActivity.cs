@@ -34,7 +34,6 @@ public class MainActivity : AppCompatActivity
     private SimpleNotificationService? _notificationService;
     private SimpleUpdateService? _updateService;
     private NotificationContentService? _contentService;
-    private PowerManager.WakeLock? _wakeLock;
     
     private LinearLayout? _categoryContainer;
     private TextView? _categoryIcon;
@@ -1482,54 +1481,6 @@ public class MainActivity : AppCompatActivity
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error handling permission result: {ex.Message}");
-        }
-    }
-    
-    private void AcquireWakeLock()
-    {
-        try
-        {
-            if (_wakeLock != null && !_wakeLock.IsHeld)
-            {
-                _wakeLock.Acquire();
-                System.Diagnostics.Debug.WriteLine("✅ MainActivity Wake lock acquired successfully - ScreenBright mode active");
-            }
-            else if (_wakeLock != null && _wakeLock.IsHeld)
-            {
-                System.Diagnostics.Debug.WriteLine("ℹ️ MainActivity Wake lock already held");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("❌ MainActivity Wake lock is null");
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"❌ Failed to acquire MainActivity wake lock: {ex.Message}");
-        }
-    }
-    
-    private void ReleaseWakeLock()
-    {
-        try
-        {
-            if (_wakeLock != null && _wakeLock.IsHeld)
-            {
-                _wakeLock.Release();
-                System.Diagnostics.Debug.WriteLine("✅ MainActivity Wake lock released successfully");
-            }
-            else if (_wakeLock != null && !_wakeLock.IsHeld)
-            {
-                System.Diagnostics.Debug.WriteLine("ℹ️ MainActivity Wake lock not held");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("❌ MainActivity Wake lock is null");
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"❌ Failed to release MainActivity wake lock: {ex.Message}");
         }
     }
     
