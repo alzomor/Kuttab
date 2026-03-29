@@ -210,5 +210,103 @@
       "endTime": "2026-04-05T23:59:59Z"
     },
     "createdAt": "2026-03-29T18:00:00Z"
+  },
+  {
+    "id": "shawwal_reminder_ar",
+    "title": "🌙 عشرة أيام من شوال",
+    "message": "عشر أيام مضت من شوال\n\nإذا كنت محافظاً على وردك القرآني بعد رمضان فاحمد الله على التوفيق\n\nوإن كنت أصابك بعض الفتور فالوقت لم يتأخر\n\nيمكنك الاستماع للقرآن وتعلم أحكام التجويد مع تطبيق كُتّاب\n\nمع ميزات جديدة ودعم لغات أكثر",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["ar"],
+    "schedule": {
+      "startTime": "2026-03-29T00:00:00Z",
+      "endTime": "2026-04-10T23:59:59Z"
+    },
+    "createdAt": "2026-03-29T21:00:00Z"
+  },
+  {
+    "id": "shawwal_reminder_en",
+    "title": "🌙 Ten Days of Shawwal",
+    "message": "Ten days have passed since Shawwal began\n\nIf you've maintained your Quranic routine after Ramadan, praise Allah for His guidance\n\nAnd if you've experienced some decline, it's not too late\n\nYou can listen to the Quran and learn Tajweed rules with Kuttab app\n\nWith new features and support for more languages",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["en", "all"],
+    "schedule": {
+      "startTime": "2026-03-29T00:00:00Z",
+      "endTime": "2026-04-10T23:59:59Z"
+    },
+    "createdAt": "2026-03-29T21:00:00Z"
+  },
+  {
+    "id": "shawwal_reminder_de",
+    "title": "🌙 Zehn Tage von Shawwal",
+    "message": "Zehn Tage sind seit Beginn von Shawwal vergangen\n\nWenn Sie Ihre Quran-Routine nach Ramadan beibehalten haben, preisen Sie Allah für Seine Führung\n\nUnd wenn Sie einen Rückgang erlebt haben, ist es nicht zu spät\n\nSie können den Quran hören und Tajweed-Regeln mit der Kuttab-App lernen\n\nMit neuen Funktionen und Unterstützung für mehr Sprachen",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["de"],
+    "schedule": {
+      "startTime": "2026-03-29T00:00:00Z",
+      "endTime": "2026-04-10T23:59:59Z"
+    },
+    "createdAt": "2026-03-29T21:00:00Z"
+  },
+  {
+    "id": "shawwal_reminder_es",
+    "title": "🌙 Diez Días de Shawwal",
+    "message": "Han pasado diez días desde que comenzó Shawwal\n\nSi has mantenido tu rutina coránica después de Ramadán, alaba a Allah por Su guía\n\nY si has experimentado algún declive, no es demasiado tarde\n\nPuedes escuchar el Corán y aprender las reglas del Tajweed con la aplicación Kuttab\n\nCon nuevas funciones y soporte para más idiomas",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["es"],
+    "schedule": {
+      "startTime": "2026-03-29T00:00:00Z",
+      "endTime": "2026-04-10T23:59:59Z"
+    },
+    "createdAt": "2026-03-29T21:00:00Z"
+  },
+  {
+    "id": "shawwal_reminder_tr",
+    "title": "🌙 Şevval'in On Günü",
+    "message": "Şevval ayının başlangıcından bu yana on gün geçti\n\nRamazan'dan sonra Kur'an rutininizi sürdürdüyseniz, Allah'a hidayeti için hamd edin\n\nVe bir düşüş yaşadıysanız, henüz geç değil\n\nKuttab uygulaması ile Kur'an dinleyebilir ve Tecvid kurallarını öğrenebilirsiniz\n\nYeni özellikler ve daha fazla dil desteği ile",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["tr"],
+    "schedule": {
+      "startTime": "2026-03-29T00:00:00Z",
+      "endTime": "2026-04-10T23:59:59Z"
+    },
+    "createdAt": "2026-03-29T21:00:00Z"
+  },
+  {
+    "id": "shawwal_reminder_fr",
+    "title": "🌙 Dix Jours de Shawwal",
+    "message": "Dix jours se sont écoulés depuis le début de Shawwal\n\nSi vous avez maintenu votre routine coranique après le Ramadan, louez Allah pour Sa guidance\n\nEt si vous avez connu un déclin, il n'est pas trop tard\n\nVous pouvez écouter le Coran et apprendre les règles du Tajweed avec l'application Kuttab\n\nAvec de nouvelles fonctionnalités et un support pour plus de langues",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["fr"],
+    "schedule": {
+      "startTime": "2026-03-29T00:00:00Z",
+      "endTime": "2026-04-10T23:59:59Z"
+    },
+    "createdAt": "2026-03-29T21:00:00Z"
+  },
+  {
+    "id": "shawwal_reminder_ja",
+    "title": "🌙 シャウワール月の10日間",
+    "message": "シャウワール月が始まってから10日が経ちました\n\nラマダン後もクルアーンの習慣を維持している方は、アッラーの導きに感謝しましょう\n\n少し怠けてしまった方も、まだ遅くありません\n\nKuttabアプリでクルアーンを聴き、タジュウィードの規則を学ぶことができます\n\n新機能と多言語サポートで",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["ja"],
+    "schedule": {
+      "startTime": "2026-03-29T00:00:00Z",
+      "endTime": "2026-04-10T23:59:59Z"
+    },
+    "createdAt": "2026-03-29T21:00:00Z"
   }
 ]
