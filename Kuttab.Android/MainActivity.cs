@@ -34,6 +34,7 @@ public class MainActivity : AppCompatActivity
     private SimpleNotificationService? _notificationService;
     private SimpleUpdateService? _updateService;
     private NotificationContentService? _contentService;
+    private PowerManager.WakeLock? _wakeLock;
     
     private LinearLayout? _categoryContainer;
     private TextView? _categoryIcon;
@@ -104,6 +105,16 @@ public class MainActivity : AppCompatActivity
         
         SetContentView(Resource.Layout.activity_main);
         
+        // Lock orientation to portrait
+        RequestedOrientation = global::Android.Content.PM.ScreenOrientation.Portrait;
+        
+        // Initialize wake lock to keep screen on during audio playback
+        var powerManager = (PowerManager?)GetSystemService(PowerService);
+        if (powerManager != null)
+        {
+            _wakeLock = powerManager.NewWakeLock(WakeLockFlags.ScreenBright | WakeLockFlags.AcquireCausesWakeup | WakeLockFlags.OnAfterRelease, "QuranSearch::MainActivityWakeLock");
+        }
+        
         InitializeServices();
         InitializeViews();
         SetupRecyclerView();
@@ -128,12 +139,7 @@ public class MainActivity : AppCompatActivity
             _localizationService = new LocalizationService(fileService);
             _recordingService = new AndroidAudioRecordingService(this);
             
-            // Initialize wake lock to keep screen on during playback
-            var powerManager = (PowerManager?)GetSystemService(PowerService);
-            if (powerManager != null)
-            {
-                _wakeLock = powerManager.NewWakeLock(WakeLockFlags.ScreenDim, "QuranSearch::PlaybackWakeLock");
-            }
+            // Wake lock already initialized in OnCreate with ScreenBright
             
             // Setup audio event handlers
             if (_audioService != null)
@@ -942,10 +948,32 @@ public class MainActivity : AppCompatActivity
             // Only update UI state - sequence playback is handled by OnSequencePlaybackEnded
             UpdateAudioButtonsState(_searchResults.Count > 0);
             
-            // Release wake lock when single ayah playback ends (not in sequence mode)
-            if (!isPlaying && !_isPlayingSequence)
+            if (isPlaying)
             {
-                ReleaseWakeLock();
+                // Acquire wake lock and set window flag when playback starts
+                AcquireWakeLock();
+                
+                // Also set window flag as backup method
+                if (Window != null)
+                {
+                    Window.AddFlags(global::Android.Views.WindowManagerFlags.KeepScreenOn);
+                    System.Diagnostics.Debug.WriteLine("✅ MainActivity Window flag KeepScreenOn set");
+                }
+            }
+            else
+            {
+                // Release wake lock and clear window flag when playback ends (not in sequence mode)
+                if (!_isPlayingSequence)
+                {
+                    ReleaseWakeLock();
+                    
+                    // Clear window flag
+                    if (Window != null)
+                    {
+                        Window.ClearFlags(global::Android.Views.WindowManagerFlags.KeepScreenOn);
+                        System.Diagnostics.Debug.WriteLine("✅ MainActivity Window flag KeepScreenOn cleared");
+                    }
+                }
             }
             
             // Update recording visibility when playback state changes
@@ -1001,6 +1029,14 @@ public class MainActivity : AppCompatActivity
                     _isPlayingSequence = false;
                     _adapter?.ClearPlayingPosition();
                     ReleaseWakeLock();
+                    
+                    // Clear window flag
+                    if (Window != null)
+                    {
+                        Window.ClearFlags(global::Android.Views.WindowManagerFlags.KeepScreenOn);
+                        System.Diagnostics.Debug.WriteLine("✅ MainActivity Window flag KeepScreenOn cleared (sequence ended)");
+                    }
+                    
                     UpdateStatus(GetString(Resource.String.ready));
                 }
             }
@@ -1447,6 +1483,72 @@ public class MainActivity : AppCompatActivity
         {
             System.Diagnostics.Debug.WriteLine($"Error handling permission result: {ex.Message}");
         }
+    }
+    
+    private void AcquireWakeLock()
+    {
+        try
+        {
+            if (_wakeLock != null && !_wakeLock.IsHeld)
+            {
+                _wakeLock.Acquire();
+                System.Diagnostics.Debug.WriteLine("✅ MainActivity Wake lock acquired successfully - ScreenBright mode active");
+            }
+            else if (_wakeLock != null && _wakeLock.IsHeld)
+            {
+                System.Diagnostics.Debug.WriteLine("ℹ️ MainActivity Wake lock already held");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("❌ MainActivity Wake lock is null");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Failed to acquire MainActivity wake lock: {ex.Message}");
+        }
+    }
+    
+    private void ReleaseWakeLock()
+    {
+        try
+        {
+            if (_wakeLock != null && _wakeLock.IsHeld)
+            {
+                _wakeLock.Release();
+                System.Diagnostics.Debug.WriteLine("✅ MainActivity Wake lock released successfully");
+            }
+            else if (_wakeLock != null && !_wakeLock.IsHeld)
+            {
+                System.Diagnostics.Debug.WriteLine("ℹ️ MainActivity Wake lock not held");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("❌ MainActivity Wake lock is null");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Failed to release MainActivity wake lock: {ex.Message}");
+        }
+    }
+    
+    protected override void OnResume()
+    {
+        base.OnResume();
+        
+        // Force portrait orientation every time activity resumes
+        RequestedOrientation = global::Android.Content.PM.ScreenOrientation.Portrait;
+        System.Diagnostics.Debug.WriteLine("🔄 MainActivity OnResume: Forced portrait orientation");
+    }
+    
+    protected override void OnStart()
+    {
+        base.OnStart();
+        
+        // Force portrait orientation when activity starts
+        RequestedOrientation = global::Android.Content.PM.ScreenOrientation.Portrait;
+        System.Diagnostics.Debug.WriteLine("🔄 MainActivity OnStart: Forced portrait orientation");
     }
 
     protected override void OnDestroy()
