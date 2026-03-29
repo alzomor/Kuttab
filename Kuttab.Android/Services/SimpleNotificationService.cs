@@ -206,7 +206,10 @@ public class SimpleNotificationService
                 .SetContentText(message)
                 .SetAutoCancel(true)
                 .SetContentIntent(pendingIntent)
-                .SetPriority(NotificationCompat.PriorityDefault);
+                .SetPriority(NotificationCompat.PriorityDefault)
+                .SetStyle(new NotificationCompat.BigTextStyle()
+                    .BigText(message)
+                    .SetBigContentTitle(title));
 
             _notificationManager.Notify(notificationId, notificationBuilder.Build());
         }
