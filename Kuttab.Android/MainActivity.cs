@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Kuttab.Android;
 
-[Activity(Label = "@string/app_name", MainLauncher = true, Theme = "@style/SplashTheme")]
+[Activity(Label = "@string/app_name", MainLauncher = true, Theme = "@style/SplashTheme", ScreenOrientation = ScreenOrientation.Portrait, LaunchMode = LaunchMode.SingleTop)]
 public class MainActivity : AppCompatActivity
 {
     private QuranSearchService? _searchService;
