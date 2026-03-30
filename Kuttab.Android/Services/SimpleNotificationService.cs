@@ -189,27 +189,18 @@ public class SimpleNotificationService
             if (!AreNotificationsEnabled())
                 return;
 
-            var intent = new Intent(_context, typeof(MainActivity));
-            intent.AddFlags(ActivityFlags.ClearTop);
-
             var notificationId = _notificationIdCounter++;
-            
-            var pendingIntent = PendingIntent.GetActivity(
-                _context,
-                notificationId,
-                intent,
-                PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
 
             var notificationBuilder = new NotificationCompat.Builder(_context, CHANNEL_ID_GENERAL)
                 .SetSmallIcon(Resource.Drawable.ic_notification)
                 .SetContentTitle(title)
                 .SetContentText(message)
                 .SetAutoCancel(true)
-                .SetContentIntent(pendingIntent)
                 .SetPriority(NotificationCompat.PriorityDefault)
                 .SetStyle(new NotificationCompat.BigTextStyle()
                     .BigText(message)
-                    .SetBigContentTitle(title));
+                    .SetBigContentTitle(title))
+                .SetOnlyAlertOnce(true);
 
             _notificationManager.Notify(notificationId, notificationBuilder.Build());
         }
