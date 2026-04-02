@@ -427,18 +427,17 @@ public class SettingsActivity : AppCompatActivity
     
     private string GetGroupDisplayName(string group)
     {
-        return group switch
-        {
-            "lam" => "━━ Lam / اللام ━━",
-            "noon_tanween" => "━━ Noon & Tanween / النون والتنوين ━━",
-            "meem_sakinah" => "━━ Meem Sakinah / الميم الساكنة ━━",
-            "noon_meem_mushaddad" => "━━ Noon & Meem Mushaddad / النون والميم المشددتين ━━",
-            "qalqalah" => "━━ Qalqalah / القلقلة ━━",
-            "mad" => "━━ Madd / المد ━━",
-            "waqf" => "━━ Waqf / الوقف ━━",
-            "tafkhim_tarqiq" => "━━ Tafkhim & Tarqiq / التفخيم والترقيق ━━",
-            _ => $"━━ {group} ━━"
-        };
+        var languageCode = _localizationService?.CurrentLanguage ?? "ar";
+        var localizedTitle = RuleGroupTranslator.GetGroupTitle(group, languageCode);
+        var arabicTitle = RuleGroupTranslator.GetGroupTitle(group, "ar");
+
+        if (string.IsNullOrEmpty(localizedTitle))
+            return $"━━ {group} ━━";
+
+        if (languageCode == "ar" || localizedTitle == arabicTitle)
+            return $"━━ {arabicTitle} ━━";
+
+        return $"━━ {localizedTitle} / {arabicTitle} ━━";
     }
     
     private void UpdateTajweedRuleCardVisibility(bool showTajweed)

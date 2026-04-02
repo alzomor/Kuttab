@@ -32,6 +32,7 @@
                 android:layout_marginBottom="8dp" />
 
             <TextView
+                android:id="@+id/infoSubtitleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/info_app_subtitle"
@@ -60,6 +61,7 @@
             android:elevation="4dp">
 
             <TextView
+                android:id="@+id/citationsTitleText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/info_citations_title"
@@ -90,6 +92,7 @@
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/quranTextTitleText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/info_quran_text_title"
@@ -100,6 +103,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/quranTextContentText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/info_quran_text_content"
@@ -139,6 +143,7 @@
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/audioTitleText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/info_audio_files_title"
@@ -149,6 +154,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/audioContentText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/info_audio_files_content"
@@ -188,6 +194,7 @@
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/picturesTitleText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/info_picture_files_title"
@@ -198,6 +205,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/picturesContentText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/info_picture_files_content"
@@ -227,6 +235,7 @@
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/usulAiTitleText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/info_usul_ai_title"
@@ -237,6 +246,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/usulAiContentText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/info_usul_ai_content"
@@ -267,6 +277,7 @@
             android:elevation="4dp">
 
             <TextView
+                android:id="@+id/disclaimerTitleText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/info_disclaimer_title"
@@ -297,6 +308,7 @@
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/trainingDisclaimerTitleText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/info_training_disclaimer_title"
@@ -307,6 +319,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/trainingDisclaimerContentText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/info_training_disclaimer_content"
@@ -325,6 +338,7 @@
                 android:layout_marginBottom="12dp">
 
                 <TextView
+                    android:id="@+id/generalDisclaimerText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/info_general_disclaimer_content"
@@ -355,6 +369,7 @@
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/contactEmailTitleText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/info_contact_email_title"
@@ -383,6 +398,7 @@
                     android:layout_marginBottom="4dp" />
 
                 <TextView
+                    android:id="@+id/contactNoteText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/info_contact_note"

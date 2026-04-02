@@ -38,6 +38,9 @@ public class InfoActivity : AppCompatActivity
         
         SetContentView(Resource.Layout.activity_info);
         
+        // Apply localized text to all translatable views
+        ApplyLocalizedContent();
+        
         // Set version dynamically from package info
         var versionTextView = FindViewById<TextView>(Resource.Id.appVersionTextView);
         if (versionTextView != null)
@@ -70,6 +73,36 @@ public class InfoActivity : AppCompatActivity
         }
     }
     
+    private void ApplyLocalizedContent()
+    {
+        if (_localizationService == null) return;
+        var loc = _localizationService;
+
+        SetText(Resource.Id.infoSubtitleText, loc["AppSubtitle"]);
+        SetText(Resource.Id.citationsTitleText, loc["CitationsTitle"]);
+        SetText(Resource.Id.quranTextTitleText, loc["QuranTextCitation"]);
+        SetText(Resource.Id.quranTextContentText, loc["QuranTextCitationText"]);
+        SetText(Resource.Id.audioTitleText, loc["AudioFilesCitation"]);
+        SetText(Resource.Id.audioContentText, loc["AudioFilesCitationText"]);
+        SetText(Resource.Id.picturesTitleText, loc["PictureFilesCitation"]);
+        SetText(Resource.Id.picturesContentText, loc["PictureFilesCitationText"]);
+        SetText(Resource.Id.usulAiTitleText, loc["UsulAiCitation"]);
+        SetText(Resource.Id.usulAiContentText, loc["UsulAiCitationText"]);
+        SetText(Resource.Id.disclaimerTitleText, loc["DisclaimerTitle"]);
+        SetText(Resource.Id.trainingDisclaimerTitleText, loc["TrainingDisclaimer"]);
+        SetText(Resource.Id.trainingDisclaimerContentText, loc["TrainingDisclaimerText"]);
+        SetText(Resource.Id.generalDisclaimerText, loc["DisclaimerText"]);
+        SetText(Resource.Id.contactEmailTitleText, loc["ContactEmail"]);
+        SetText(Resource.Id.contactNoteText, loc["ContactNote"]);
+    }
+
+    private void SetText(int viewId, string text)
+    {
+        var view = FindViewById<TextView>(viewId);
+        if (view != null && !string.IsNullOrEmpty(text) && !text.StartsWith("["))
+            view.Text = text;
+    }
+
     private void ShareAppInfo()
     {
         try

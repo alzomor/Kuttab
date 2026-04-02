@@ -417,8 +417,10 @@ public class MainActivity : AppCompatActivity
             ScrollToTop();
             
             var matchCount = _searchResults.Count;
-            // Use Android formatting (resource uses %d)
-            UpdateStatus(GetString(Resource.String.found_matches, matchCount));
+            var foundMsg = _localizationService != null
+                ? string.Format(_localizationService["FoundMatches"], matchCount)
+                : GetString(Resource.String.found_matches, matchCount);
+            UpdateStatus(foundMsg);
             
             // Enable audio buttons if there are results (none selected yet)
             UpdateAudioButtonsState(matchCount > 0);
@@ -1001,7 +1003,7 @@ public class MainActivity : AppCompatActivity
                 {
                     _ayaImage.Visibility = ViewStates.Gone;
                     if (!ok)
-                        UpdateStatus("Image not available (offline or cannot download).");
+                        UpdateStatus(_localizationService?["ErrorCouldNotLoadImage"] ?? "Image not available (offline or cannot download).");
                 }
             });
         }
