@@ -49,7 +49,6 @@ public class MainActivity : AppCompatActivity
     private Button? _settingsButton;
     private Button? _infoButton;
     private Button? _recitationButton;
-    private Button? _donateButton;
     private Button? _ruleButton;
         private bool _showTajweedRules = true;
     private Button? _playButton;
@@ -244,7 +243,6 @@ public class MainActivity : AppCompatActivity
         _settingsButton = FindViewById<Button>(Resource.Id.settingsButton);
         _infoButton = FindViewById<Button>(Resource.Id.infoButton);
         _recitationButton = FindViewById<Button>(Resource.Id.recitationButton);
-        _donateButton = FindViewById<Button>(Resource.Id.donateButton);
         _ruleButton = FindViewById<Button>(Resource.Id.ruleButton);
         _playButton = FindViewById<Button>(Resource.Id.playButton);
         _playRepeatButton = FindViewById<Button>(Resource.Id.playRepeatButton);
@@ -272,8 +270,6 @@ public class MainActivity : AppCompatActivity
             _infoButton.Click += OnInfoClick;
         if (_recitationButton != null)
             _recitationButton.Click += OnRecitationClick;
-        if (_donateButton != null)
-            _donateButton.Click += OnDonateClick;
         if (_ruleButton != null)
             _ruleButton.Click += OnRuleClick;
         if (_playButton != null)
@@ -1129,11 +1125,6 @@ public class MainActivity : AppCompatActivity
         StartActivity(intent);
     }
 
-    private void OnDonateClick(object? sender, EventArgs e)
-    {
-        var intent = new Intent(this, typeof(DonateActivity));
-        StartActivity(intent);
-    }
     
     private void OnInfoClick(object? sender, EventArgs e)
     {

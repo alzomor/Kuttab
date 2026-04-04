@@ -308,5 +308,103 @@
       "endTime": "2026-04-10T23:59:59Z"
     },
     "createdAt": "2026-03-29T21:00:00Z"
+  },
+  {
+    "id": "mosque_donation_conclusion_en",
+    "title": "🕌 Mosque Land Purchase Campaign Concluded",
+    "message": "Alhamdulillah! We are grateful to announce that the donation campaign for purchasing the land for the BBF Islamic Center Freiburg mosque has been successfully concluded.\n\nThank you to everyone who contributed and supported this blessed project. May Allah accept your donations and reward you abundantly.\n\nThe donation feature has been removed from the app. Continue your Quranic journey with Kuttab!\n\nJazakum Allahu Khairan 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["en"],
+    "schedule": {
+      "startTime": "2026-04-04T00:00:00Z",
+      "endTime": "2026-04-15T23:59:59Z"
+    },
+    "createdAt": "2026-04-04T11:00:00Z"
+  },
+  {
+    "id": "mosque_donation_conclusion_de",
+    "title": "🕌 Moscheegrundstück-Spendenkampagne Abgeschlossen",
+    "message": "Alhamdulillah! Wir freuen uns mitteilen zu können, dass die Spendenkampagne für den Kauf des Grundstücks für die BBF Islamisches Zentrum Freiburg Moschee erfolgreich abgeschlossen wurde.\n\nVielen Dank an alle, die zu diesem gesegneten Projekt beigetragen und es unterstützt haben. Möge Allah Ihre Spenden annehmen und Sie reichlich belohnen.\n\nDie Spendenfunktion wurde aus der App entfernt. Setzen Sie Ihre Quran-Reise mit Kuttab fort!\n\nJazakum Allahu Khairan 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["de"],
+    "schedule": {
+      "startTime": "2026-04-04T00:00:00Z",
+      "endTime": "2026-04-15T23:59:59Z"
+    },
+    "createdAt": "2026-04-04T11:00:00Z"
+  },
+  {
+    "id": "mosque_donation_conclusion_ar",
+    "title": "🕌 اختتام حملة التبرع لشراء أرض المسجد",
+    "message": "الحمد لله! يسعدنا أن نعلن أن حملة التبرع لشراء أرض مسجد المركز الإسلامي BBF في فرايبورغ قد اختُتمت بنجاح.\n\nشكراً لكل من ساهم ودعم هذا المشروع المبارك. تقبل الله تبرعاتكم وجزاكم خير الجزاء.\n\nتم إزالة ميزة التبرع من التطبيق. واصلوا رحلتكم القرآنية مع كُتّاب!\n\nجزاكم الله خيراً 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["ar"],
+    "schedule": {
+      "startTime": "2026-04-04T00:00:00Z",
+      "endTime": "2026-04-15T23:59:59Z"
+    },
+    "createdAt": "2026-04-04T11:00:00Z"
+  },
+  {
+    "id": "mosque_donation_conclusion_es",
+    "title": "🕌 Campaña de Donación para Terreno de Mezquita Concluida",
+    "message": "¡Alhamdulillah! Nos complace anunciar que la campaña de donación para la compra del terreno para la mezquita del Centro Islámico BBF Freiburg ha concluido con éxito.\n\nGracias a todos los que contribuyeron y apoyaron este bendito proyecto. Que Allah acepte sus donaciones y los recompense abundantemente.\n\nLa función de donación ha sido eliminada de la aplicación. ¡Continúa tu viaje coránico con Kuttab!\n\nJazakum Allahu Khairan 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["es"],
+    "schedule": {
+      "startTime": "2026-04-04T00:00:00Z",
+      "endTime": "2026-04-15T23:59:59Z"
+    },
+    "createdAt": "2026-04-04T11:00:00Z"
+  },
+  {
+    "id": "mosque_donation_conclusion_tr",
+    "title": "🕌 Cami Arazi Alımı Bağış Kampanyası Tamamlandı",
+    "message": "Elhamdülillah! BBF İslam Merkezi Freiburg camisi için arazi alımı bağış kampanyasının başarıyla tamamlandığını duyurmaktan mutluluk duyuyoruz.\n\nBu mübarek projeye katkıda bulunan ve destek veren herkese teşekkür ederiz. Allah bağışlarınızı kabul etsin ve sizi bol bol mükafatlandırsın.\n\nBağış özelliği uygulamadan kaldırılmıştır. Kur'an yolculuğunuza Kuttab ile devam edin!\n\nCezakümüllahü Hayran 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["tr"],
+    "schedule": {
+      "startTime": "2026-04-04T00:00:00Z",
+      "endTime": "2026-04-15T23:59:59Z"
+    },
+    "createdAt": "2026-04-04T11:00:00Z"
+  },
+  {
+    "id": "mosque_donation_conclusion_fr",
+    "title": "🕌 Campagne de Don pour le Terrain de la Mosquée Conclue",
+    "message": "Alhamdulillah! Nous sommes heureux d'annoncer que la campagne de don pour l'achat du terrain de la mosquée du Centre Islamique BBF Freiburg a été conclue avec succès.\n\nMerci à tous ceux qui ont contribué et soutenu ce projet béni. Qu'Allah accepte vos dons et vous récompense abondamment.\n\nLa fonction de don a été retirée de l'application. Continuez votre voyage coranique avec Kuttab!\n\nJazakum Allahu Khairan 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["fr"],
+    "schedule": {
+      "startTime": "2026-04-04T00:00:00Z",
+      "endTime": "2026-04-15T23:59:59Z"
+    },
+    "createdAt": "2026-04-04T11:00:00Z"
+  },
+  {
+    "id": "mosque_donation_conclusion_ja",
+    "title": "🕌 モスク用地購入寄付キャンペーン終了",
+    "message": "アルハムドゥリッラー！BBFイスラムセンター・フライブルクのモスク用地購入のための寄付キャンペーンが無事終了したことをお知らせいたします。\n\nこの祝福されたプロジェクトに貢献し、支援してくださった皆様に感謝いたします。アッラーが皆様の寄付を受け入れ、豊かに報いてくださいますように。\n\n寄付機能はアプリから削除されました。Kuttabでクルアーンの旅を続けてください！\n\nジャザーカッラーフ・ハイラン 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["ja"],
+    "schedule": {
+      "startTime": "2026-04-04T00:00:00Z",
+      "endTime": "2026-04-15T23:59:59Z"
+    },
+    "createdAt": "2026-04-04T11:00:00Z"
   }
 ]
