@@ -792,21 +792,16 @@ public class HifzActivity : AppCompatActivity
                     }
                     
                     // Add aya marker
-                    int markerStart = spannable.Length();
+                    int bismillahMarkerStart = spannable.Length();
                     spannable.Append($" \u06DD{ConvertToArabicNumber(aya.AyaNumber)} ");
-                    int markerEnd = spannable.Length();
+                    int bismillahMarkerEnd = spannable.Length();
                     spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#888888")),
-                        markerStart, markerEnd, SpanTypes.ExclusiveExclusive);
+                        bismillahMarkerStart, bismillahMarkerEnd, SpanTypes.ExclusiveExclusive);
                     spannable.SetSpan(new RelativeSizeSpan(0.85f),
-                        markerStart, markerEnd, SpanTypes.ExclusiveExclusive);
-                    
-                    int bismillahEnd = spannable.Length();
-                    
-                    // Center align the entire Bismillah line
-                    spannable.SetSpan(new AlignmentSpan.Standard(Layout.Alignment.AlignCenter),
-                        bismillahStart, bismillahEnd, SpanTypes.ExclusiveExclusive);
+                        bismillahMarkerStart, bismillahMarkerEnd, SpanTypes.ExclusiveExclusive);
                     
                     // Add newline after Bismillah
+                    // Note: Center alignment not available in .NET for Android
                     spannable.Append("\n\n");
                     firstAya = false;
                     continue;
