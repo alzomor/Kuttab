@@ -7,7 +7,7 @@ from pathlib import Path
 
 # Configuration
 PROJECT_NAME = "Kuttab"
-VERSION = "0.92"
+VERSION = "0.95"
 TARGETS = [
     {"rid": "win-x64", "ext": "zip"},
     {"rid": "linux-x64", "ext": "tar.gz"},

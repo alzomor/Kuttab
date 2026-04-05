@@ -33,6 +33,7 @@ public class HifzActivity : AppCompatActivity
     private SpeechRecognitionService? _speechService;
     private QuranPageService? _pageService;
     private Vibrator? _vibrator;
+    private PowerManager.WakeLock? _wakeLock;
 
     // UI Elements
     private TextView? _titleTextView;
@@ -113,6 +114,7 @@ public class HifzActivity : AppCompatActivity
         LoadSettings();
         SetupSpinners();
         LoadQuranData();
+        InitializeWakeLock();
     }
 
     private void InitializeServices()
@@ -138,6 +140,23 @@ public class HifzActivity : AppCompatActivity
         catch (Exception ex)
         {
             ShowToast($"Init error: {ex.Message}");
+        }
+    }
+
+    private void InitializeWakeLock()
+    {
+        try
+        {
+            var powerManager = (PowerManager?)GetSystemService(PowerService);
+            if (powerManager != null)
+            {
+                _wakeLock = powerManager.NewWakeLock(WakeLockFlags.ScreenBright, "Kuttab::HifzWakeLock");
+                _wakeLock?.SetReferenceCounted(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            global::Android.Util.Log.Error("Hifz", $"Failed to initialize wake lock: {ex.Message}");
         }
     }
 
@@ -436,6 +455,11 @@ public class HifzActivity : AppCompatActivity
         UpdateStatus(_localizationService?.HifzListening ?? "Listening...");
         _speechService?.StartListening();
         StartIdleTimeout();
+        AcquireWakeLock();
+        
+        // Additional screen-on mechanism using Window flag
+        if (Window != null)
+            Window.AddFlags(WindowManagerFlags.KeepScreenOn);
     }
 
     private void StopHifzSession()
@@ -447,6 +471,11 @@ public class HifzActivity : AppCompatActivity
         UpdateButtonStates();
         UpdateStatus(_localizationService?.HifzStopped ?? "Stopped");
         StopIdleTimeout();
+        ReleaseWakeLock();
+        
+        // Remove screen-on flag
+        if (Window != null)
+            Window.ClearFlags(WindowManagerFlags.KeepScreenOn);
     }
 
     private void UpdateButtonStates()
@@ -585,27 +614,36 @@ public class HifzActivity : AppCompatActivity
                 {
                     currentAya.WordStates[_currentWordIdx] = WordState.Revealed;
                     _currentWordIdx++;
-                    VibrateCorrect();
+                    // No vibration on correct match - only vibrate on errors
                     anyProgress = true;
                     if (_currentWordIdx >= currentAya.Words.Count) OnAyaComplete();
                     continue;
                 }
 
-                // Priority 2: Recovery - check if recognized word matches any of the next 2-3 words
+                // Priority 2: Recovery - check if recognized word matches any of the next words
                 // This handles ASR mistakes (missed first word, wrong word detection)
+                // Use larger lookahead (5 words) to handle speech recognition startup delay
                 bool foundAhead = false;
-                int lookAhead = Math.Min(3, currentAya.Words.Count - _currentWordIdx);
+                int lookAhead = Math.Min(5, currentAya.Words.Count - _currentWordIdx);
                 for (int ahead = 1; ahead < lookAhead; ahead++)
                 {
                     int checkIdx = _currentWordIdx + ahead;
                     if (QuranWordMatcher.IsWordMatch(recWord, currentAya.Words[checkIdx], 2))
                     {
                         // Found a match ahead - auto-skip the missed words
+                        int skippedCount = 0;
                         for (int skip = _currentWordIdx; skip < checkIdx; skip++)
+                        {
                             currentAya.WordStates[skip] = WordState.Skipped;
+                            skippedCount++;
+                        }
                         currentAya.WordStates[checkIdx] = WordState.Revealed;
                         _currentWordIdx = checkIdx + 1;
-                        VibrateCorrect();
+                        
+                        // Vibrate for skipped words
+                        if (skippedCount > 0)
+                            VibrateWrongWord();
+                        
                         anyProgress = true;
                         foundAhead = true;
                         if (_currentWordIdx >= currentAya.Words.Count) OnAyaComplete();
@@ -614,7 +652,8 @@ public class HifzActivity : AppCompatActivity
                 }
                 if (foundAhead) continue;
                 
-                // No match found - ignore (ASR noise)
+                // No match found - vibrate for unmatched recognized word
+                VibrateWrongWord();
             }
 
             if (anyProgress) { DisplayPage(); UpdateProgress(); }
@@ -699,6 +738,80 @@ public class HifzActivity : AppCompatActivity
 
             foreach (var aya in _pageAyas)
             {
+                // Check if this is Bismillah (first ayah of a surah)
+                bool isBismillah = (aya.AyaNumber == 1 && aya.FullText.Contains("بِسْمِ ٱللَّهِ"));
+                
+                if (isBismillah)
+                {
+                    // Add newline before Bismillah if not first
+                    if (!firstAya) spannable.Append("\n\n");
+                    
+                    int bismillahStart = spannable.Length();
+                    
+                    // Render Bismillah with word states
+                    if (aya.InRange)
+                    {
+                        for (int i = 0; i < aya.Words.Count; i++)
+                        {
+                            int start = spannable.Length();
+                            var word = aya.Words[i];
+                            var state = aya.WordStates[i];
+
+                            if (state == WordState.Revealed)
+                            {
+                                spannable.Append(word);
+                                int end = spannable.Length();
+                                spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#1B5E20")),
+                                    start, end, SpanTypes.ExclusiveExclusive);
+                            }
+                            else if (state == WordState.Skipped)
+                            {
+                                spannable.Append(word);
+                                int end = spannable.Length();
+                                spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#C62828")),
+                                    start, end, SpanTypes.ExclusiveExclusive);
+                            }
+                            else
+                            {
+                                var dots = new string('\u00B7', Math.Max(word.Length / 2, 1));
+                                spannable.Append(dots);
+                                int end = spannable.Length();
+                                spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#D0D0D0")),
+                                    start, end, SpanTypes.ExclusiveExclusive);
+                            }
+
+                            if (i < aya.Words.Count - 1) spannable.Append(" ");
+                        }
+                    }
+                    else
+                    {
+                        spannable.Append(aya.FullText);
+                        int end = spannable.Length();
+                        spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#555555")),
+                            bismillahStart, end, SpanTypes.ExclusiveExclusive);
+                    }
+                    
+                    // Add aya marker
+                    int markerStart = spannable.Length();
+                    spannable.Append($" \u06DD{ConvertToArabicNumber(aya.AyaNumber)} ");
+                    int markerEnd = spannable.Length();
+                    spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#888888")),
+                        markerStart, markerEnd, SpanTypes.ExclusiveExclusive);
+                    spannable.SetSpan(new RelativeSizeSpan(0.85f),
+                        markerStart, markerEnd, SpanTypes.ExclusiveExclusive);
+                    
+                    int bismillahEnd = spannable.Length();
+                    
+                    // Center align the entire Bismillah line
+                    spannable.SetSpan(new AlignmentSpan.Standard(Layout.Alignment.AlignCenter),
+                        bismillahStart, bismillahEnd, SpanTypes.ExclusiveExclusive);
+                    
+                    // Add newline after Bismillah
+                    spannable.Append("\n\n");
+                    firstAya = false;
+                    continue;
+                }
+                
                 if (!firstAya) spannable.Append(" ");
                 firstAya = false;
 
@@ -749,7 +862,7 @@ public class HifzActivity : AppCompatActivity
                         start, end, SpanTypes.ExclusiveExclusive);
                 }
 
-                // Aya end marker
+                // Aya end marker (skip for Bismillah as it's already added above)
                 int markerStart = spannable.Length();
                 spannable.Append($" \u06DD{ConvertToArabicNumber(aya.AyaNumber)} ");
                 int markerEnd = spannable.Length();
@@ -900,6 +1013,40 @@ public class HifzActivity : AppCompatActivity
             _idleTimeoutHandler.RemoveCallbacks(_idleTimeoutRunnable);
     }
 
+    // ── Wake Lock Management ─────────────────────────────────
+
+    private void AcquireWakeLock()
+    {
+        try
+        {
+            if (_wakeLock != null && !_wakeLock.IsHeld)
+            {
+                _wakeLock.Acquire();
+                global::Android.Util.Log.Debug("Hifz", "Wake lock acquired - screen will stay on");
+            }
+        }
+        catch (Exception ex)
+        {
+            global::Android.Util.Log.Error("Hifz", $"Failed to acquire wake lock: {ex.Message}");
+        }
+    }
+
+    private void ReleaseWakeLock()
+    {
+        try
+        {
+            if (_wakeLock != null && _wakeLock.IsHeld)
+            {
+                _wakeLock.Release();
+                global::Android.Util.Log.Debug("Hifz", "Wake lock released");
+            }
+        }
+        catch (Exception ex)
+        {
+            global::Android.Util.Log.Error("Hifz", $"Failed to release wake lock: {ex.Message}");
+        }
+    }
+
     // ── Helpers ───────────────────────────────────────────────
 
     private void ShowToast(string message)
@@ -910,6 +1057,12 @@ public class HifzActivity : AppCompatActivity
     protected override void OnDestroy()
     {
         StopIdleTimeout();
+        ReleaseWakeLock();
+        
+        // Ensure screen-on flag is cleared
+        if (Window != null)
+            Window.ClearFlags(WindowManagerFlags.KeepScreenOn);
+        
         _speechService?.StopListening();
         _speechService?.Dispose();
         base.OnDestroy();

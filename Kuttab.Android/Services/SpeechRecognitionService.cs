@@ -63,10 +63,11 @@ public class SpeechRecognitionService : Java.Lang.Object, IRecognitionListener, 
             intent.PutExtra(RecognizerIntent.ExtraLanguagePreference, _languageCode);
             intent.PutExtra(RecognizerIntent.ExtraPartialResults, true);
             intent.PutExtra(RecognizerIntent.ExtraMaxResults, 3);
-            // Longer silence timeouts for Quran recitation (must be int, not long)
-            intent.PutExtra(RecognizerIntent.ExtraSpeechInputCompleteSilenceLengthMillis, 3000);
-            intent.PutExtra(RecognizerIntent.ExtraSpeechInputPossiblyCompleteSilenceLengthMillis, 2000);
-            intent.PutExtra(RecognizerIntent.ExtraSpeechInputMinimumLengthMillis, 1000);
+            // Longer silence timeouts for Quran recitation to reduce restarts between ayahs
+            // This minimizes the "missed first word" issue caused by engine restart delay
+            intent.PutExtra(RecognizerIntent.ExtraSpeechInputCompleteSilenceLengthMillis, 5000);
+            intent.PutExtra(RecognizerIntent.ExtraSpeechInputPossiblyCompleteSilenceLengthMillis, 3000);
+            intent.PutExtra(RecognizerIntent.ExtraSpeechInputMinimumLengthMillis, 500);
 
             _shouldRestart = true;
             _consecutiveErrors = 0;
@@ -137,7 +138,8 @@ public class SpeechRecognitionService : Java.Lang.Object, IRecognitionListener, 
         try
         {
             _isListening = false;
-            // Small delay before restarting to avoid rapid cycling
+            // Minimal delay before restarting to reduce startup delay impact
+            // Faster restart = less time for first word to be missed
             var handler = new Handler(Looper.MainLooper!);
             handler.PostDelayed(() =>
             {
@@ -145,7 +147,7 @@ public class SpeechRecognitionService : Java.Lang.Object, IRecognitionListener, 
                 {
                     StartListening();
                 }
-            }, 300);
+            }, 100);
         }
         catch (Exception ex)
         {

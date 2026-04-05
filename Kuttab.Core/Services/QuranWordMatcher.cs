@@ -27,21 +27,23 @@ public class QuranWordMatcher
         { '\u0626', '\u064A' }, // ئ (ya hamza) → ي
         { '\u0629', '\u0647' }, // ة (ta marbuta) → ه
         { '\u0649', '\u064A' }, // ى (alef maqsura) → ي
+        { '\u0670', '\u0627' }, // ٰ (superscript alef) → ا
+        { '\u06E5', '\u0648' }, // ۥ (small waw) → و
+        { '\u06E6', '\u064A' }, // ۦ (small yaa) → ي
     };
 
-    // Small Quran annotation characters to remove
+    // Small Quran annotation characters to remove (excluding small letters which are normalized)
     private static readonly HashSet<char> SmallAnnotations = new()
     {
         '\u06D6', '\u06D7', '\u06D8', '\u06D9', '\u06DA', '\u06DB', '\u06DC',
         '\u06DD', '\u06DE', '\u06DF', '\u06E0', '\u06E1', '\u06E2', '\u06E3',
-        '\u06E4', '\u06E5', '\u06E6', '\u06E7', '\u06E8', '\u06E9', '\u06EA',
+        '\u06E4', '\u06E7', '\u06E8', '\u06E9', '\u06EA',
         '\u06EB', '\u06EC', '\u06ED',
         '\u0615', '\u0616', '\u0617', '\u0618', '\u0619', '\u061A',
         '\u08D4', '\u08D5', '\u08D6', '\u08D7', '\u08D8', '\u08D9',
         '\u08DA', '\u08DB', '\u08DC', '\u08DD', '\u08DE', '\u08DF',
         '\u08E0', '\u08E1', '\u08E3', '\u08E4', '\u08E5', '\u08E6',
         '\u08E7', '\u08E8', '\u08E9', '\u08EA', '\u08EB', '\u08EC',
-        '\u0670', // superscript alef
         '\u0640', // tatweel (kashida)
     };
 
@@ -53,24 +55,32 @@ public class QuranWordMatcher
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
-        // Remove harakat
-        var stripped = HarakatRegex.Replace(text, "");
-
-        var sb = new StringBuilder(stripped.Length);
-        foreach (var ch in stripped)
+        // First pass: normalize characters (including small letters) BEFORE removing harakat
+        // This ensures small yaa/waw/alef are replaced before being stripped by HarakatRegex
+        var sb = new StringBuilder(text.Length);
+        foreach (var ch in text)
         {
-            // Skip small annotations
-            if (SmallAnnotations.Contains(ch))
-                continue;
-
-            // Normalize characters
+            // Normalize characters first
             if (CharNormalization.TryGetValue(ch, out var normalized))
                 sb.Append(normalized);
             else
                 sb.Append(ch);
         }
 
-        return sb.ToString().Trim();
+        // Second pass: remove harakat and annotations
+        var normalized1 = sb.ToString();
+        var stripped = HarakatRegex.Replace(normalized1, "");
+
+        var sb2 = new StringBuilder(stripped.Length);
+        foreach (var ch in stripped)
+        {
+            // Skip small annotations
+            if (SmallAnnotations.Contains(ch))
+                continue;
+            sb2.Append(ch);
+        }
+
+        return sb2.ToString().Trim();
     }
 
     /// <summary>
