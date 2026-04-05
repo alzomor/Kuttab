@@ -160,10 +160,10 @@
                 android:textColor="#1A1A1A"
                 android:layoutDirection="rtl"
                 android:textDirection="rtl"
-                android:textAlignment="textEnd"
+                android:textAlignment="textStart"
                 android:lineSpacingMultiplier="1.1"
                 android:lineSpacingExtra="0dp"
-                android:gravity="right|center_vertical"
+                android:gravity="right"
                 android:padding="10dp"
                 android:fontFamily="serif" />
 

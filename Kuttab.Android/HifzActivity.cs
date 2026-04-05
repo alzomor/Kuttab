@@ -738,20 +738,42 @@ public class HifzActivity : AppCompatActivity
 
             foreach (var aya in _pageAyas)
             {
-                // Check if this is Bismillah (first ayah of a surah)
-                bool isBismillah = (aya.AyaNumber == 1 && aya.FullText.Contains("بِسْمِ ٱللَّهِ"));
+                // Check if this is Bismillah (first ayah of every surah except At-Tawba/9)
+                bool isBismillah = (aya.AyaNumber == 1 && aya.Surah != 9);
+                // Check if this is the last ayah of a surah
+                bool isLastAyahOfSurah = (aya.AyaNumber == SurahInfo.GetAyaCount(aya.Surah));
+                
+                // Display surah name for ayah 1 (all surahs including Surah 9)
+                if (aya.AyaNumber == 1)
+                {
+                    if (!firstAya) spannable.Append("\n");
+                    string surahName = $"﴾ سورة {SurahInfo.GetSurahName(aya.Surah)} ﴿";
+                    int nameStart = spannable.Length();
+                    spannable.Append(surahName);
+                    int nameEnd = spannable.Length();
+                    spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#B8860B")),
+                        nameStart, nameEnd - 1, SpanTypes.ExclusiveExclusive);
+                    spannable.SetSpan(new RelativeSizeSpan(1.15f),
+                        nameStart, nameEnd - 1, SpanTypes.ExclusiveExclusive);
+                    spannable.SetSpan(new StyleSpan(global::Android.Graphics.TypefaceStyle.Bold),
+                        nameStart, nameEnd - 1, SpanTypes.ExclusiveExclusive);
+                    spannable.SetSpan(new global::Android.Text.Style.AlignmentSpanStandard(global::Android.Text.Layout.Alignment.AlignCenter),
+                        nameStart, nameEnd, SpanTypes.ExclusiveExclusive);
+                    spannable.Append("\n");
+                    firstAya = false;
+                }
                 
                 if (isBismillah)
                 {
-                    // Add newline before Bismillah if not first
-                    if (!firstAya) spannable.Append("\n\n");
+                    // Bismillah is the first 4 words of ayah 1: بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+                    // Split them onto their own line, then render remaining words as ayah text
+                    int bismillahWordCount = 4;
                     
+                    // --- Render the Bismillah phrase (first 4 words) on its own line ---
                     int bismillahStart = spannable.Length();
-                    
-                    // Render Bismillah with word states
                     if (aya.InRange)
                     {
-                        for (int i = 0; i < aya.Words.Count; i++)
+                        for (int i = 0; i < Math.Min(bismillahWordCount, aya.Words.Count); i++)
                         {
                             int start = spannable.Length();
                             var word = aya.Words[i];
@@ -780,34 +802,94 @@ public class HifzActivity : AppCompatActivity
                                     start, end, SpanTypes.ExclusiveExclusive);
                             }
 
-                            if (i < aya.Words.Count - 1) spannable.Append(" ");
+                            // Use non-breaking space between Bismillah words to keep on single line
+                            if (i < bismillahWordCount - 1 && i < aya.Words.Count - 1)
+                                spannable.Append("\u00A0");
                         }
                     }
                     else
                     {
-                        spannable.Append(aya.FullText);
+                        // Not in range - show Bismillah text in gray
+                        string bismillahText = string.Join("\u00A0", aya.Words.Take(Math.Min(bismillahWordCount, aya.Words.Count)));
+                        spannable.Append(bismillahText);
                         int end = spannable.Length();
                         spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#555555")),
                             bismillahStart, end, SpanTypes.ExclusiveExclusive);
                     }
                     
-                    // Add aya marker
-                    int bismillahMarkerStart = spannable.Length();
-                    spannable.Append($" \u06DD{ConvertToArabicNumber(aya.AyaNumber)} ");
-                    int bismillahMarkerEnd = spannable.Length();
-                    spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#888888")),
-                        bismillahMarkerStart, bismillahMarkerEnd, SpanTypes.ExclusiveExclusive);
-                    spannable.SetSpan(new RelativeSizeSpan(0.85f),
-                        bismillahMarkerStart, bismillahMarkerEnd, SpanTypes.ExclusiveExclusive);
+                    // Center-align the Bismillah line
+                    spannable.SetSpan(new global::Android.Text.Style.AlignmentSpanStandard(global::Android.Text.Layout.Alignment.AlignCenter),
+                        bismillahStart, spannable.Length(), SpanTypes.ExclusiveExclusive);
                     
-                    // Add newline after Bismillah
-                    // Note: Center alignment not available in .NET for Android
-                    spannable.Append("\n\n");
+                    // Newline after Bismillah phrase
+                    spannable.Append("\n");
+                    
                     firstAya = false;
+                    
+                    // --- Render remaining words of ayah 1 (after Bismillah) as normal ayah text ---
+                    if (aya.Words.Count > bismillahWordCount)
+                    {
+                        if (aya.InRange)
+                        {
+                            for (int i = bismillahWordCount; i < aya.Words.Count; i++)
+                            {
+                                int start = spannable.Length();
+                                var word = aya.Words[i];
+                                var state = aya.WordStates[i];
+
+                                if (state == WordState.Revealed)
+                                {
+                                    spannable.Append(word);
+                                    int end = spannable.Length();
+                                    spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#1B5E20")),
+                                        start, end, SpanTypes.ExclusiveExclusive);
+                                }
+                                else if (state == WordState.Skipped)
+                                {
+                                    spannable.Append(word);
+                                    int end = spannable.Length();
+                                    spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#C62828")),
+                                        start, end, SpanTypes.ExclusiveExclusive);
+                                }
+                                else
+                                {
+                                    var dots = new string('\u00B7', Math.Max(word.Length / 2, 1));
+                                    spannable.Append(dots);
+                                    int end = spannable.Length();
+                                    spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#D0D0D0")),
+                                        start, end, SpanTypes.ExclusiveExclusive);
+                                }
+
+                                if (i < aya.Words.Count - 1) spannable.Append(" ");
+                            }
+                        }
+                        else
+                        {
+                            // Not in range - show remaining text in gray
+                            string remainingText = string.Join(" ", aya.Words.Skip(bismillahWordCount));
+                            int start = spannable.Length();
+                            spannable.Append(remainingText);
+                            int end = spannable.Length();
+                            spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#555555")),
+                                start, end, SpanTypes.ExclusiveExclusive);
+                        }
+                        
+                        // Add aya marker after the remaining text
+                        int ayaMarkerStart = spannable.Length();
+                        spannable.Append($" \u06DD{ConvertToArabicNumber(aya.AyaNumber)} ");
+                        int ayaMarkerEnd = spannable.Length();
+                        spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#888888")),
+                            ayaMarkerStart, ayaMarkerEnd, SpanTypes.ExclusiveExclusive);
+                        spannable.SetSpan(new RelativeSizeSpan(0.85f),
+                            ayaMarkerStart, ayaMarkerEnd, SpanTypes.ExclusiveExclusive);
+                        
+                        // Newline after last ayah handled by next surah's name block
+                    }
+                    
                     continue;
                 }
                 
-                if (!firstAya) spannable.Append(" ");
+                if (!firstAya && aya.AyaNumber != 1) spannable.Append(" ");
                 firstAya = false;
 
                 if (aya.InRange)
@@ -865,8 +947,13 @@ public class HifzActivity : AppCompatActivity
                     markerStart, markerEnd, SpanTypes.ExclusiveExclusive);
                 spannable.SetSpan(new RelativeSizeSpan(0.85f),
                     markerStart, markerEnd, SpanTypes.ExclusiveExclusive);
+                
+                // Newline after last ayah handled by next surah's name block
             }
 
+            // Debug: dump spannable to find hidden newlines
+            string dbg = spannable.ToString().Replace("\n", "⏎");
+            global::Android.Util.Log.Info("HifzSpan", $"FULL TEXT: {dbg}");
             _pageTextView.TextFormatted = spannable;
         }
         catch (Exception ex)
