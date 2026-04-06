@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:background="#0D3F13">
+
+    <!-- Green Header Bar -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#4CAF50"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:elevation="4dp">
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hifz Mode"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/pageInfoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="13sp"
+            android:textColor="#E0E0E0"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:id="@+id/statusLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="12sp"
+            android:textColor="#C8E6C9"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+
+    <!-- Setup Panel (shown before session starts) -->
+    <LinearLayout
+        android:id="@+id/setupPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#E8F5E9"
+        android:padding="12dp"
+        android:visibility="visible">
+
+        <!-- Surah Selector Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:id="@+id/surahLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Surah:"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginEnd="6dp" />
+
+            <Spinner
+                android:id="@+id/surahSpinner"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:background="@drawable/spinner_background"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" />
+        </LinearLayout>
+
+        <!-- Aya Range Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/fromAyaLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="From:"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginEnd="4dp" />
+
+            <EditText
+                android:id="@+id/fromAyaInput"
+                android:layout_width="56dp"
+                android:layout_height="38dp"
+                android:inputType="number"
+                android:text="1"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_background"
+                android:layout_marginEnd="12dp"
+                android:padding="4dp" />
+
+            <TextView
+                android:id="@+id/toAyaLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="To:"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginEnd="4dp" />
+
+            <EditText
+                android:id="@+id/toAyaInput"
+                android:layout_width="56dp"
+                android:layout_height="38dp"
+                android:inputType="number"
+                android:text="7"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:background="@drawable/edittext_background"
+                android:padding="4dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Main Quran Page Display Area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#FFFEF5">
+
+        <ScrollView
+            android:id="@+id/pageScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <TextView
+                android:id="@+id/pageTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="22sp"
+                android:textColor="#1A1A1A"
+                android:layoutDirection="rtl"
+                android:textDirection="rtl"
+                android:textAlignment="textEnd"
+                android:lineSpacingMultiplier="1.1"
+                android:lineSpacingExtra="0dp"
+                android:gravity="right|center_vertical"
+                android:padding="10dp"
+                android:fontFamily="serif" />
+
+        </ScrollView>
+
+        <!-- Progress overlay at bottom of page area -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"
+            android:background="#CCFFFEF5"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp">
+
+            <ProgressBar
+                android:id="@+id/wordProgressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:max="100"
+                android:progress="0"
+                android:progressTint="#4CAF50"
+                android:progressBackgroundTint="#E0E0E0" />
+
+            <TextView
+                android:id="@+id/progressText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="11sp"
+                android:textColor="#888888"
+                android:gravity="center" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Recognized Text (small feedback bar) -->
+    <LinearLayout
+        android:id="@+id/recognizedPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#F0F0F0"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/recognizedTextLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🎤 "
+            android:textSize="12sp"
+            android:textColor="#999999" />
+
+        <TextView
+            android:id="@+id/recognizedTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textSize="13sp"
+            android:textColor="#666666"
+            android:layoutDirection="rtl"
+            android:textDirection="rtl"
+            android:singleLine="true"
+            android:ellipsize="start" />
+    </LinearLayout>
+
+    <!-- Bottom Control Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:background="#E8F5E9"
+        android:elevation="4dp">
+
+        <!-- Mic Button -->
+        <Button
+            android:id="@+id/micButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:text="🎤"
+            android:textSize="24sp"
+            android:background="@drawable/btn_android_icon"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
+            android:layout_marginEnd="12dp" />
+
+        <!-- Stop Button -->
+        <Button
+            android:id="@+id/stopButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:text="⏹️"
+            android:textSize="24sp"
+            android:background="@drawable/btn_android_icon"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
+            android:enabled="false"
+            android:layout_marginEnd="12dp" />
+
+        <!-- Reset Button -->
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:text="🔄"
+            android:textSize="24sp"
+            android:background="@drawable/btn_android_icon"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
+            android:layout_marginEnd="12dp" />
+
+        <!-- Previous Page -->
+        <Button
+            android:id="@+id/prevPageButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:text="◀"
+            android:textSize="20sp"
+            android:background="@drawable/btn_android_icon"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
+            android:layout_marginEnd="12dp" />
+
+        <!-- Next Page -->
+        <Button
+            android:id="@+id/nextPageButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:text="▶"
+            android:textSize="20sp"
+            android:background="@drawable/btn_android_icon"
+            android:stateListAnimator="@null"
+            android:elevation="0dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

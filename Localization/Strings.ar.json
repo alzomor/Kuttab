@@ -199,5 +199,17 @@
   "ShareAppInfo": "📤 مشاركة التطبيق",
   "ShareDonationInfo": "📤 مشاركة معلومات التبرع",
   "ShareAppInfoChooser": "مشاركة التطبيق عبر",
-  "ShareDonationChooser": "مشاركة معلومات التبرع عبر"
+  "ShareDonationChooser": "مشاركة معلومات التبرع عبر",
+
+  "HifzMode": "📖 وضع الحفظ",
+  "OpenHifz": "الحفظ",
+  "HifzStatus": "الحالة:",
+  "HifzHeard": "سُمع:",
+  "HifzListening": "🎤 جارِ الاستماع...",
+  "HifzStopped": "متوقف",
+  "HifzAyaComplete": "تم إكمال الآية {0}!",
+  "HifzSessionComplete": "✅ تمت الجلسة بنجاح! أحسنت!",
+  "HifzNoSpeechEngine": "التعرف على الكلام غير متاح. يرجى تثبيت الكتابة بالصوت من Google.",
+  "HifzMicPermissionDenied": "يلزم إذن الميكروفون لوضع الحفظ.",
+  "HifzWrongWord": "حاول مرة أخرى"
 }
