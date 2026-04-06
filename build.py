@@ -3,11 +3,20 @@ import sys
 import subprocess
 import shutil
 import platform
+import re
+import argparse
 from pathlib import Path
+from datetime import datetime
 
 # Configuration
 PROJECT_NAME = "Kuttab"
 VERSION = "0.95"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ANDROID_PROJECT_DIR = os.path.join(SCRIPT_DIR, "Kuttab.Android")
+CORE_PROJECT_DIR = os.path.join(SCRIPT_DIR, "Kuttab.Core")
+INFO_ACTIVITY_PATH = os.path.join(ANDROID_PROJECT_DIR, "InfoActivity.cs")
+DIST_DIR = os.path.join(SCRIPT_DIR, "dist")
+APK_NAME = f"{PROJECT_NAME}-android-{VERSION}.apk"
 TARGETS = [
     {"rid": "win-x64", "ext": "zip"},
     {"rid": "linux-x64", "ext": "tar.gz"},
@@ -86,22 +95,143 @@ def build_for_platform(target):
     print(f"✅ Successfully built for {rid}")
     return True
 
-def build_android_apk():
-    """Build the Android APK."""
+def update_build_date():
+    """Update the build date in InfoActivity.cs with the current timestamp."""
+    print(f"\n📅 Updating build date in InfoActivity.cs...")
+    
+    if not os.path.exists(INFO_ACTIVITY_PATH):
+        print(f"⚠️  InfoActivity.cs not found at: {INFO_ACTIVITY_PATH}")
+        return False
+    
+    with open(INFO_ACTIVITY_PATH, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    build_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # Replace the build date string
+    new_content = re.sub(
+        r'var buildTime = "[^"]*";(\s*//.*)?',
+        f'var buildTime = "{build_time}"; // Auto-updated by build.py',
+        content
+    )
+    
+    if new_content == content:
+        print("⚠️  Could not find build date pattern in InfoActivity.cs")
+        return False
+    
+    with open(INFO_ACTIVITY_PATH, 'w', encoding='utf-8') as f:
+        f.write(new_content)
+    
+    print(f"✅ Build date updated to: {build_time}")
+    return True
+
+
+def clean_build_artifacts():
+    """Remove bin and obj directories to ensure a clean build."""
+    print(f"\n🧹 Cleaning build artifacts...")
+    
+    dirs_to_clean = []
+    for root, dirs, files in os.walk(SCRIPT_DIR):
+        # Skip hidden directories and dist
+        if any(part.startswith('.') for part in root.split(os.sep)):
+            continue
+        for d in dirs:
+            if d in ('bin', 'obj'):
+                full_path = os.path.join(root, d)
+                dirs_to_clean.append(full_path)
+    
+    for d in dirs_to_clean:
+        try:
+            shutil.rmtree(d)
+            print(f"   Removed: {os.path.relpath(d, SCRIPT_DIR)}")
+        except Exception as e:
+            print(f"   ⚠️  Failed to remove {d}: {e}")
+    
+    print(f"✅ Cleaned {len(dirs_to_clean)} directories")
+    return True
+
+
+def get_android_env():
+    """Set up Android SDK environment variables."""
+    env = os.environ.copy()
+    android_home = env.get("ANDROID_HOME") or env.get("ANDROID_SDK_ROOT")
+    if not android_home:
+        android_home = str(Path.home() / "Android" / "Sdk")
+    env["ANDROID_HOME"] = android_home
+    if "ANDROID_SDK_ROOT" not in env:
+        env["ANDROID_SDK_ROOT"] = android_home
+    if not os.path.exists(android_home):
+        print(f"❌ Android SDK not found at: {android_home}")
+        print("   Set ANDROID_HOME or ANDROID_SDK_ROOT to your SDK path and retry.")
+        return None
+    return env
+
+
+def get_connected_devices():
+    """Get list of connected ADB devices."""
+    try:
+        result = subprocess.run(
+            ["adb", "devices"],
+            capture_output=True, text=True, check=True
+        )
+        devices = []
+        for line in result.stdout.strip().split('\n')[1:]:
+            parts = line.strip().split('\t')
+            if len(parts) == 2 and parts[1] == 'device':
+                device_id = parts[0]
+                device_type = 'emulator' if device_id.startswith('emulator') else 'phone'
+                devices.append({'id': device_id, 'type': device_type})
+        return devices
+    except Exception:
+        return []
+
+
+def install_apk(device_id, apk_path):
+    """Install APK to a specific device."""
+    print(f"\n📲 Installing APK to {device_id}...")
+    
+    # Uninstall first to ensure clean install
+    subprocess.run(
+        ["adb", "-s", device_id, "uninstall", "com.kuttab.app"],
+        capture_output=True, text=True
+    )
+    
+    result = subprocess.run(
+        ["adb", "-s", device_id, "install", apk_path],
+        capture_output=True, text=True
+    )
+    
+    if result.returncode == 0:
+        print(f"✅ Installed to {device_id}")
+        # Launch the app
+        subprocess.run(
+            ["adb", "-s", device_id, "shell", "monkey", "-p", "com.kuttab.app",
+             "-c", "android.intent.category.LAUNCHER", "1"],
+            capture_output=True, text=True
+        )
+        print(f"🚀 Launched app on {device_id}")
+        return True
+    else:
+        print(f"❌ Failed to install to {device_id}: {result.stderr}")
+        return False
+
+
+def build_android_apk(install=False):
+    """Build the Android APK with a clean build."""
     print(f"\n{'='*80}")
     print(f"🤖 Building Android APK")
     print(f"{'='*80}")
     
-    android_project_dir = "./Kuttab.Android"
-    if not os.path.exists(android_project_dir):
+    if not os.path.exists(ANDROID_PROJECT_DIR):
         print("⚠️  Android project not found, skipping Android build")
         return False
     
-    # Try to find a dotnet command capable of building Android.
-    # Priority: 1) ~/.dotnet-9/dotnet (has Android workload)
-    #           2) ~/.dotnet-android/dotnet
-    #           3) dotnet-android command
-    #           4) system dotnet
+    # Step 1: Update build date
+    update_build_date()
+    
+    # Step 2: Clean build artifacts
+    clean_build_artifacts()
+    
+    # Step 3: Find dotnet command
     dotnet9_path = str(Path.home() / ".dotnet-9" / "dotnet")
     dotnet_android_path = str(Path.home() / ".dotnet-android" / "dotnet")
     android_dotnet_cmd = "dotnet"
@@ -120,20 +250,13 @@ def build_android_apk():
         else:
             print("ℹ️  Using dotnet (ensure Android workload is installed)")
 
-    # Set ANDROID_HOME environment variable (prefer existing env, fallback to ~/Android/Sdk)
-    env = os.environ.copy()
-    android_home = env.get("ANDROID_HOME") or env.get("ANDROID_SDK_ROOT")
-    if not android_home:
-        android_home = str(Path.home() / "Android" / "Sdk")
-    env["ANDROID_HOME"] = android_home
-    if "ANDROID_SDK_ROOT" not in env:
-        env["ANDROID_SDK_ROOT"] = android_home
-    if not os.path.exists(android_home):
-        print(f"❌ Android SDK not found at: {android_home}")
-        print("   Set ANDROID_HOME or ANDROID_SDK_ROOT to your SDK path and retry.")
+    # Step 4: Set up Android environment
+    env = get_android_env()
+    if env is None:
         return False
     
-    # Publish command for Android (creates universal APK with all ABIs)
+    # Step 5: Build
+    print(f"\n🔨 Publishing Android APK...")
     cmd = [
         android_dotnet_cmd, "publish",
         "-c", "Release",
@@ -141,41 +264,45 @@ def build_android_apk():
         "Kuttab.Android.csproj"
     ]
     
-    if not run_command(cmd, cwd=android_project_dir, env=env):
+    if not run_command(cmd, cwd=ANDROID_PROJECT_DIR, env=env):
         print("❌ Failed to build Android APK")
         return False
     
-    # Find the generated APK (universal APK goes to publish subfolder)
-    apk_search_dir = os.path.join(android_project_dir, "bin/Release/net9.0-android/publish")
+    # Step 6: Find and copy APK
+    apk_search_dir = os.path.join(ANDROID_PROJECT_DIR, "bin/Release/net9.0-android/publish")
     if not os.path.exists(apk_search_dir):
-        # Fallback to non-publish path
-        apk_search_dir = os.path.join(android_project_dir, "bin/Release/net9.0-android")
+        apk_search_dir = os.path.join(ANDROID_PROJECT_DIR, "bin/Release/net9.0-android")
     
     if not os.path.exists(apk_search_dir):
         print("❌ APK output directory not found")
         return False
     
-    # Find signed APK files
     apk_files = [f for f in os.listdir(apk_search_dir) if f.endswith("-Signed.apk")]
     if not apk_files:
-        # Fallback to any APK
         apk_files = [f for f in os.listdir(apk_search_dir) if f.endswith(".apk")]
     
     if not apk_files:
         print("❌ No APK file found in output directory")
         return False
     
-    # Copy APK to dist folder
-    os.makedirs("dist", exist_ok=True)
-    for apk_file in apk_files:
-        src_apk = os.path.join(apk_search_dir, apk_file)
-        # Rename to a cleaner name
-        dest_apk = os.path.join("dist", f"{PROJECT_NAME}-android-{VERSION}.apk")
-        shutil.copy2(src_apk, dest_apk)
-        # Fix timestamp (deterministic builds set it to 1981)
-        os.utime(dest_apk, None)
-        print(f"✅ Copied APK to: {dest_apk}")
-        break  # Only copy the first (signed) APK
+    os.makedirs(DIST_DIR, exist_ok=True)
+    src_apk = os.path.join(apk_search_dir, apk_files[0])
+    dest_apk = os.path.join(DIST_DIR, APK_NAME)
+    shutil.copy2(src_apk, dest_apk)
+    os.utime(dest_apk, None)
+    apk_size_mb = os.path.getsize(dest_apk) / (1024 * 1024)
+    print(f"✅ APK ready: {dest_apk} ({apk_size_mb:.1f} MB)")
+    
+    # Step 7: Install if requested
+    if install:
+        devices = get_connected_devices()
+        if not devices:
+            print("⚠️  No connected devices found for installation")
+        else:
+            print(f"\n📱 Found {len(devices)} device(s):")
+            for dev in devices:
+                print(f"   - {dev['id']} ({dev['type']})")
+                install_apk(dev['id'], dest_apk)
     
     return True
 
@@ -225,45 +352,66 @@ def copy_installation_instructions():
         print(f"⚠️  Installation instructions file not found: {src_file}")
 
 def main():
-    # Create necessary directories
-    os.makedirs("dist", exist_ok=True)
+    parser = argparse.ArgumentParser(description=f"{PROJECT_NAME} Build Script")
+    parser.add_argument('--android', action='store_true',
+                        help='Build only the Android APK (skip desktop targets)')
+    parser.add_argument('--install', action='store_true',
+                        help='Install APK to all connected devices after building')
+    parser.add_argument('--all', action='store_true',
+                        help='Build all targets (desktop + Android)')
+    args = parser.parse_args()
     
-    # Copy installation instructions
-    copy_installation_instructions()
+    # Default to --android --install if no flags given
+    if not args.android and not args.all:
+        args.android = True
+        args.install = True
     
-    # Build for all desktop targets
-    success_count = 0
-    for target in TARGETS:
-        if build_for_platform(target):
-            if create_archive(target["rid"], target["ext"]):
-                success_count += 1
+    os.makedirs(DIST_DIR, exist_ok=True)
     
-    # Build Android APK
-    android_success = build_android_apk()
-    if android_success:
-        success_count += 1
+    if args.all:
+        # Copy installation instructions
+        copy_installation_instructions()
+        
+        # Build for all desktop targets
+        success_count = 0
+        for target in TARGETS:
+            if build_for_platform(target):
+                if create_archive(target["rid"], target["ext"]):
+                    success_count += 1
+        
+        # Build Android APK
+        android_success = build_android_apk(install=args.install)
+        if android_success:
+            success_count += 1
+        
+        total_targets = len(TARGETS) + 1
+        
+        print("\n" + "="*50)
+        print(f"🚀 Build Summary")
+        print("="*50)
+        print(f"Total targets: {total_targets}")
+        print(f"Successfully built: {success_count}")
+        print(f"Failed: {total_targets - success_count}")
+        
+        if success_count > 0:
+            print("\n📦 Distribution packages created in the 'dist' directory:")
+            dist_files = os.listdir(DIST_DIR)
+            for file in dist_files:
+                size_mb = os.path.getsize(os.path.join(DIST_DIR, file)) / (1024 * 1024)
+                print(f"- {file} ({size_mb:.2f} MB)")
+        
+        cleanup_publish_folder()
+        
+        print("\n✅ Build process completed!" if success_count > 0 else "\n❌ Build process completed with errors!")
     
-    total_targets = len(TARGETS) + 1  # Desktop targets + Android
-    
-    # Print summary
-    print("\n" + "="*50)
-    print(f"🚀 Build Summary")
-    print("="*50)
-    print(f"Total targets: {total_targets}")
-    print(f"Successfully built: {success_count}")
-    print(f"Failed: {total_targets - success_count}")
-    
-    if success_count > 0:
-        print("\n📦 Distribution packages created in the 'dist' directory:")
-        dist_files = os.listdir("dist")
-        for file in dist_files:
-            size_mb = os.path.getsize(os.path.join("dist", file)) / (1024 * 1024)
-            print(f"- {file} ({size_mb:.2f} MB)")
-    
-    # Clean up temporary publish folder
-    cleanup_publish_folder()
-    
-    print("\n✅ Build process completed!" if success_count > 0 else "\n❌ Build process completed with errors!")
+    elif args.android:
+        success = build_android_apk(install=args.install)
+        if success:
+            print("\n✅ Android build completed successfully!")
+        else:
+            print("\n❌ Android build failed!")
+            sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
