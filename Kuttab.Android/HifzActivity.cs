@@ -357,7 +357,7 @@ public class HifzActivity : AppCompatActivity
         var ayaRefs = _pageService.GetAyasOnPage(pageIndex);
         foreach (var r in ayaRefs)
         {
-            var text = GetAyaText(r.Sura, r.Aya);
+            var text = GetAyaText(r.Sura, r.Aya).TrimEnd();
             var words = QuranWordMatcher.TokenizeWords(text);
             bool inRange = (r.Sura == _selectedSurah && r.Aya >= _fromAya && r.Aya <= _toAya);
 
@@ -746,12 +746,26 @@ public class HifzActivity : AppCompatActivity
                 // Display surah name for ayah 1 (all surahs including Surah 9)
                 if (aya.AyaNumber == 1)
                 {
-                    if (!firstAya) spannable.Append("\n");
-                    string surahName = $"﴾ سورة {SurahInfo.GetSurahName(aya.Surah)} ﴿";
+                    // Only insert a newline before Surah name if previous character is not whitespace
+                    if (!firstAya && spannable.Length() > 0)
+                    {
+                        char prev = spannable.ToString()[spannable.Length() - 1];
+                        if (prev != '\n' && prev != ' ')
+                            spannable.Append("\n");
+                        else if (prev == ' ')
+                        {
+                            // Replace trailing space with newline
+                            spannable.Delete(spannable.Length() - 1, spannable.Length());
+                            spannable.Append("\n");
+                        }
+                    }
+                    global::Android.Util.Log.Info("HifzSurah", $"=== SURAH {aya.Surah} NAME BLOCK ===");
+                    string surahName = $"﴿ سورة {SurahInfo.GetSurahName(aya.Surah)} ﴾";
                     int nameStart = spannable.Length();
                     spannable.Append(surahName);
                     int nameEnd = spannable.Length();
-                    spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#B8860B")),
+                    global::Android.Util.Log.Info("HifzSurah", $"Setting green color span from {nameStart} to {nameEnd - 1}");
+                    spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#1B5E20")),
                         nameStart, nameEnd - 1, SpanTypes.ExclusiveExclusive);
                     spannable.SetSpan(new RelativeSizeSpan(1.15f),
                         nameStart, nameEnd - 1, SpanTypes.ExclusiveExclusive);
@@ -759,7 +773,14 @@ public class HifzActivity : AppCompatActivity
                         nameStart, nameEnd - 1, SpanTypes.ExclusiveExclusive);
                     spannable.SetSpan(new global::Android.Text.Style.AlignmentSpanStandard(global::Android.Text.Layout.Alignment.AlignCenter),
                         nameStart, nameEnd, SpanTypes.ExclusiveExclusive);
-                    spannable.Append("\n");
+                    // Only add newline if this is not the last ayah of the surah on the last line of the page
+                    bool isLastAyaOnPage = aya == _pageAyas.Last();
+                    bool isLastAyahOfSurahForPage = (aya.AyaNumber == SurahInfo.GetAyaCount(aya.Surah));
+                    if (!(isLastAyaOnPage && isLastAyahOfSurahForPage))
+                    {
+                        if (spannable.Length() > 0 && spannable.ToString()[spannable.Length() - 1] != '\n')
+                            spannable.Append("\n");
+                    }
                     firstAya = false;
                 }
                 
@@ -822,7 +843,8 @@ public class HifzActivity : AppCompatActivity
                         bismillahStart, spannable.Length(), SpanTypes.ExclusiveExclusive);
                     
                     // Newline after Bismillah phrase
-                    spannable.Append("\n");
+                    if (spannable.Length() > 0 && spannable.ToString()[spannable.Length() - 1] != '\n')
+                        spannable.Append("\n");
                     
                     firstAya = false;
                     
@@ -933,7 +955,7 @@ public class HifzActivity : AppCompatActivity
                 {
                     // Not in range — show full text in normal color
                     int start = spannable.Length();
-                    spannable.Append(aya.FullText);
+                    spannable.Append(aya.FullText.TrimEnd());
                     int end = spannable.Length();
                     spannable.SetSpan(new ForegroundColorSpan(Color.ParseColor("#555555")),
                         start, end, SpanTypes.ExclusiveExclusive);
