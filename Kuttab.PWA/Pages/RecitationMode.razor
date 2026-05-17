@@ -2,6 +2,7 @@
 @implements IDisposable
 @inject QuranSearchService SearchService
 @inject LocalizationService Loc
+@inject LocalStorageService Storage
 @inject IJSRuntime JS
 @inject IFileService FileService
 @using Kuttab.Core.Interfaces
@@ -78,6 +79,16 @@
         <div class="quran-text" dir="rtl" style="text-align: center;">
             @((MarkupString)_highlightedAyaText)
         </div>
+        @if (_useOnlineImages && _currentPageNumber > 0)
+        {
+            <div class="text-center mt-2">
+                <img src="https://everyayah.com/data/quranpages/@(_currentPageNumber.ToString("D3")).png"
+                     alt="Quran page @_currentPageNumber"
+                     style="max-width: 100%; border-radius: 4px; border: 1px solid #e0e0e0;"
+                     loading="lazy" />
+                <div style="font-size: 0.75rem; color: var(--kuttab-text-light); margin-top: 0.25rem;">@Loc["Page"] @_currentPageNumber</div>
+            </div>
+        }
     </div>
 }
 
@@ -140,6 +151,12 @@
     private int _currentRepeat;
     private List<TajweedRuleMatch> _tajweedMatches = new();
     private DotNetObjectReference<RecitationMode>? _dotNetRef;
+    private bool _useOnlineImages = true;
+    private List<string>? _selectedTajweedRules = null; // null = all rules
+    private int _currentPageNumber = 0;
+    private bool _needsBasmalah = false;
+    private bool _playingBasmalah = false;
+    private QuranPageService _pageService = new();
 
     private Dictionary<string, string> _quranTextCache = new();
 
@@ -175,6 +192,29 @@
         _maxAya = SurahInfo.GetAyaCount(_selectedSurah);
         _toAya = _maxAya;
         _statusText = Loc["Ready"];
+
+        // Load settings
+        _useOnlineImages = (await Storage.GetStringAsync("onlineImages")) != "false";
+        _showTajweedRules = (await Storage.GetStringAsync("showTajweedRules")) != "false";
+        var savedRulesJson = await Storage.GetStringAsync("selectedTajweedRules");
+        if (!string.IsNullOrEmpty(savedRulesJson))
+        {
+            try
+            {
+                var set = System.Text.Json.JsonSerializer.Deserialize<HashSet<string>>(savedRulesJson);
+                if (set != null && set.Count > 0)
+                    _selectedTajweedRules = set.ToList();
+            }
+            catch { }
+        }
+
+        // Load quran-data.xml for page mapping
+        try
+        {
+            var xmlContent = await FileService.ReadAllTextAsync("quran-data.xml");
+            _pageService.LoadFromXml(xmlContent);
+        }
+        catch { }
     }
 
     private void OnSurahChanged(ChangeEventArgs e)
@@ -190,24 +230,64 @@
         _isPlaying = true;
         _currentPlayIdx = _fromAya;
         _currentRepeat = 1;
+        _needsBasmalah = ShouldPlayBasmalah(_selectedSurah, _fromAya);
+        _playingBasmalah = false;
         _dotNetRef = DotNetObjectReference.Create(this);
         await JS.InvokeVoidAsync("AudioInterop.init", _dotNetRef);
         await PlayCurrentAya();
     }
 
+    private bool ShouldPlayBasmalah(int surah, int aya)
+    {
+        if (aya != 1) return false;
+        if (surah == 1 || surah == 9) return false;
+        // Reciters whose audio already includes Basmalah
+        if (_selectedReciter == "Menshawi_32kbps" ||
+            _selectedReciter == "Mustafa_Ismail_48kbps")
+            return false;
+        // Al-Banna includes Basmalah except for Surah 108
+        if (_selectedReciter == "mahmoud_ali_al_banna_32kbps")
+            return surah == 108;
+        return true;
+    }
+
     private async Task PlayCurrentAya()
     {
-        if (!_isPlaying || _currentPlayIdx > _toAya) 
+        if (!_isPlaying)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        // Play Basmalah before the first aya of a surah when required
+        if (_needsBasmalah && !_playingBasmalah)
+        {
+            _playingBasmalah = true;
+            _currentAyaInfo = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ";
+            _currentAyaText = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ";
+            _highlightedAyaText = System.Net.WebUtility.HtmlEncode(_currentAyaText);
+            _tajweedMatches = new();
+            _statusText = Loc["Playing"];
+            StateHasChanged();
+            var basmalahUrl = GetAudioUrl(1, 1);
+            await JS.InvokeVoidAsync("AudioInterop.play", basmalahUrl);
+            return;
+        }
+
+        if (_currentPlayIdx > _toAya)
         {
             if (_repeatMode == "range" && _currentRepeat < _repeatCount)
             {
                 _currentRepeat++;
                 _currentPlayIdx = _fromAya;
+                _needsBasmalah = ShouldPlayBasmalah(_selectedSurah, _fromAya);
+                _playingBasmalah = false;
                 await PlayCurrentAya();
                 return;
             }
             _isPlaying = false;
             _statusText = Loc["Ready"];
+            _currentPageNumber = 0;
             StateHasChanged();
             return;
         }
@@ -218,8 +298,11 @@
         _currentAyaText = text;
         _highlightedAyaText = HighlightAyaWithTajweed(text);
 
-        // Get tajweed matches
-        _tajweedMatches = SearchService.SearchAyaForRules(text);
+        // Get tajweed matches using selected rules filter
+        _tajweedMatches = SearchService.SearchAyaForRules(text, _selectedTajweedRules);
+
+        // Update page number for image display
+        _currentPageNumber = _pageService.IsLoaded ? _pageService.GetPageForAya(_selectedSurah, _currentPlayIdx) : 0;
 
         var repeatSuffix = _repeatMode == "aya" && _repeatCount > 1
             ? $" ({_currentRepeat}/{_repeatCount})"
@@ -236,6 +319,15 @@
     public async Task OnPlaybackEnded()
     {
         if (!_isPlaying) return;
+
+        // If we just played the Basmalah, now play the actual aya
+        if (_playingBasmalah)
+        {
+            _playingBasmalah = false;
+            _needsBasmalah = false;
+            await PlayCurrentAya();
+            return;
+        }
 
         if (_repeatMode == "aya" && _currentRepeat < _repeatCount)
         {
@@ -254,6 +346,9 @@
         }
 
         _currentPlayIdx++;
+        // Check if next aya starts a new surah (would need basmalah)
+        _needsBasmalah = _currentPlayIdx <= _toAya && ShouldPlayBasmalah(_selectedSurah, _currentPlayIdx);
+        _playingBasmalah = false;
         await PlayCurrentAya();
     }
 
@@ -275,7 +370,7 @@
     private string HighlightAyaWithTajweed(string ayaText)
     {
         if (string.IsNullOrEmpty(ayaText)) return "";
-        var matches = SearchService.SearchAyaForRules(ayaText);
+        var matches = SearchService.SearchAyaForRules(ayaText, _selectedTajweedRules);
         if (matches.Count == 0)
             return System.Net.WebUtility.HtmlEncode(ayaText);
 

@@ -51,11 +51,18 @@ public static class RuleNameTranslator
         if (!Translations.TryGetValue(arabicName, out var value))
             return arabicName;
 
-        return languageCode switch
+        var raw = languageCode switch
         {
             "en" => value.En,
             "de" => value.De,
             _ => arabicName
         };
+
+        // Remove the trailing parenthetical transliteration e.g. " (Madd Tabee'i)"
+        var parenIdx = raw.LastIndexOf(" (", System.StringComparison.Ordinal);
+        if (parenIdx > 0 && raw.EndsWith(")"))
+            return raw.Substring(0, parenIdx);
+
+        return raw;
     }
 }

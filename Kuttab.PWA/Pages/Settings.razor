@@ -2,8 +2,10 @@
 @implements IDisposable
 @inject LocalizationService Loc
 @inject LocalStorageService Storage
+@inject QuranSearchService SearchService
 @inject IJSRuntime JS
 @inject NavigationManager Nav
+@using Kuttab.Core.Services
 
 <PageTitle>Kuttab - @Loc["Settings"]</PageTitle>
 
@@ -124,6 +126,51 @@
 </div>
 
 <div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["TajweedRulesSelection"]</h6>
+    <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" id="showTajweedRules" @bind="_showTajweedRules" @bind:after="OnShowTajweedRulesChanged" />
+        <label class="form-check-label" for="showTajweedRules">@Loc["ShowTajweedRules"]</label>
+    </div>
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="enableRecording" @bind="_enableRecording" />
+        <label class="form-check-label" for="enableRecording">@Loc["EnableRecording"]</label>
+    </div>
+    @if (_showTajweedRules && _ruleGroups.Count > 0)
+    {
+        <div class="d-flex gap-2 mb-2">
+            <button class="btn-kuttab-outline" style="font-size:0.8rem; padding:0.25rem 0.6rem;" @onclick="SelectAllRules">@Loc["SelectAllRules"]</button>
+            <button class="btn-kuttab-outline" style="font-size:0.8rem; padding:0.25rem 0.6rem;" @onclick="DeselectAllRules">@Loc["DeselectAllRules"]</button>
+        </div>
+        @foreach (var group in _ruleGroups)
+        {
+            <div class="mb-2" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 0.5rem;">
+                <div class="form-check mb-1">
+                    <input class="form-check-input" type="checkbox"
+                        id="group_@group.GroupName"
+                        checked="@group.AllSelected"
+                        @onchange="(e) => OnGroupCheckChanged(group, (bool)(e.Value ?? false))" />
+                    <label class="form-check-label fw-bold" for="group_@group.GroupName">
+                        <span class="tajweed-@group.GroupName" style="font-weight:700;">@group.DisplayName</span>
+                    </label>
+                </div>
+                @foreach (var rule in group.Rules)
+                {
+                    <div class="form-check ms-3">
+                        <input class="form-check-input" type="checkbox"
+                            id="rule_@rule.Name"
+                            @bind="rule.IsSelected"
+                            @bind:after="() => OnRuleCheckChanged(group)" />
+                        <label class="form-check-label" for="rule_@rule.Name" style="font-size:0.85rem;">
+                            @RuleNameTranslator.GetLocalizedName(rule.Name, Loc.CurrentLanguage)
+                        </label>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+<div class="card-panel">
     <div class="d-flex gap-2">
         <button class="btn-kuttab flex-fill" @onclick="SaveSettings">@Loc["Save"]</button>
         <button class="btn-kuttab-outline flex-fill" @onclick="Cancel">@Loc["Cancel"]</button>
@@ -148,9 +195,26 @@
     private bool _useOnlineAudio = true;
     private bool _useOnlineImages = true;
     private string _selectedReciter = "Husary_128kbps";
+    private bool _showTajweedRules = true;
+    private bool _enableRecording = true;
     private string _saveMessage = "";
 
     private int[] _fontSizes = { 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32 };
+
+    // Tajweed rule group model
+    private class RuleGroupModel
+    {
+        public string GroupName { get; set; } = "";
+        public string DisplayName { get; set; } = "";
+        public List<RuleCheckModel> Rules { get; set; } = new();
+        public bool AllSelected => Rules.All(r => r.IsSelected);
+    }
+    private class RuleCheckModel
+    {
+        public string Name { get; set; } = "";
+        public bool IsSelected { get; set; } = true;
+    }
+    private List<RuleGroupModel> _ruleGroups = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -174,6 +238,8 @@
         _selectedReciter = await Storage.GetStringAsync("reciter") ?? "Husary_128kbps";
         _useOnlineAudio = (await Storage.GetStringAsync("onlineAudio")) != "false";
         _useOnlineImages = (await Storage.GetStringAsync("onlineImages")) != "false";
+        _showTajweedRules = (await Storage.GetStringAsync("showTajweedRules")) != "false";
+        _enableRecording = (await Storage.GetStringAsync("enableRecording")) != "false";
 
         var ss = await Storage.GetStringAsync("singleSurah");
         if (int.TryParse(ss, out var parsedSs)) _singleSurah = parsedSs;
@@ -181,6 +247,32 @@
         if (int.TryParse(startS, out var parsedStart)) _startSurah = parsedStart;
         var endS = await Storage.GetStringAsync("endSurah");
         if (int.TryParse(endS, out var parsedEnd)) _endSurah = parsedEnd;
+
+        // Build rule group models
+        await SearchService.LoadRulesAsync();
+        var allRules = SearchService.GetRules();
+        var savedRulesJson = await Storage.GetStringAsync("selectedTajweedRules");
+        HashSet<string>? savedRules = null;
+        if (!string.IsNullOrEmpty(savedRulesJson))
+        {
+            try { savedRules = System.Text.Json.JsonSerializer.Deserialize<HashSet<string>>(savedRulesJson); } catch { }
+        }
+
+        var groups = allRules.GroupBy(r => r.Group ?? "");
+        foreach (var g in groups)
+        {
+            var groupModel = new RuleGroupModel
+            {
+                GroupName = g.Key,
+                DisplayName = RuleGroupTranslator.GetGroupTitle(g.Key, Loc.CurrentLanguage),
+                Rules = g.Select(r => new RuleCheckModel
+                {
+                    Name = r.Name,
+                    IsSelected = savedRules == null || savedRules.Contains(r.Name)
+                }).ToList()
+            };
+            _ruleGroups.Add(groupModel);
+        }
     }
 
     private async Task OnLanguageChanged(ChangeEventArgs e)
@@ -213,6 +305,37 @@
         _searchDomain = e.Value?.ToString() ?? "whole";
     }
 
+    private void OnShowTajweedRulesChanged()
+    {
+        // visibility update handled by Razor binding
+    }
+
+    private void OnGroupCheckChanged(RuleGroupModel group, bool isChecked)
+    {
+        foreach (var rule in group.Rules)
+            rule.IsSelected = isChecked;
+    }
+
+    private void OnRuleCheckChanged(RuleGroupModel group)
+    {
+        // group header indeterminate state auto-computed via AllSelected
+        _ = group;
+    }
+
+    private void SelectAllRules()
+    {
+        foreach (var g in _ruleGroups)
+            foreach (var r in g.Rules)
+                r.IsSelected = true;
+    }
+
+    private void DeselectAllRules()
+    {
+        foreach (var g in _ruleGroups)
+            foreach (var r in g.Rules)
+                r.IsSelected = false;
+    }
+
     private async Task SaveSettings()
     {
         await Storage.SetStringAsync("language", _selectedLanguage);
@@ -222,9 +345,24 @@
         await Storage.SetStringAsync("reciter", _selectedReciter);
         await Storage.SetStringAsync("onlineAudio", _useOnlineAudio.ToString().ToLower());
         await Storage.SetStringAsync("onlineImages", _useOnlineImages.ToString().ToLower());
+        await Storage.SetStringAsync("showTajweedRules", _showTajweedRules.ToString().ToLower());
+        await Storage.SetStringAsync("enableRecording", _enableRecording.ToString().ToLower());
         await Storage.SetStringAsync("singleSurah", _singleSurah.ToString());
         await Storage.SetStringAsync("startSurah", _startSurah.ToString());
         await Storage.SetStringAsync("endSurah", _endSurah.ToString());
+
+        // Save selected tajweed rules
+        var selectedRuleNames = _ruleGroups
+            .SelectMany(g => g.Rules)
+            .Where(r => r.IsSelected)
+            .Select(r => r.Name)
+            .ToHashSet();
+        var allRuleNames = _ruleGroups.SelectMany(g => g.Rules).Select(r => r.Name).ToHashSet();
+        // If all selected, save null (means all) to save space
+        if (selectedRuleNames.SetEquals(allRuleNames))
+            await Storage.SetStringAsync("selectedTajweedRules", "");
+        else
+            await Storage.SetStringAsync("selectedTajweedRules", System.Text.Json.JsonSerializer.Serialize(selectedRuleNames));
 
         _saveMessage = "✅ " + Loc["SettingsSaved"];
         StateHasChanged();

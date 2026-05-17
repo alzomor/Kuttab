@@ -79,6 +79,7 @@ def build_for_platform(target):
         "-c", "Release",
         "-r", rid,
         "--self-contained", "true",
+        "-maxcpucount",
         "-p:PublishSingleFile=true",
         "-p:IncludeNativeLibrariesForSelfExtract=true",
         "-p:DebugType=None",
@@ -261,6 +262,7 @@ def build_android_apk(install=False):
         android_dotnet_cmd, "publish",
         "-c", "Release",
         "-f", "net9.0-android",
+        "-maxcpucount",
         "Kuttab.Android.csproj"
     ]
     

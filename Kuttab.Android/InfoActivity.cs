@@ -47,7 +47,7 @@ public class InfoActivity : AppCompatActivity
                 var packageInfo = PackageManager?.GetPackageInfo(PackageName ?? "", 0);
                 var versionName = packageInfo?.VersionName ?? "0.0";
                 // Use compile-time build date
-                var buildTime = "2026-04-06 10:24:20"; // Auto-updated by build.py
+                var buildTime = "2026-04-06 11:47:19"; // Auto-updated by build.py
                 var versionText = $"v{versionName}\nBuild: {buildTime}";
                 versionTextView.Text = versionText;
                 global::Android.Util.Log.Info("InfoActivity", $"Setting version: {versionText}");

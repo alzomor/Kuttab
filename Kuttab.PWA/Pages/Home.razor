@@ -2,7 +2,10 @@
 @implements IDisposable
 @inject QuranSearchService SearchService
 @inject LocalizationService Loc
+@inject LocalStorageService Storage
+@inject IFileService FileService
 @inject IJSRuntime JS
+@using Kuttab.Core.Interfaces
 @using Kuttab.Core.Services
 
 <PageTitle>Kuttab - @Loc["SelectTajweedRule"]</PageTitle>
@@ -80,19 +83,34 @@
                 var idx = i;
                 var aya = _searchResults[idx];
                 <div class="aya-item @(idx == _selectedIndex ? "selected" : "")" @onclick="() => SelectAya(idx)">
-                    <div class="aya-ref">@Loc["Surah"] @aya.SurahNumber : @Loc["Aya"] @aya.AyaNumber</div>
-                    <div class="aya-text" dir="rtl">@((MarkupString)HighlightAya(aya))</div>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="aya-ref">@Loc["Surah"] @aya.SurahNumber : @Loc["Aya"] @aya.AyaNumber</div>
+                        <button class="btn-icon" title="@Loc["ShareButton"]" @onclick:stopPropagation="true" @onclick="() => ShareAya(idx)">📤</button>
+                    </div>
+                    <div class="aya-text" dir="rtl" style="text-align: right; unicode-bidi: embed;">@((MarkupString)HighlightAya(aya))</div>
                 </div>
             }
         </div>
     </div>
 
+    @if (_useOnlineImages && _selectedIndex >= 0 && _selectedPageNumber > 0)
+    {
+        <div class="card-panel text-center">
+            <div style="font-size:0.8rem; color: var(--kuttab-text-light); margin-bottom:0.25rem;">@Loc["Page"] @_selectedPageNumber</div>
+            <img src="https://everyayah.com/data/quranpages/@(_selectedPageNumber.ToString("D3")).png"
+                 alt="Quran page @_selectedPageNumber"
+                 style="max-width: 100%; border-radius: 4px; border: 1px solid #e0e0e0;"
+                 loading="lazy" />
+        </div>
+    }
+
     <div class="controls-fixed">
         <div class="d-flex gap-2 justify-content-center flex-wrap mb-1">
             <button class="btn-kuttab" @onclick="PlaySelected" disabled="@(_selectedIndex < 0)">@Loc["PlaySingle"]</button>
+            <button class="btn-kuttab-outline" @onclick="PlayRepeat" disabled="@(_selectedIndex < 0)">🔁 @Loc["Repeat"]</button>
             <button class="btn-kuttab-outline" @onclick="PlayAll">@Loc["PlayAll"]</button>
             <button class="btn-kuttab-outline" @onclick="StopPlayback">@Loc["Stop"]</button>
-            @if (_selectedIndex >= 0)
+            @if (_enableRecording && _selectedIndex >= 0)
             {
                 @if (!_isRecording)
                 {
@@ -140,6 +158,11 @@
     // Audio playback state
     private DotNetObjectReference<Home>? _dotNetRef;
     private bool _isPlayingAll = false;
+    private bool _isRepeating = false;
+    private bool _useOnlineImages = true;
+    private bool _enableRecording = true;
+    private int _selectedPageNumber = 0;
+    private QuranPageService _pageService = new();
 
     private class CategoryInfo { public string Id { get; set; } = ""; public string DisplayName { get; set; } = ""; }
     private class RuleInfo { public string Name { get; set; } = ""; public string Group { get; set; } = ""; public string DisplayName { get; set; } = ""; }
@@ -150,6 +173,20 @@
         _dotNetRef = DotNetObjectReference.Create(this);
         await SearchService.LoadQuranTextAsync();
         await SearchService.LoadRulesAsync();
+
+        _useOnlineImages = (await Storage.GetStringAsync("onlineImages")) != "false";
+        _enableRecording = (await Storage.GetStringAsync("enableRecording")) != "false";
+        _selectedReciter = await Storage.GetStringAsync("reciter") ?? "Husary_128kbps";
+
+        if (_useOnlineImages)
+        {
+            try
+            {
+                var xmlContent = await FileService.ReadAllTextAsync("quran-data.xml");
+                _pageService.LoadFromXml(xmlContent);
+            }
+            catch { }
+        }
 
         // Build categories and rules from the loaded data
         var rules = SearchService.GetRules();
@@ -217,6 +254,15 @@
     private void SelectAya(int index)
     {
         _selectedIndex = index;
+        if (_useOnlineImages && _selectedIndex >= 0 && _selectedIndex < _searchResults.Count)
+        {
+            var aya = _searchResults[_selectedIndex];
+            _selectedPageNumber = _pageService.IsLoaded ? _pageService.GetPageForAya(aya.SurahNumber, aya.AyaNumber) : 0;
+        }
+        else
+        {
+            _selectedPageNumber = 0;
+        }
     }
 
     private void ToggleRuleExplanation()
@@ -227,24 +273,42 @@
 
     private string HighlightAya(QuranAya aya)
     {
-        if (aya.MatchPositions == null || aya.MatchPositions.Count == 0)
-            return System.Net.WebUtility.HtmlEncode(aya.Text);
-
         var text = aya.Text;
+        if (string.IsNullOrEmpty(text)) return "";
+        if (aya.MatchPositions == null || aya.MatchPositions.Count == 0)
+            return System.Net.WebUtility.HtmlEncode(text);
+
+        const string ZWJ = "\u200D";
+        var group = _selectedRuleGroup;
         var sb = new System.Text.StringBuilder();
         int lastEnd = 0;
-        var group = _selectedRuleGroup;
 
-        foreach (var match in aya.MatchPositions.OrderBy(m => m.Start))
+        foreach (var mp in aya.MatchPositions.OrderBy(m => m.Start))
         {
-            if (match.Start > lastEnd)
-                sb.Append(System.Net.WebUtility.HtmlEncode(text.Substring(lastEnd, match.Start - lastEnd)));
+            int start = mp.Start;
+            int end = mp.Start + mp.Length;
+            if (start < lastEnd || start >= text.Length) continue;
 
-            var matchText = text.Substring(match.Start, match.Length);
-            sb.Append($"<span class=\"tajweed-{group} tajweed-highlight-{group}\" style=\"font-weight:700\">");
+            // Text before this match
+            if (start > lastEnd)
+                sb.Append(System.Net.WebUtility.HtmlEncode(text.Substring(lastEnd, start - lastEnd)));
+
+            // ZWJ before the span if the previous character is a joining Arabic letter
+            if (start > 0 && IsJoiningArabic(text[start - 1]))
+                sb.Append(ZWJ);
+
+            // The highlighted match
+            var matchLen = Math.Min(mp.Length, text.Length - start);
+            var matchText = text.Substring(start, matchLen);
+            sb.Append($"<span class=\"tajweed-{group} tajweed-highlight-{group}\">");
             sb.Append(System.Net.WebUtility.HtmlEncode(matchText));
             sb.Append("</span>");
-            lastEnd = match.Start + match.Length;
+
+            // ZWJ after the span if the next character can receive a connection
+            if (end < text.Length && IsReceivingArabic(text[end]))
+                sb.Append(ZWJ);
+
+            lastEnd = end;
         }
 
         if (lastEnd < text.Length)
@@ -253,11 +317,37 @@
         return sb.ToString();
     }
 
+    // Arabic letters that connect forward to the next letter (all except alef-types, dal, dhal, raa, zay, waw, hamza)
+    private static bool IsJoiningArabic(char c)
+    {
+        if (!((c >= '\u0621' && c <= '\u064A') || c == '\u0671')) return false;
+        return c != '\u0621' && c != '\u0627' && c != '\u0622' && c != '\u0623' &&
+               c != '\u0625' && c != '\u0671' && c != '\u062F' && c != '\u0630' &&
+               c != '\u0631' && c != '\u0632' && c != '\u0648';
+    }
+
+    // Arabic letters that can receive a connection from the right (all real Arabic letters)
+    private static bool IsReceivingArabic(char c)
+        => (c >= '\u0622' && c <= '\u064A') || c == '\u0671';
+
     private async Task PlaySelected()
     {
         if (_selectedIndex < 0 || _selectedIndex >= _searchResults.Count) return;
+        _isRepeating = false;
         var aya = _searchResults[_selectedIndex];
         var url = GetAudioUrl(aya.SurahNumber, aya.AyaNumber);
+        await JS.InvokeVoidAsync("AudioInterop.init", _dotNetRef);
+        await JS.InvokeVoidAsync("AudioInterop.play", url);
+    }
+
+    private async Task PlayRepeat()
+    {
+        if (_selectedIndex < 0 || _selectedIndex >= _searchResults.Count) return;
+        _isRepeating = true;
+        _isPlayingAll = false;
+        var aya = _searchResults[_selectedIndex];
+        var url = GetAudioUrl(aya.SurahNumber, aya.AyaNumber);
+        await JS.InvokeVoidAsync("AudioInterop.init", _dotNetRef);
         await JS.InvokeVoidAsync("AudioInterop.play", url);
     }
 
@@ -266,19 +356,34 @@
         if (_searchResults.Count == 0) return;
         
         _isPlayingAll = true;
+        _isRepeating = false;
         _selectedIndex = 0;
         
-        // Initialize AudioInterop with DotNet reference
+        if (_useOnlineImages)
+        {
+            var first = _searchResults[0];
+            _selectedPageNumber = _pageService.IsLoaded ? _pageService.GetPageForAya(first.SurahNumber, first.AyaNumber) : 0;
+        }
+
         await JS.InvokeVoidAsync("AudioInterop.init", _dotNetRef);
-        
-        // Play first ayah
         var aya = _searchResults[0];
         await JS.InvokeVoidAsync("AudioInterop.play", GetAudioUrl(aya.SurahNumber, aya.AyaNumber));
+    }
+
+    private async Task ShareAya(int index)
+    {
+        if (index < 0 || index >= _searchResults.Count) return;
+        var aya = _searchResults[index];
+        var surahName = SurahInfo.GetSurahName(aya.SurahNumber);
+        var text = $"{Loc["Surah"]}: {surahName} ({aya.SurahNumber}) - {Loc["Aya"]}: {aya.AyaNumber}\n\n{aya.Text}\n\n📱 Kuttab - Quran Learning App";
+        var title = $"{surahName} ({aya.SurahNumber}:{aya.AyaNumber})";
+        await JS.InvokeVoidAsync("UtilsInterop.share", title, text, "");
     }
 
     private async Task StopPlayback()
     {
         _isPlayingAll = false;
+        _isRepeating = false;
         await JS.InvokeVoidAsync("AudioInterop.stop");
     }
 
@@ -366,20 +471,33 @@
     [JSInvokable]
     public async Task OnPlaybackEnded()
     {
+        // Repeat current aya indefinitely
+        if (_isRepeating)
+        {
+            if (_selectedIndex >= 0 && _selectedIndex < _searchResults.Count)
+            {
+                var aya = _searchResults[_selectedIndex];
+                await JS.InvokeVoidAsync("AudioInterop.play", GetAudioUrl(aya.SurahNumber, aya.AyaNumber));
+            }
+            return;
+        }
+
         if (!_isPlayingAll) return;
         
         _selectedIndex++;
         if (_selectedIndex < _searchResults.Count)
         {
-            // Play next ayah
             var aya = _searchResults[_selectedIndex];
+            if (_useOnlineImages)
+                _selectedPageNumber = _pageService.IsLoaded ? _pageService.GetPageForAya(aya.SurahNumber, aya.AyaNumber) : 0;
+            StateHasChanged();
             await JS.InvokeVoidAsync("AudioInterop.play", GetAudioUrl(aya.SurahNumber, aya.AyaNumber));
         }
         else
         {
-            // Finished playing all
             _isPlayingAll = false;
             _selectedIndex = -1;
+            _selectedPageNumber = 0;
             StateHasChanged();
         }
     }

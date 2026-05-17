@@ -218,6 +218,160 @@ html, body {
     .page-content { padding: 0.5rem; padding-bottom: 10rem; }
 }
 
+/* ===== Buttons ===== */
+.btn-kuttab {
+    background: var(--kuttab-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+    font-family: var(--font-ui);
+}
+.btn-kuttab:hover:not(:disabled) { background: var(--kuttab-green-light); }
+.btn-kuttab:disabled { opacity: 0.45; cursor: default; }
+
+.btn-kuttab-outline {
+    background: transparent;
+    color: var(--kuttab-green);
+    border: 1.5px solid var(--kuttab-green);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    font-family: var(--font-ui);
+}
+.btn-kuttab-outline:hover:not(:disabled) {
+    background: var(--kuttab-green);
+    color: white;
+}
+.btn-kuttab-outline:disabled { opacity: 0.45; cursor: default; }
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    padding: 0.15rem 0.4rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.15s, background 0.15s;
+    flex-shrink: 0;
+}
+.btn-icon:hover { opacity: 1; background: rgba(0,0,0,0.06); }
+
+/* ===== Forms ===== */
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--kuttab-text-light);
+    margin-bottom: 0.25rem;
+    display: block;
+}
+.form-select, .form-control {
+    width: 100%;
+    padding: 0.45rem 0.75rem;
+    border: 1.5px solid var(--kuttab-border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: var(--font-ui);
+    background: white;
+    color: var(--kuttab-text);
+    outline: none;
+    transition: border-color 0.2s;
+}
+.form-select:focus, .form-control:focus { border-color: var(--kuttab-green); }
+.form-check { display: flex; align-items: center; gap: 0.5rem; }
+.form-check-input { width: 1.1rem; height: 1.1rem; cursor: pointer; accent-color: var(--kuttab-green); }
+.form-check-label { font-size: 0.9rem; cursor: pointer; }
+
+/* ===== Aya List Items ===== */
+.aya-item {
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid var(--kuttab-border);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.aya-item:last-child { border-bottom: none; }
+.aya-item:hover { background: #f0f7f0; }
+.aya-item.selected { background: #e8f5e9; }
+
+.aya-ref {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--kuttab-green-dark);
+    margin-bottom: 0.3rem;
+}
+
+.aya-text {
+    font-family: var(--font-arabic);
+    font-size: 1.25rem;
+    line-height: 2.2;
+    direction: rtl !important;
+    text-align: right !important;
+    unicode-bidi: embed;
+    color: var(--kuttab-text);
+    word-break: break-word;
+}
+
+.aya-text span[class^="tajweed-"] {
+    display: inline;
+    border-radius: 3px;
+    padding: 0 1px;
+}
+
+/* ===== Fixed Bottom Controls ===== */
+.controls-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 280px;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--kuttab-border);
+    padding: 0.6rem 1rem;
+    z-index: 50;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+}
+[dir="rtl"] .controls-fixed {
+    left: 0;
+    right: 280px;
+}
+@media (max-width: 768px) {
+    .controls-fixed { left: 240px; }
+    [dir="rtl"] .controls-fixed { left: 0; right: 240px; }
+}
+@media (max-width: 576px) {
+    .controls-fixed { left: 0; right: 0; }
+    [dir="rtl"] .controls-fixed { left: 0; right: 0; }
+}
+
+/* ===== Tajweed Highlight Colors ===== */
+/* Text color per group */
+.tajweed-lam              { color: #1565C0; }
+.tajweed-noon_tanween     { color: #2E7D32; }
+.tajweed-meem_sakinah     { color: #00838F; }
+.tajweed-noon_meem_mushaddad { color: #6A1B9A; }
+.tajweed-qalqalah         { color: #E65100; }
+.tajweed-mad              { color: #8E24AA; }
+.tajweed-waqf             { color: #EF6C00; }
+.tajweed-tafkhim_tarqiq   { color: #C62828; }
+
+/* Highlight (background) per group */
+.tajweed-highlight-lam              { background-color: rgba(21,  101, 192, 0.18); border-radius: 3px; }
+.tajweed-highlight-noon_tanween     { background-color: rgba(46,  125,  50, 0.18); border-radius: 3px; }
+.tajweed-highlight-meem_sakinah     { background-color: rgba(0,   131, 143, 0.18); border-radius: 3px; }
+.tajweed-highlight-noon_meem_mushaddad { background-color: rgba(106,  27, 154, 0.18); border-radius: 3px; }
+.tajweed-highlight-qalqalah         { background-color: rgba(230,  81,   0, 0.18); border-radius: 3px; }
+.tajweed-highlight-mad              { background-color: rgba(142,  36, 170, 0.18); border-radius: 3px; }
+.tajweed-highlight-waqf             { background-color: rgba(239, 108,   0, 0.18); border-radius: 3px; }
+.tajweed-highlight-tafkhim_tarqiq   { background-color: rgba(198,  40,  40, 0.18); border-radius: 3px; }
+
 /* ===== Loading ===== */
 #blazor-error-ui {
     color-scheme: light only;
