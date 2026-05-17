@@ -1,6 +1,7 @@
 {
   "WindowTitle": "Kuttab v0.85",
   "SelectTajweedRule": "📖 Seleccionar Regla de Tajweed:",
+  "SelectCategory": "📂 Seleccionar Categoría:",
   "Search": "🔍 Buscar",
   "Play": "▶️ Reproducir",
   "PlayRepeat": "🔁 Repetir",
@@ -124,6 +125,7 @@
   "RepeatRangeError": "Rango de repetición válido",
   "Basmalah": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
   "OpenRecitation": "🎙️ Recitación",
+  "Info": "Información",
   "OpenInfo": "ℹ️ Información",
   "OpenDonate": "🕌 Donar",
   "DonateTitle": "🕌 Apoyar Proyecto Centro BBF",

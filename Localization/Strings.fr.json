@@ -1,6 +1,7 @@
 {
   "WindowTitle": "Kuttab v0.85",
-  "SelectTajweedRule": "📖 Sélectionner une Règle de Tajweed:",
+  "SelectTajweedRule": "📖 Sélectionner une règle de Tajweed:",
+  "SelectCategory": "📂 Sélectionner une catégorie:",
   "Search": "🔍 Rechercher",
   "Play": "▶️ Lire",
   "PlayRepeat": "🔁 Répéter",
@@ -124,6 +125,7 @@
   "RepeatRangeError": "Plage de répétition valide",
   "Basmalah": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
   "OpenRecitation": "🎙️ Récitation",
+  "Info": "Info",
   "OpenInfo": "ℹ️ Info",
   "OpenDonate": "🕌 Faire un Don",
   "DonateTitle": "🕌 Soutenir le Projet du Centre BBF",

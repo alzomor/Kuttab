@@ -50,9 +50,11 @@ html, body {
 .bismillah {
     font-family: var(--font-arabic);
     font-size: 1.3rem;
-    text-align: center;
+    text-align: center !important;
     color: var(--kuttab-text);
     direction: rtl;
+    display: block;
+    width: 100%;
 }
 
 /* ===== App Container ===== */
@@ -96,6 +98,31 @@ html, body {
     gap: 0.25rem;
 }
 
+.nav-footer {
+    padding: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.nav-footer a.nav-play-link {
+    display: inline-block !important;
+    flex-direction: row !important;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    color: white !important;
+    font-size: inherit !important;
+}
+
+.nav-footer a.nav-play-link:hover {
+    opacity: 1;
+    background: none !important;
+}
+
 .nav-side a {
     display: flex;
     align-items: center;
@@ -129,7 +156,10 @@ html, body {
 .main-content {
     flex: 1;
     margin-left: 280px;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 [dir="rtl"] .main-content {
@@ -154,10 +184,15 @@ html, body {
 
 /* ===== Page Content Area ===== */
 .page-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: 1rem;
-    padding-bottom: 8rem; /* space for fixed controls only */
     max-width: 800px;
     margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* ===== Responsive ===== */
@@ -204,6 +239,9 @@ html, body {
         margin-right: 0;
         margin-bottom: 0.25rem;
     }
+    .nav-footer {
+        display: none;
+    }
     [dir="rtl"] .nav-side a .nav-icon {
         margin-left: 0;
     }
@@ -215,7 +253,7 @@ html, body {
         margin-right: 0;
     }
     .quran-text { font-size: 1.2rem; line-height: 2; }
-    .page-content { padding: 0.5rem; padding-bottom: 10rem; }
+    .page-content { padding: 0.5rem; }
 }
 
 /* ===== Buttons ===== */
@@ -287,9 +325,34 @@ html, body {
     transition: border-color 0.2s;
 }
 .form-select:focus, .form-control:focus { border-color: var(--kuttab-green); }
-.form-check { display: flex; align-items: center; gap: 0.5rem; }
-.form-check-input { width: 1.1rem; height: 1.1rem; cursor: pointer; accent-color: var(--kuttab-green); }
-.form-check-label { font-size: 0.9rem; cursor: pointer; }
+.form-check {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-inline-start: 0 !important;
+    padding-inline-end: 0 !important;
+    min-height: unset !important;
+}
+.form-check-input {
+    float: none !important;
+    position: static !important;
+    width: 1.1rem !important;
+    height: 1.1rem !important;
+    flex-shrink: 0 !important;
+    cursor: pointer;
+    accent-color: var(--kuttab-green);
+    margin: 0.15rem 0 0 0 !important;
+}
+.form-check-label {
+    font-size: 0.9rem;
+    cursor: pointer;
+    flex: 1 !important;
+    line-height: 1.4;
+    margin: 0 !important;
+    padding: 0 !important;
+}
 
 /* ===== Aya List Items ===== */
 .aya-item {
@@ -320,35 +383,112 @@ html, body {
     word-break: break-word;
 }
 
-.aya-text span[class^="tajweed-"] {
-    display: inline;
+.aya-text span[class^="tajweed-"],
+.quran-text span[class^="tajweed-"] {
+    font-weight: 700;
     border-radius: 3px;
-    padding: 0 1px;
+    padding: 0 2px;
 }
 
-/* ===== Fixed Bottom Controls ===== */
+/* ===== Hifz Mode Word States ===== */
+.word-hidden {
+    color: transparent;
+    background-color: rgba(76, 175, 80, 0.2);
+    border-radius: 3px;
+    padding: 0 2px;
+    margin: 0 1px;
+    display: inline-block;
+    min-width: 1em;
+    text-align: center;
+    position: relative;
+}
+
+.word-hidden::after {
+    content: "...";
+    color: var(--kuttab-green);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8em;
+}
+
+.word-revealed {
+    color: var(--kuttab-text);
+    background-color: rgba(76, 175, 80, 0.3);
+    border-radius: 3px;
+    padding: 0 2px;
+    margin: 0 1px;
+    font-weight: 600;
+}
+
+.word-normal {
+    color: var(--kuttab-text-light);
+    background-color: transparent;
+}
+
+.word-skipped {
+    color: var(--kuttab-text-light);
+    background-color: rgba(255, 152, 0, 0.2);
+    border-radius: 3px;
+    padding: 0 2px;
+    margin: 0 1px;
+    text-decoration: line-through;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+}
+
+/* ===== Recitation Mode Layout ===== */
+.recitation-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.recitation-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.recitation-tajweed {
+    overflow-y: auto;
+}
+
+@media (orientation: landscape) and (min-width: 600px) {
+    .recitation-layout {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .recitation-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .recitation-tajweed {
+        width: 320px;
+        flex-shrink: 0;
+        max-height: calc(100vh - 2rem);
+        overflow-y: auto;
+        position: sticky;
+        top: 0.5rem;
+    }
+}
+
+/* ===== Sticky Bottom Controls ===== */
 .controls-fixed {
-    position: fixed;
-    bottom: 0;
-    left: 280px;
-    right: 0;
+    position: sticky;
+    bottom: -1rem; /* cancel out page-content bottom padding */
     background: white;
     border-top: 1px solid var(--kuttab-border);
     padding: 0.6rem 1rem;
-    z-index: 50;
+    z-index: 10;
     box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-}
-[dir="rtl"] .controls-fixed {
-    left: 0;
-    right: 280px;
-}
-@media (max-width: 768px) {
-    .controls-fixed { left: 240px; }
-    [dir="rtl"] .controls-fixed { left: 0; right: 240px; }
+    margin: 0 -1rem; /* bleed to page-content edges */
 }
 @media (max-width: 576px) {
-    .controls-fixed { left: 0; right: 0; }
-    [dir="rtl"] .controls-fixed { left: 0; right: 0; }
+    .controls-fixed { margin: 0 -0.5rem; bottom: -0.5rem; }
 }
 
 /* ===== Tajweed Highlight Colors ===== */

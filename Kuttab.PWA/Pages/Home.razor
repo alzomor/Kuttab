@@ -60,7 +60,7 @@
                 }
                 @if (!string.IsNullOrEmpty(explanation))
                 {
-                    <div style="line-height: 1.4; white-space: pre-line; text-align: left;">@explanation</div>
+                    <div style="line-height: 1.4; white-space: pre-line; text-align: @(Loc.IsRightToLeft ? "right" : "left");">@explanation</div>
                 }
                 else
                 {
@@ -77,7 +77,7 @@
 @if (_searchResults.Count > 0)
 {
     <div class="card-panel" style="padding: 0;">
-        <div style="max-height: 60vh; overflow-y: auto;">
+        <div>
             @for (int i = 0; i < _searchResults.Count; i++)
             {
                 var idx = i;
@@ -271,6 +271,23 @@
         StateHasChanged();
     }
 
+    // Android exact colors: foreground = opaque, background = 0x40 alpha (~25%)
+    private static (string Fg, string Bg) GetGroupColor(string group) => group switch
+    {
+        "lam"                  => ("#1565C0", "rgba(21,101,192,0.25)"),
+        "noon_tanween"         => ("#2E7D32", "rgba(46,125,50,0.25)"),
+        "meem_sakinah"         => ("#00838F", "rgba(0,131,143,0.25)"),
+        "noon_meem_mushaddad"  => ("#6A1B9A", "rgba(106,27,154,0.25)"),
+        "qalqalah"             => ("#E65100", "rgba(230,81,0,0.25)"),
+        "mad"                  => ("#8E24AA", "rgba(142,36,170,0.25)"),
+        "waqf"                 => ("#EF6C00", "rgba(239,108,0,0.25)"),
+        "tafkhim_tarqiq"       => ("#C62828", "rgba(198,40,40,0.25)"),
+        _                      => ("#555555", "rgba(85,85,85,0.18)")
+    };
+
+    private static bool IsDiacritic(char c)
+        => (c >= '\u064B' && c <= '\u0652') || c == '\u0670';
+
     private string HighlightAya(QuranAya aya)
     {
         var text = aya.Text;
@@ -279,36 +296,72 @@
             return System.Net.WebUtility.HtmlEncode(text);
 
         const string ZWJ = "\u200D";
-        var group = _selectedRuleGroup;
+        var (fg, bg) = GetGroupColor(_selectedRuleGroup);
+        var spanStyle = $"color:{fg};background-color:{bg};font-weight:700;border-radius:3px;padding:0 2px;";
         var sb = new System.Text.StringBuilder();
         int lastEnd = 0;
 
         foreach (var mp in aya.MatchPositions.OrderBy(m => m.Start))
         {
             int start = mp.Start;
-            int end = mp.Start + mp.Length;
-            if (start < lastEnd || start >= text.Length) continue;
+            int matchLen = Math.Min(mp.Length, text.Length - start);
+            int end = start + matchLen;
+            if (start < lastEnd || matchLen <= 0) continue;
 
-            // Text before this match
             if (start > lastEnd)
                 sb.Append(System.Net.WebUtility.HtmlEncode(text.Substring(lastEnd, start - lastEnd)));
 
-            // ZWJ before the span if the previous character is a joining Arabic letter
-            if (start > 0 && IsJoiningArabic(text[start - 1]))
-                sb.Append(ZWJ);
+            // Find previous base letter (skip any diacritics immediately before match)
+            int prevBase = start - 1;
+            while (prevBase >= 0 && IsDiacritic(text[prevBase])) prevBase--;
 
-            // The highlighted match
-            var matchLen = Math.Min(mp.Length, text.Length - start);
-            var matchText = text.Substring(start, matchLen);
-            sb.Append($"<span class=\"tajweed-{group} tajweed-highlight-{group}\">");
-            sb.Append(System.Net.WebUtility.HtmlEncode(matchText));
+            // Find last base letter inside the match
+            int lastBase = end - 1;
+            while (lastBase >= start && IsDiacritic(text[lastBase])) lastBase--;
+
+            // Extend span end to absorb trailing harakat of last matched letter.
+            // Orphaned combining marks outside the span break text shaping and
+            // cause the following letter to appear in isolated form.
+            int spanEnd = end;
+            while (spanEnd < text.Length && IsDiacritic(text[spanEnd])) spanEnd++;
+            // spanEnd is now the first base letter after the match (= nextBase)
+            int nextBase = spanEnd;
+
+            bool connectBefore = prevBase >= 0
+                && IsJoiningArabic(text[prevBase])
+                && IsReceivingArabic(text[start]);
+
+            bool connectAfter = nextBase < text.Length
+                && lastBase >= start
+                && IsJoiningArabic(text[lastBase])
+                && IsReceivingArabic(text[nextBase]);
+
+            // Include trailing diacritics INSIDE the span (like Android) to maintain text shaping
+            int baseContentLen = lastBase - start + 1;
+            int trailingDiacriticsLen = spanEnd - (lastBase + 1);
+
+            // ZWJ outside span (before) + inside span (before first char)
+            if (connectBefore) sb.Append(ZWJ);
+            sb.Append($"<span style=\"{spanStyle}\">");
+            if (connectBefore) sb.Append(ZWJ);
+
+            // Base letters content
+            sb.Append(System.Net.WebUtility.HtmlEncode(text.Substring(start, baseContentLen)));
+
+            // ZWJ immediately after last base letter (before trailing diacritics)
+            if (connectAfter) sb.Append(ZWJ);
+
+            // Include trailing diacritics INSIDE the span (critical for proper shaping)
+            if (trailingDiacriticsLen > 0)
+                sb.Append(System.Net.WebUtility.HtmlEncode(text.Substring(lastBase + 1, trailingDiacriticsLen)));
+
+            // Close span after trailing diacritics
             sb.Append("</span>");
 
-            // ZWJ after the span if the next character can receive a connection
-            if (end < text.Length && IsReceivingArabic(text[end]))
-                sb.Append(ZWJ);
+            // ZWJ outside span (after) - connects to next letter
+            if (connectAfter) sb.Append(ZWJ);
 
-            lastEnd = end;
+            lastEnd = spanEnd; // advance past absorbed harakat
         }
 
         if (lastEnd < text.Length)

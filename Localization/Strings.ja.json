@@ -1,6 +1,7 @@
 {
   "WindowTitle": "Kuttab v0.85",
-  "SelectTajweedRule": "📖 タジュウィード規則を選択:",
+  "SelectTajweedRule": "📖 タジウィード規則の選択:",
+  "SelectCategory": "📂 カテゴリの選択:",
   "Search": "🔍 検索",
   "Play": "▶️ 再生",
   "PlayRepeat": "🔁 リピート",
@@ -124,6 +125,7 @@
   "RepeatRangeError": "有効なリピート範囲",
   "Basmalah": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
   "OpenRecitation": "🎙️ 朗唱",
+  "Info": "情報",
   "OpenInfo": "ℹ️ 情報",
   "OpenDonate": "🕌 寄付",
   "DonateTitle": "🕌 BBFセンタープロジェクトを支援",

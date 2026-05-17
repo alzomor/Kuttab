@@ -286,6 +286,8 @@
 
     private void OnLocLanguageChanged(object? sender, EventArgs e)
     {
+        foreach (var group in _ruleGroups)
+            group.DisplayName = RuleGroupTranslator.GetGroupTitle(group.GroupName, Loc.CurrentLanguage);
         InvokeAsync(StateHasChanged);
     }
 

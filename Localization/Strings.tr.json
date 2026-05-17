@@ -1,6 +1,7 @@
 {
   "WindowTitle": "Kuttab v0.85",
-  "SelectTajweedRule": "📖 Tecvid Kuralını Seçin:",
+  "SelectTajweedRule": "📖 Tajweed Kuralı Seçin:",
+  "SelectCategory": "📂 Kategori Seçin:",
   "Search": "🔍 Ara",
   "Play": "▶️ Oynat",
   "PlayRepeat": "🔁 Tekrarla",
@@ -124,6 +125,7 @@
   "RepeatRangeError": "Geçerli tekrar aralığı",
   "Basmalah": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
   "OpenRecitation": "🎙️ Okuma",
+  "Info": "Bilgi",
   "OpenInfo": "ℹ️ Bilgi",
   "OpenDonate": "🕌 Bağış Yap",
   "DonateTitle": "🕌 BBF Merkez Projesini Destekle",

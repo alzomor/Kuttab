@@ -1,6 +1,7 @@
 {
   "WindowTitle": "Kuttab v0.85",
   "SelectTajweedRule": "📖 اختر قاعدة التجويد:",
+  "SelectCategory": "📂 اختر الفئة:",
   "Search": "🔍 بحث",
   "Play": "▶️ تشغيل",
   "PlayRepeat": "🔁 تكرار التشغيل",
@@ -121,6 +122,7 @@
   "RepeatRangeError": "نطاق التكرار الصحيح",
   "Basmalah": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
   "OpenRecitation": "🎙️ التلاوة",
+  "Info": "معلومات",
   "OpenInfo": "ℹ️ معلومات",
   "OpenDonate": "🕌 تبرع",
   "DonateTitle": "🕌 ادعم مشروع بناء مركز الجمعية",

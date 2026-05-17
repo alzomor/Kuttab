@@ -58,7 +58,7 @@ else
     </div>
 
     <div class="card-panel" id="pageContent">
-        <div class="quran-text" dir="rtl">
+        <div class="aya-text" dir="rtl" style="font-size: 1.4rem; line-height: 2.2;">
             @((MarkupString)_renderedPage)
         </div>
     </div>
@@ -219,36 +219,81 @@ else
     private void RenderPage()
     {
         var sb = new System.Text.StringBuilder();
+        int actualPage = _pageService != null
+            ? _pageService.GetPageForAya(_selectedSurah, _fromAya) + _currentPage - 1
+            : 99;
+        bool isFirstTwoPages = (actualPage <= 2);
 
         foreach (var aya in _pageAyas)
         {
-            // Surah name for ayah 1
+            // Surah name header for first ayah of each surah
             if (aya.AyaNumber == 1)
             {
                 sb.Append($"<div class=\"surah-name\">﴿ سورة {SurahInfo.GetSurahName(aya.Surah)} ﴾</div>");
+            }
 
-                // Bismillah for all surahs except 9
-                if (aya.Surah != 9 && aya.Surah != 1)
+            // isBismillah: first ayah of every surah except At-Tawba (9)
+            // On the first two mushaf pages, the Bismillah is already part of the text (no split)
+            bool isBismillah = (aya.AyaNumber == 1 && aya.Surah != 9 && !isFirstTwoPages);
+            int bismillahWordCount = 4;
+
+            if (isBismillah)
+            {
+                // Render the Bismillah (first 4 words) as a centered line
+                int bCount = Math.Min(bismillahWordCount, aya.Words.Count);
+                sb.Append("<div class=\"bismillah\">");
+                for (int w = 0; w < bCount; w++)
                 {
-                    sb.Append("<div class=\"bismillah\">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>");
+                    var css = aya.WordStates[w] switch
+                    {
+                        WordState.Hidden => "word-hidden",
+                        WordState.Revealed => aya.InRange ? "word-revealed" : "word-normal",
+                        WordState.Skipped => "word-skipped",
+                        _ => "word-normal"
+                    };
+                    sb.Append($"<span class=\"{css}\">{System.Net.WebUtility.HtmlEncode(aya.Words[w])}</span>\u00A0");
+                }
+                sb.Append("</div>");
+
+                // Render remaining words of ayah 1 (after Bismillah) as normal ayah line
+                // For Surah 1 (Al-Fatiha): all 4 words are Bismillah, no remaining words for ayah 1
+                int startWord = Math.Min(bismillahWordCount, aya.Words.Count);
+                if (startWord < aya.Words.Count)
+                {
+                    sb.Append("<div style=\"margin-bottom: 0.5rem;\">");
+                    for (int w = startWord; w < aya.Words.Count; w++)
+                    {
+                        var css = aya.WordStates[w] switch
+                        {
+                            WordState.Hidden => "word-hidden",
+                            WordState.Revealed => aya.InRange ? "word-revealed" : "word-normal",
+                            WordState.Skipped => "word-skipped",
+                            _ => "word-normal"
+                        };
+                        sb.Append($"<span class=\"{css}\">{System.Net.WebUtility.HtmlEncode(aya.Words[w])}</span> ");
+                    }
+                    sb.Append($"<span style=\"color: var(--kuttab-gold); font-size: 0.9em;\">﴿{aya.AyaNumber}﴾</span>");
+                    sb.Append("</div>");
                 }
             }
-
-            sb.Append("<div style=\"margin-bottom: 0.5rem;\">");
-            for (int w = 0; w < aya.Words.Count; w++)
+            else
             {
-                var css = aya.WordStates[w] switch
+                // Normal ayah rendering (all words)
+                sb.Append("<div style=\"margin-bottom: 0.5rem;\">");
+                for (int w = 0; w < aya.Words.Count; w++)
                 {
-                    WordState.Hidden => "word-hidden",
-                    WordState.Revealed => aya.InRange ? "word-revealed" : "word-normal",
-                    WordState.Skipped => "word-skipped",
-                    _ => "word-normal"
-                };
-                sb.Append($"<span class=\"{css}\">{System.Net.WebUtility.HtmlEncode(aya.Words[w])}</span> ");
+                    var css = aya.WordStates[w] switch
+                    {
+                        WordState.Hidden => "word-hidden",
+                        WordState.Revealed => aya.InRange ? "word-revealed" : "word-normal",
+                        WordState.Skipped => "word-skipped",
+                        _ => "word-normal"
+                    };
+                    sb.Append($"<span class=\"{css}\">{System.Net.WebUtility.HtmlEncode(aya.Words[w])}</span> ");
+                }
+                sb.Append($"<span style=\"color: var(--kuttab-gold); font-size: 0.9em;\">﴿{aya.AyaNumber}﴾</span>");
+                sb.Append("</div>");
             }
-            // Aya marker
-            sb.Append($"<span style=\"color: var(--kuttab-gold); font-size: 0.9em;\">﴿{aya.AyaNumber}﴾</span>");
-            sb.Append("</div>");
         }
 
         _renderedPage = sb.ToString();
@@ -316,7 +361,21 @@ else
     [JSInvokable]
     public void OnSpeechError(string error)
     {
-        _statusText = $"Error: {error}";
+        switch (error)
+        {
+            case "not-allowed":
+                _statusText = Loc["HifzMicrophoneDenied"] ?? "Microphone access denied. Please allow microphone access in your browser settings and refresh the page.";
+                break;
+            case "no-speech":
+                _statusText = Loc["HifzNoSpeech"] ?? "No speech detected. Please try again.";
+                break;
+            case "network":
+                _statusText = Loc["HifzNetworkError"] ?? "Network error. Please check your internet connection.";
+                break;
+            default:
+                _statusText = Loc["HifzSpeechError"] ?? $"Speech recognition error: {error}";
+                break;
+        }
         StateHasChanged();
     }
 

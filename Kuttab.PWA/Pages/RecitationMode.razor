@@ -10,126 +10,129 @@
 
 <PageTitle>Kuttab - @Loc["RecitationMode"]</PageTitle>
 
-<div class="card-panel">
-    <h5 style="color: var(--kuttab-green); font-weight: 700;">@Loc["RecitationMode"]</h5>
+<div class="recitation-layout">
+    <div class="recitation-main">
+        <div class="card-panel">
+            <h5 style="color: var(--kuttab-green); font-weight: 700;">@Loc["RecitationMode"]</h5>
 
-    <div class="mb-2">
-        <label class="form-label">@Loc["SelectReciter"]</label>
-        <select class="form-select" @bind="_selectedReciter">
-            @foreach (var r in _reciters)
-            {
-                <option value="@r.Id">@Loc[r.DisplayKey]</option>
-            }
-        </select>
-    </div>
-
-    <div class="mb-2">
-        <label class="form-label">@Loc["Surah"]</label>
-        <select class="form-select" @onchange="OnSurahChanged">
-            @for (int s = 1; s <= 114; s++)
-            {
-                var sNum = s;
-                <option value="@sNum" selected="@(sNum == _selectedSurah)">@sNum - @SurahInfo.GetSurahName(sNum)</option>
-            }
-        </select>
-    </div>
-
-    <div class="row mb-2">
-        <div class="col-6">
-            <label class="form-label">@Loc["FromAya"]</label>
-            <input type="number" class="form-control" min="1" max="@_maxAya" @bind="_fromAya" />
-        </div>
-        <div class="col-6">
-            <label class="form-label">@Loc["ToAya"]</label>
-            <input type="number" class="form-control" min="1" max="@_maxAya" @bind="_toAya" />
-        </div>
-    </div>
-
-    <div class="row mb-2">
-        <div class="col-6">
-            <label class="form-label">@Loc["RepeatCount"]</label>
-            <input type="number" class="form-control" min="1" max="99" @bind="_repeatCount" />
-        </div>
-        <div class="col-6">
-            <label class="form-label">@Loc["RepeatMode"]</label>
-            <select class="form-select" @bind="_repeatMode">
-                <option value="aya">@Loc["RepeatAya"]</option>
-                <option value="range">@Loc["RepeatRange"]</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="form-check mb-2">
-        <input class="form-check-input" type="checkbox" id="teacherMode" @bind="_teacherMode" />
-        <label class="form-check-label" for="teacherMode">@Loc["TeacherMode"]</label>
-    </div>
-    
-    <div class="form-check mb-2">
-        <input class="form-check-input" type="checkbox" id="showTajweedRules" @bind="_showTajweedRules" />
-        <label class="form-check-label" for="showTajweedRules">@Loc["ShowTajweedRules"]</label>
-    </div>
-</div>
-
-@if (!string.IsNullOrEmpty(_currentAyaText))
-{
-    <div class="card-panel">
-        <div class="text-center mb-1" style="font-size: 0.85rem; color: var(--kuttab-green); font-weight: 600;">
-            @_currentAyaInfo
-        </div>
-        <div class="quran-text" dir="rtl" style="text-align: center;">
-            @((MarkupString)_highlightedAyaText)
-        </div>
-        @if (_useOnlineImages && _currentPageNumber > 0)
-        {
-            <div class="text-center mt-2">
-                <img src="https://everyayah.com/data/quranpages/@(_currentPageNumber.ToString("D3")).png"
-                     alt="Quran page @_currentPageNumber"
-                     style="max-width: 100%; border-radius: 4px; border: 1px solid #e0e0e0;"
-                     loading="lazy" />
-                <div style="font-size: 0.75rem; color: var(--kuttab-text-light); margin-top: 0.25rem;">@Loc["Page"] @_currentPageNumber</div>
+            <div class="mb-2">
+                <label class="form-label">@Loc["SelectReciter"]</label>
+                <select class="form-select" @bind="_selectedReciter">
+                    @foreach (var r in _reciters)
+                    {
+                        <option value="@r.Id">@Loc[r.DisplayKey]</option>
+                    }
+                </select>
             </div>
-        }
-    </div>
-}
 
-<div class="controls-fixed">
-    <div class="d-flex gap-2 justify-content-center flex-wrap">
-        @if (!_isPlaying)
-        {
-            <button class="btn-kuttab" @onclick="StartPlayback">@Loc["Play"]</button>
-        }
-        else
-        {
-            <button class="btn-kuttab" style="background: #C62828;" @onclick="StopPlayback">@Loc["Stop"]</button>
-        }
-    </div>
-    <div class="text-center mt-1" style="font-size: 0.85rem; color: var(--kuttab-text-light);">
-        @_statusText
-    </div>
-</div>
+            <div class="mb-2">
+                <label class="form-label">@Loc["Surah"]</label>
+                <select class="form-select" @onchange="OnSurahChanged">
+                    @for (int s = 1; s <= 114; s++)
+                    {
+                        var sNum = s;
+                        <option value="@sNum" selected="@(sNum == _selectedSurah)">@sNum - @SurahInfo.GetSurahName(sNum)</option>
+                    }
+                </select>
+            </div>
 
-@if (_showTajweedRules && _tajweedMatches.Count > 0)
-{
-    <div class="card-panel">
-        <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["TajweedRules"]</h6>
-        @foreach (var match in _tajweedMatches)
-        {
-            var explanation = TajweedRulesExplanation.GetExplanation(match.RuleName, Loc.CurrentLanguage);
-            <div class="mb-2" style="font-size: 0.85rem;">
-                <div class="mb-1">
-                    <span class="tajweed-@match.GroupName" style="font-weight: 700;">@(RuleNameTranslator.GetLocalizedName(match.RuleName, Loc.CurrentLanguage))</span>
-                    <span style="color: var(--kuttab-text-light);"> — @match.MatchedText</span>
+            <div class="row mb-2">
+                <div class="col-6">
+                    <label class="form-label">@Loc["FromAya"]</label>
+                    <input type="number" class="form-control" min="1" max="@_maxAya" @bind="_fromAya" />
                 </div>
-                @if (!string.IsNullOrEmpty(explanation))
+                <div class="col-6">
+                    <label class="form-label">@Loc["ToAya"]</label>
+                    <input type="number" class="form-control" min="1" max="@_maxAya" @bind="_toAya" />
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-6">
+                    <label class="form-label">@Loc["RepeatCount"]</label>
+                    <input type="number" class="form-control" min="1" max="99" @bind="_repeatCount" />
+                </div>
+                <div class="col-6">
+                    <label class="form-label">@Loc["RepeatMode"]</label>
+                    <select class="form-select" @bind="_repeatMode">
+                        <option value="aya">@Loc["RepeatAya"]</option>
+                        <option value="range">@Loc["RepeatRange"]</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="teacherMode" @bind="_teacherMode" />
+                <label class="form-check-label" for="teacherMode">@Loc["TeacherMode"]</label>
+            </div>
+
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="showTajweedRules" @bind="_showTajweedRules" />
+                <label class="form-check-label" for="showTajweedRules">@Loc["ShowTajweedRules"]</label>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(_currentAyaText))
+        {
+            <div class="card-panel">
+                <div class="text-center mb-1" style="font-size: 0.85rem; color: var(--kuttab-green); font-weight: 600;">
+                    @_currentAyaInfo
+                </div>
+                <div class="quran-text" dir="rtl" style="text-align: center;">
+                    @((MarkupString)_highlightedAyaText)
+                </div>
+                @if (_useOnlineImages && _currentAyaImageUrl != "")
                 {
-                    <div class="ms-3" style="color: var(--kuttab-text-light); font-size: 0.8rem; line-height: 1.4;">
-                        @(explanation.Replace("\n", "<br/>"))
+                    <div class="text-center mt-2">
+                        <img src="@_currentAyaImageUrl"
+                             alt="Aya @_currentPlayIdx"
+                             style="max-width: 100%; border-radius: 4px; border: 1px solid #e0e0e0;"
+                             loading="lazy" />
                     </div>
                 }
             </div>
         }
+
+        <div class="controls-fixed">
+            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                @if (!_isPlaying)
+                {
+                    <button class="btn-kuttab" @onclick="StartPlayback">@Loc["Play"]</button>
+                }
+                else
+                {
+                    <button class="btn-kuttab" style="background: #C62828;" @onclick="StopPlayback">@Loc["Stop"]</button>
+                }
+            </div>
+            <div class="text-center mt-1" style="font-size: 0.85rem; color: var(--kuttab-text-light);">
+                @_statusText
+            </div>
+        </div>
     </div>
-}
+
+    @if (_showTajweedRules && _tajweedMatches.Count > 0)
+    {
+        <div class="recitation-tajweed card-panel">
+            <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["TajweedRulesSelection"]</h6>
+            @foreach (var match in _tajweedMatches)
+            {
+                var explanation = TajweedRulesExplanation.GetExplanation(match.RuleName, Loc.CurrentLanguage);
+                <div class="mb-2" style="font-size: 0.85rem;">
+                    <div class="mb-1">
+                        <span class="tajweed-@match.GroupName" style="font-weight: 700;">@(RuleNameTranslator.GetLocalizedName(match.RuleName, Loc.CurrentLanguage))</span>
+                        <span style="color: var(--kuttab-text-light);"> — @match.MatchedText</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(explanation))
+                    {
+                        <div class="ms-3" style="color: var(--kuttab-text-light); font-size: 0.8rem; line-height: 1.4;">
+                            @explanation
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
 
 @code {
     private int _selectedSurah = 1;
@@ -154,6 +157,7 @@
     private bool _useOnlineImages = true;
     private List<string>? _selectedTajweedRules = null; // null = all rules
     private int _currentPageNumber = 0;
+    private string _currentAyaImageUrl = "";
     private bool _needsBasmalah = false;
     private bool _playingBasmalah = false;
     private QuranPageService _pageService = new();
@@ -288,6 +292,7 @@
             _isPlaying = false;
             _statusText = Loc["Ready"];
             _currentPageNumber = 0;
+            _currentAyaImageUrl = "";
             StateHasChanged();
             return;
         }
@@ -301,8 +306,9 @@
         // Get tajweed matches using selected rules filter
         _tajweedMatches = SearchService.SearchAyaForRules(text, _selectedTajweedRules);
 
-        // Update page number for image display
+        // Update page number and image URL
         _currentPageNumber = _pageService.IsLoaded ? _pageService.GetPageForAya(_selectedSurah, _currentPlayIdx) : 0;
+        _currentAyaImageUrl = _useOnlineImages ? $"https://everyayah.com/data/QuranText_jpg/{_selectedSurah}_{_currentPlayIdx}.jpg" : "";
 
         var repeatSuffix = _repeatMode == "aya" && _repeatCount > 1
             ? $" ({_currentRepeat}/{_repeatCount})"
@@ -367,6 +373,23 @@
         _statusText = Loc["Ready"];
     }
 
+    // Android exact colors: foreground = opaque, background = 0x40 alpha (~25%)
+    private static (string Fg, string Bg) GetGroupColor(string group) => group switch
+    {
+        "lam"                  => ("#1565C0", "rgba(21,101,192,0.25)"),
+        "noon_tanween"         => ("#2E7D32", "rgba(46,125,50,0.25)"),
+        "meem_sakinah"         => ("#00838F", "rgba(0,131,143,0.25)"),
+        "noon_meem_mushaddad"  => ("#6A1B9A", "rgba(106,27,154,0.25)"),
+        "qalqalah"             => ("#E65100", "rgba(230,81,0,0.25)"),
+        "mad"                  => ("#8E24AA", "rgba(142,36,170,0.25)"),
+        "waqf"                 => ("#EF6C00", "rgba(239,108,0,0.25)"),
+        "tafkhim_tarqiq"       => ("#C62828", "rgba(198,40,40,0.25)"),
+        _                      => ("#555555", "rgba(85,85,85,0.18)")
+    };
+
+    private static bool IsDiacritic(char c)
+        => (c >= '\u064B' && c <= '\u0652') || c == '\u0670';
+
     private string HighlightAyaWithTajweed(string ayaText)
     {
         if (string.IsNullOrEmpty(ayaText)) return "";
@@ -374,151 +397,84 @@
         if (matches.Count == 0)
             return System.Net.WebUtility.HtmlEncode(ayaText);
 
-        // Implement Android-style ZWJ handling for proper Arabic connections
-        const char ZWJ = '\u200D';
-        var textBuilder = new System.Text.StringBuilder(ayaText);
-        var sortedMatches = matches.OrderBy(m => m.MatchStart).ToList();
-        
-        // Helper functions from Android
-        bool IsArabicLetter(char c) => (c >= '\u0621' && c <= '\u064A') || c == '\u0671';
-        bool IsDiacritic(char c) => (c >= '\u064B' && c <= '\u0652') || (c >= '\u0670' && c <= '\u0670');
-        bool IsConnector(char c) => IsArabicLetter(c) && 
-            c != '\u0627' && c != '\u0622' && c != '\u0623' && c != '\u0625' && c != '\u0671' &&
-            c != '\u062F' && c != '\u0630' && c != '\u0631' && c != '\u0632' && c != '\u0648' && c != '\u0621';
-        bool CanReceiveFromRight(char c) => IsArabicLetter(c) && c != '\u0621';
-        
-        int FindPrevBaseIndex(string s, int start)
-        {
-            int i = start;
-            while (i >= 0 && (IsDiacritic(s[i]) || s[i] == ZWJ)) i--;
-            return i;
-        }
-        
-        int FindNextBaseIndex(string s, int start)
-        {
-            int i = start;
-            while (i < s.Length && (IsDiacritic(s[i]) || s[i] == ZWJ)) i++;
-            return i < s.Length ? i : -1;
-        }
-
-        // Process each match to add ZWJs where needed
-        int offsetAdjustment = 0;
-        for (int matchIndex = 0; matchIndex < sortedMatches.Count; matchIndex++)
-        {
-            var match = sortedMatches[matchIndex];
-            int adjustedStart = match.MatchStart + offsetAdjustment;
-            int adjustedLength = match.MatchLength;
-            var added = 0;
-
-            var prevIndex = FindPrevBaseIndex(textBuilder.ToString(), adjustedStart - 1);
-            var nextIndex = FindNextBaseIndex(textBuilder.ToString(), adjustedStart + adjustedLength);
-
-            char firstChar = adjustedStart < textBuilder.Length ? textBuilder[adjustedStart] : '\0';
-            char lastChar = (adjustedStart + adjustedLength - 1) < textBuilder.Length && adjustedLength > 0
-                ? textBuilder[adjustedStart + adjustedLength - 1] : '\0';
-
-            bool connectPrevToFirst = prevIndex >= 0 && IsConnector(textBuilder[prevIndex]) && IsConnector(firstChar);
-            bool connectLastToNext = nextIndex >= 0 && IsConnector(lastChar) && CanReceiveFromRight(textBuilder[nextIndex]);
-
-            // BEFORE boundary: external ZWJ after previous cluster, internal ZWJ at start of match
-            if (connectPrevToFirst)
-            {
-                // External ZWJ after previous cluster
-                int extPos = prevIndex + 1;
-                while (extPos < textBuilder.Length && IsDiacritic(textBuilder[extPos])) extPos++;
-                
-                if (extPos >= 0 && !(extPos < textBuilder.Length && textBuilder[extPos] == ZWJ))
-                {
-                    textBuilder.Insert(extPos, ZWJ);
-                    if (extPos <= adjustedStart) adjustedStart++;
-                    added++;
-                }
-
-                // Internal ZWJ at the very start of the match
-                if (!(adjustedStart < textBuilder.Length && textBuilder[adjustedStart] == ZWJ))
-                {
-                    textBuilder.Insert(adjustedStart, ZWJ);
-                    added++;
-                }
-            }
-
-            // AFTER boundary: internal ZWJ right after last base, external ZWJ after trailing diacritics
-            if (connectLastToNext)
-            {
-                // Internal ZWJ immediately after the last base (before its diacritics)
-                int intAfterPos = adjustedStart + adjustedLength + (connectPrevToFirst ? 1 : 0);
-                if (!(intAfterPos < textBuilder.Length && textBuilder[intAfterPos] == ZWJ))
-                {
-                    textBuilder.Insert(intAfterPos, ZWJ);
-                    added++;
-                }
-
-                // External ZWJ after last base + its diacritics (between clusters)
-                int extAfterPos = adjustedStart + adjustedLength + added;
-                while (extAfterPos < textBuilder.Length && IsDiacritic(textBuilder[extAfterPos])) extAfterPos++;
-                
-                if (!(extAfterPos < textBuilder.Length && textBuilder[extAfterPos] == ZWJ))
-                {
-                    textBuilder.Insert(extAfterPos, ZWJ);
-                    added++;
-                }
-            }
-
-            offsetAdjustment += added;
-        }
-
-        var adjustedText = textBuilder.ToString();
+        const string ZWJ = "\u200D";
         var sb = new System.Text.StringBuilder();
         int lastEnd = 0;
-        
-        // Apply highlighting with ZWJ-aware positions
-        foreach (var match in sortedMatches)
+
+        foreach (var match in matches.OrderBy(m => m.MatchStart))
         {
-            // Find the adjusted position accounting for ZWJs inserted before this match
-            int originalPos = 0;
-            int adjustedStart = 0;
-            
-            for (int i = 0; i < adjustedText.Length; i++)
-            {
-                if (originalPos == match.MatchStart)
-                {
-                    adjustedStart = i;
-                    // Skip ZWJs to find actual content start
-                    while (adjustedStart < adjustedText.Length && adjustedText[adjustedStart] == ZWJ)
-                        adjustedStart++;
-                    break;
-                }
-                if (adjustedText[i] != ZWJ)
-                    originalPos++;
-            }
-            
-            if (adjustedStart < lastEnd) continue;
-            if (adjustedStart > lastEnd)
-                sb.Append(System.Net.WebUtility.HtmlEncode(adjustedText.Substring(lastEnd, adjustedStart - lastEnd)));
-            
-            // Find the end of the match, excluding trailing ZWJs
-            int adjustedEnd = adjustedStart;
-            int charsToConsume = match.MatchLength;
-            while (charsToConsume > 0 && adjustedEnd < adjustedText.Length)
-            {
-                if (adjustedText[adjustedEnd] != ZWJ)
-                    charsToConsume--;
-                if (charsToConsume > 0) // Don't advance past the last character
-                    adjustedEnd++;
-            }
-            
-            var matchText = adjustedText.Substring(adjustedStart, adjustedEnd - adjustedStart);
-            sb.Append($"<span class=\"tajweed-{match.GroupName} tajweed-highlight-{match.GroupName}\">");
-            sb.Append(System.Net.WebUtility.HtmlEncode(matchText));
+            int start = match.MatchStart;
+            int matchLen = Math.Min(match.MatchLength, ayaText.Length - start);
+            int end = start + matchLen;
+            if (start < lastEnd || matchLen <= 0) continue;
+
+            if (start > lastEnd)
+                sb.Append(System.Net.WebUtility.HtmlEncode(ayaText.Substring(lastEnd, start - lastEnd)));
+
+            int prevBase = start - 1;
+            while (prevBase >= 0 && IsDiacritic(ayaText[prevBase])) prevBase--;
+
+            int lastBase = end - 1;
+            while (lastBase >= start && IsDiacritic(ayaText[lastBase])) lastBase--;
+
+            // Extend span to absorb trailing harakat of last matched letter
+            int spanEnd = end;
+            while (spanEnd < ayaText.Length && IsDiacritic(ayaText[spanEnd])) spanEnd++;
+            int nextBase = spanEnd;
+
+            bool connectBefore = prevBase >= 0
+                && IsJoiningArabic(ayaText[prevBase])
+                && IsReceivingArabic(ayaText[start]);
+
+            bool connectAfter = nextBase < ayaText.Length
+                && lastBase >= start
+                && IsJoiningArabic(ayaText[lastBase])
+                && IsReceivingArabic(ayaText[nextBase]);
+
+            // Include trailing diacritics INSIDE the span (like Android) to maintain text shaping
+            int baseContentLen = lastBase - start + 1;
+            int trailingDiacriticsLen = spanEnd - (lastBase + 1);
+
+            var (fg, bg) = GetGroupColor(match.GroupName);
+            var spanStyle = $"color:{fg};background-color:{bg};font-weight:700;border-radius:3px;padding:0 2px;";
+
+            if (connectBefore) sb.Append(ZWJ);
+            sb.Append($"<span style=\"{spanStyle}\">");
+            if (connectBefore) sb.Append(ZWJ);
+
+            sb.Append(System.Net.WebUtility.HtmlEncode(ayaText.Substring(start, baseContentLen)));
+
+            // ZWJ after last base letter, before trailing diacritics
+            if (connectAfter) sb.Append(ZWJ);
+
+            // Include trailing diacritics INSIDE the span (critical for proper shaping)
+            if (trailingDiacriticsLen > 0)
+                sb.Append(System.Net.WebUtility.HtmlEncode(ayaText.Substring(lastBase + 1, trailingDiacriticsLen)));
+
+            // Close span after trailing diacritics
             sb.Append("</span>");
-            lastEnd = adjustedEnd;
+
+            if (connectAfter) sb.Append(ZWJ);
+
+            lastEnd = spanEnd;
         }
-        
-        if (lastEnd < adjustedText.Length)
-            sb.Append(System.Net.WebUtility.HtmlEncode(adjustedText.Substring(lastEnd)));
-        
+
+        if (lastEnd < ayaText.Length)
+            sb.Append(System.Net.WebUtility.HtmlEncode(ayaText.Substring(lastEnd)));
+
         return sb.ToString();
     }
+
+    private static bool IsJoiningArabic(char c)
+    {
+        if (!((c >= '\u0621' && c <= '\u064A') || c == '\u0671')) return false;
+        return c != '\u0621' && c != '\u0627' && c != '\u0622' && c != '\u0623' &&
+               c != '\u0625' && c != '\u0671' && c != '\u062F' && c != '\u0630' &&
+               c != '\u0631' && c != '\u0632' && c != '\u0648';
+    }
+
+    private static bool IsReceivingArabic(char c)
+        => (c >= '\u0622' && c <= '\u064A') || c == '\u0671';
 
     private string GetAudioUrl(int surah, int aya)
     {
