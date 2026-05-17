@@ -1,0 +1,65 @@
+@page "/tajweed-rule/{RuleName}"
+@inject QuranSearchService SearchService
+@inject LocalizationService Loc
+@inject IJSRuntime JS
+@using Kuttab.Core.Services
+
+<PageTitle>Kuttab - @RuleName</PageTitle>
+
+<div class="card-panel">
+    <h5 style="color: var(--kuttab-green); font-weight: 700;" dir="rtl">@RuleName</h5>
+    @if (_rule != null && !string.IsNullOrEmpty(_rule.Group))
+    {
+        <span class="tajweed-@_rule.Group" style="font-weight: 600;">@_rule.Group</span>
+    }
+</div>
+
+@if (!string.IsNullOrEmpty(_explanation))
+{
+    <div class="card-panel" dir="rtl" style="font-family: var(--font-arabic); line-height: 2;">
+        @((MarkupString)_explanation)
+    </div>
+}
+
+@if (_rule != null && _rule.Cases.Count > 0)
+{
+    <div class="card-panel">
+        <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["Cases"]</h6>
+        @foreach (var c in _rule.Cases)
+        {
+            <div class="mb-2 p-2" style="background: #F5F5F5; border-radius: 8px;">
+                <div dir="rtl" style="font-family: var(--font-arabic);">@c.Description</div>
+                <div style="font-size: 0.75rem; color: var(--kuttab-text-light); font-family: monospace;">@c.Regex</div>
+            </div>
+        }
+    </div>
+}
+
+<div class="card-panel text-center">
+    <button class="btn-kuttab-outline" @onclick="ShareRule">📤 @Loc["ShareButton"]</button>
+</div>
+
+@code {
+    [Parameter] public string RuleName { get; set; } = "";
+
+    private Kuttab.Core.Models.TajweedRule? _rule;
+    private string _explanation = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchService.LoadRulesAsync();
+        _rule = SearchService.GetRuleInfo(Uri.UnescapeDataString(RuleName));
+
+        if (_rule != null)
+        {
+            var explanation = TajweedRulesExplanation.GetExplanation(_rule.Name, Loc.CurrentLanguage);
+            _explanation = System.Net.WebUtility.HtmlEncode(explanation).Replace("\n", "<br/>");
+        }
+    }
+
+    private async Task ShareRule()
+    {
+        var text = $"{RuleName}\n{_explanation?.Replace("<br/>", "\n")}";
+        await JS.InvokeVoidAsync("UtilsInterop.share", RuleName, text, "");
+    }
+}

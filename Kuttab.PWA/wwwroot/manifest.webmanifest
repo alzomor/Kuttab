@@ -1,0 +1,27 @@
+{
+  "name": "Kuttab - كُتّاب",
+  "short_name": "Kuttab",
+  "description": "Tajweed Trainer - Learn Quran recitation rules",
+  "id": "./",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F5F5F0",
+  "theme_color": "#1B5E20",
+  "dir": "rtl",
+  "lang": "ar",
+  "prefer_related_applications": false,
+  "categories": ["education", "books"],
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ]
+}

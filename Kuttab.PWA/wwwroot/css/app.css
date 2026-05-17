@@ -1,0 +1,287 @@
+/* ===== Kuttab PWA Theme ===== */
+:root {
+    --kuttab-green-dark: #0D3F13;
+    --kuttab-green: #1B5E20;
+    --kuttab-green-light: #2E7D32;
+    --kuttab-gold: #FFD54F;
+    --kuttab-bg: #F5F5F0;
+    --kuttab-card-bg: #FFFFFF;
+    --kuttab-text: #212121;
+    --kuttab-text-light: #757575;
+    --kuttab-border: #E0E0E0;
+    --font-arabic: 'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', serif;
+    --font-ui: 'Noto Naskh Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+html, body {
+    font-family: var(--font-ui);
+    background-color: var(--kuttab-bg);
+    color: var(--kuttab-text);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+[dir="rtl"] body {
+    text-align: right;
+}
+
+[dir="ltr"] body {
+    text-align: left;
+}
+
+/* ===== Typography ===== */
+.quran-text {
+    font-family: var(--font-arabic);
+    font-size: 1.4rem;
+    line-height: 2.2;
+    direction: rtl;
+    text-align: right;
+}
+
+.surah-name {
+    font-family: var(--font-arabic);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--kuttab-green);
+    text-align: center;
+}
+
+.bismillah {
+    font-family: var(--font-arabic);
+    font-size: 1.3rem;
+    text-align: center;
+    color: var(--kuttab-text);
+    direction: rtl;
+}
+
+/* ===== App Container ===== */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===== Side Navigation ===== */
+.nav-side {
+    width: 280px;
+    background: linear-gradient(135deg, var(--kuttab-green-dark), var(--kuttab-green));
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 100;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+}
+
+.nav-header {
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.nav-header h1 {
+    font-size: 1.3rem;
+    margin: 0;
+    font-weight: 700;
+    text-align: center;
+}
+
+.nav-links {
+    flex: 1;
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.nav-side a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: rgba(255,255,255,0.8);
+    font-size: 0.9rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s;
+    border-radius: 0;
+    margin: 0 0.5rem;
+}
+
+.nav-side a.active, .nav-side a:hover {
+    color: white;
+    background: rgba(255,255,255,0.15);
+}
+
+.nav-side a .nav-icon {
+    font-size: 1.2rem;
+    margin-right: 0.75rem;
+    min-width: 1.2rem;
+    text-align: center;
+}
+
+[dir="rtl"] .nav-side a .nav-icon {
+    margin-right: 0;
+    margin-left: 0.75rem;
+}
+
+/* ===== Main Content ===== */
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    min-height: 100vh;
+}
+
+[dir="rtl"] .main-content {
+    margin-left: 0;
+    margin-right: 280px;
+}
+
+[dir="rtl"] .nav-side {
+    left: auto;
+    right: 0;
+}
+
+/* ===== Cards & Panels ===== */
+.card-panel {
+    background: var(--kuttab-card-bg);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid var(--kuttab-border);
+}
+
+/* ===== Page Content Area ===== */
+.page-content {
+    padding: 1rem;
+    padding-bottom: 8rem; /* space for fixed controls only */
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .nav-side {
+        width: 240px;
+    }
+    .main-content {
+        margin-left: 240px;
+    }
+    [dir="rtl"] .main-content {
+        margin-left: 0;
+        margin-right: 240px;
+    }
+}
+
+@media (max-width: 576px) {
+    .app-container {
+        flex-direction: column;
+    }
+    .nav-side {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .nav-header {
+        padding: 1rem;
+    }
+    .nav-links {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+    .nav-side a {
+        flex: 1;
+        min-width: calc(33.333% - 0.5rem);
+        flex-direction: column;
+        text-align: center;
+        padding: 0.5rem;
+        margin: 0;
+    }
+    .nav-side a .nav-icon {
+        margin-right: 0;
+        margin-bottom: 0.25rem;
+    }
+    [dir="rtl"] .nav-side a .nav-icon {
+        margin-left: 0;
+    }
+    .main-content {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    [dir="rtl"] .main-content {
+        margin-right: 0;
+    }
+    .quran-text { font-size: 1.2rem; line-height: 2; }
+    .page-content { padding: 0.5rem; padding-bottom: 10rem; }
+}
+
+/* ===== Loading ===== */
+#blazor-error-ui {
+    color-scheme: light only;
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+.blazor-error-boundary {
+    background: #b32121;
+    padding: 1rem;
+    color: white;
+    border-radius: 8px;
+    margin: 1rem;
+}
+
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}
+
+.loading-progress {
+    position: relative;
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    margin: 20vh auto 1rem auto;
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke: #E8F5E9;
+    stroke-width: 0.6rem;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+}
+
+.loading-progress circle:last-child {
+    stroke: var(--kuttab-green);
+    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+    transition: stroke-dasharray 0.05s ease-in-out;
+}
+
+.loading-progress-text {
+    position: absolute;
+    text-align: center;
+    font-weight: bold;
+    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+    color: var(--kuttab-green);
+}
+
+.loading-progress-text:after {
+    content: var(--blazor-load-percentage-text, "Loading");
+}

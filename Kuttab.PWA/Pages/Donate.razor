@@ -1,0 +1,135 @@
+@page "/donate"
+@implements IDisposable
+@inject LocalizationService Loc
+@inject IJSRuntime JS
+@inject HttpClient Http
+
+<PageTitle>Kuttab - @Loc["DonateTitle"]</PageTitle>
+
+<div class="card-panel">
+    <h5 style="color: var(--kuttab-green); font-weight: 700;">@Loc["DonateTitle"]</h5>
+    <p style="color: var(--kuttab-text-light);">@Loc["DonateSubtitle"]</p>
+</div>
+
+@if (_totalCost > 0)
+{
+    <div class="card-panel">
+        <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+            <span>@Loc["DonationProgress"]</span>
+            <span style="font-weight: 600;">@((_currentDonations * 100 / _totalCost))%</span>
+        </div>
+        <div class="progress-kuttab">
+            <div class="progress-bar" style="width: @((_currentDonations * 100 / _totalCost))%"></div>
+        </div>
+        <div class="text-center mt-1" style="font-size: 0.8rem; color: var(--kuttab-text-light);">
+            @_currentDonations.ToString("N0") / @_totalCost.ToString("N0") @_currency
+        </div>
+    </div>
+}
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["PaypalTitle"]</h6>
+    <p style="font-size: 0.9rem; color: var(--kuttab-text-light);">@Loc["PaypalDescription"]</p>
+    <a href="@PayPalUrl" target="_blank" class="btn-kuttab d-block text-center text-decoration-none" style="color: white;">
+        💳 @Loc["DonateViaPaypal"]
+    </a>
+</div>
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["BankTransferTitle"]</h6>
+    
+    <div class="mb-2">
+        <div style="font-size: 0.85rem; color: var(--kuttab-text-light);">@Loc["AccountHolder"]</div>
+        <div class="d-flex align-items-center gap-2">
+            <span style="font-weight: 600; flex: 1;">@AccountHolder</span>
+            <button class="btn-icon" @onclick="() => CopyText(AccountHolder)">📋</button>
+        </div>
+    </div>
+
+    <div class="mb-2">
+        <div style="font-size: 0.85rem; color: var(--kuttab-text-light);">IBAN</div>
+        <div class="d-flex align-items-center gap-2">
+            <span style="font-weight: 600; flex: 1; font-family: monospace;">@Iban</span>
+            <button class="btn-icon" @onclick="() => CopyText(Iban)">📋</button>
+        </div>
+    </div>
+
+    <div class="mb-2">
+        <div style="font-size: 0.85rem; color: var(--kuttab-text-light);">@Loc["PaymentReference"]</div>
+        <div class="d-flex align-items-center gap-2">
+            <span style="font-weight: 600; flex: 1;">@PaymentRef</span>
+            <button class="btn-icon" @onclick="() => CopyText(PaymentRef)">📋</button>
+        </div>
+    </div>
+
+    <p style="font-size: 0.8rem; color: var(--kuttab-text-light);">@Loc["BankTransferNote"]</p>
+</div>
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["AboutAssociationTitle"]</h6>
+    <p style="font-size: 0.9rem;">@Loc["AssociationDescription"]</p>
+    <a href="@AssociationUrl" target="_blank" style="color: var(--kuttab-green); font-weight: 600;">
+        🔗 @AssociationUrl
+    </a>
+    <p class="mt-2" style="font-size: 0.85rem; color: var(--kuttab-text-light);">@Loc["TaxDeductionNote"]</p>
+</div>
+
+<div class="card-panel text-center" style="background: #E8F5E9;">
+    <p style="font-family: var(--font-arabic); font-size: 1.1rem; color: var(--kuttab-green-dark); margin: 0;">
+        @Loc["BarakahMessage"]
+    </p>
+</div>
+
+@if (!string.IsNullOrEmpty(_copyMessage))
+{
+    <div style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--kuttab-green); color: white; padding: 0.5rem 1rem; border-radius: 8px; z-index: 200;">
+        @_copyMessage
+    </div>
+}
+
+@code {
+    private const string PayPalUrl = "https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=ESTNXJLMMQQQS&ssrt=1765056010634";
+    private const string AssociationUrl = "https://bbfverein.de/";
+    private const string Iban = "DE11 6805 0101 0014 3501 24";
+    private const string PaymentRef = "Spende BBF-Bauprojekt | über die App Kuttab";
+    private const string AccountHolder = "Bildungs- und Begegnungsverein Freiburg e.V.";
+
+    private long _totalCost = 1000000;
+    private long _currentDonations = 700000;
+    private string _currency = "EUR";
+    private string _copyMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Loc.LanguageChanged += OnLocLanguageChanged;
+        try
+        {
+            var json = await Http.GetStringAsync("data/donation.json");
+            var doc = System.Text.Json.JsonDocument.Parse(json);
+            _totalCost = doc.RootElement.GetProperty("totalCost").GetInt64();
+            _currentDonations = doc.RootElement.GetProperty("currentDonations").GetInt64();
+            _currency = doc.RootElement.GetProperty("currency").GetString() ?? "EUR";
+        }
+        catch { }
+    }
+
+    private async Task CopyText(string text)
+    {
+        await JS.InvokeVoidAsync("UtilsInterop.copyToClipboard", text);
+        _copyMessage = "✅ Copied!";
+        StateHasChanged();
+        await Task.Delay(1500);
+        _copyMessage = "";
+        StateHasChanged();
+    }
+
+    private void OnLocLanguageChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Loc.LanguageChanged -= OnLocLanguageChanged;
+    }
+}

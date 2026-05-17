@@ -13,6 +13,10 @@ public static class TajweedRulesExplanation
         public string Arabic { get; set; } = string.Empty;
         public string English { get; set; } = string.Empty;
         public string German { get; set; } = string.Empty;
+        public string Spanish { get; set; } = string.Empty;
+        public string Turkish { get; set; } = string.Empty;
+        public string French { get; set; } = string.Empty;
+        public string Japanese { get; set; } = string.Empty;
     }
 
     private static readonly Dictionary<string, RuleExplanation> Explanations = new()
@@ -809,7 +813,7 @@ Es ist leicht in anderen Fällen."
     /// Gets the explanation for a Tajweed rule in the specified language.
     /// </summary>
     /// <param name="arabicRuleName">The Arabic name of the rule.</param>
-    /// <param name="languageCode">The language code (ar, en, de).</param>
+    /// <param name="languageCode">The language code (ar, en, de, es, tr, fr, ja).</param>
     /// <returns>The explanation in the specified language, or an empty string if not found.</returns>
     public static string GetExplanation(string arabicRuleName, string languageCode)
     {
@@ -823,6 +827,10 @@ Es ist leicht in anderen Fällen."
         {
             "ar" => explanation.Arabic,
             "de" => explanation.German,
+            "es" => !string.IsNullOrEmpty(explanation.Spanish) ? explanation.Spanish : explanation.English,
+            "tr" => !string.IsNullOrEmpty(explanation.Turkish) ? explanation.Turkish : explanation.English,
+            "fr" => !string.IsNullOrEmpty(explanation.French) ? explanation.French : explanation.English,
+            "ja" => !string.IsNullOrEmpty(explanation.Japanese) ? explanation.Japanese : explanation.English,
             _ => explanation.English
         };
     }

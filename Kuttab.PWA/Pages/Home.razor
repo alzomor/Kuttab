@@ -1,0 +1,392 @@
+﻿@page "/"
+@implements IDisposable
+@inject QuranSearchService SearchService
+@inject LocalizationService Loc
+@inject IJSRuntime JS
+@using Kuttab.Core.Services
+
+<PageTitle>Kuttab - @Loc["SelectTajweedRule"]</PageTitle>
+
+<div class="card-panel">
+    <div class="mb-2">
+        <label class="form-label">@Loc["SelectCategory"]</label>
+        <select class="form-select" @onchange="OnCategoryChanged">
+            <option value="">-- @Loc["SelectCategory"] --</option>
+            @foreach (var cat in _categories)
+            {
+                <option value="@cat.Id">@cat.DisplayName</option>
+            }
+        </select>
+    </div>
+    <div class="mb-2">
+        <label class="form-label">@Loc["SelectTajweedRule"]</label>
+        <select class="form-select" @onchange="OnRuleChanged">
+            <option value="">-- @Loc["SelectTajweedRule"] --</option>
+            @foreach (var rule in _filteredRules)
+            {
+                <option value="@rule.Name">@rule.DisplayName</option>
+            }
+        </select>
+    </div>
+    <button class="btn-kuttab w-100" @onclick="DoSearch" disabled="@(_isSearching || string.IsNullOrEmpty(_selectedRuleName))">
+        @if (_isSearching)
+        {
+            <span>⏳ @Loc["Searching"]</span>
+        }
+        else
+        {
+            <span>@Loc["Search"]</span>
+        }
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(_statusText))
+{
+    <div class="card-panel text-center">
+        @if (!string.IsNullOrEmpty(_selectedRuleName))
+        {
+            <button class="btn-kuttab-outline mb-2" @onclick="ToggleRuleExplanation">@Loc["RuleExplanation"]</button>
+            
+            <div id="ruleExplanationPanel" class="@(_showRuleExplanation ? "" : "d-none")" style="margin-top: 1rem; padding: 1rem; border: 2px solid var(--kuttab-green); border-radius: 8px; background: #f0f8f0;">
+                <h6 style="color: var(--kuttab-green-dark); font-weight: 700; margin-bottom: 0.5rem;">@Loc["RuleExplanationTitle"]</h6>
+                <div class="mb-2" style="font-weight: 600;">
+                    @Loc["RuleNameLabel"]: @(RuleNameTranslator.GetLocalizedName(_selectedRuleName, Loc.CurrentLanguage))
+                </div>
+                @{
+                    var explanation = TajweedRulesExplanation.GetExplanation(_selectedRuleName, Loc.CurrentLanguage);
+                }
+                @if (!string.IsNullOrEmpty(explanation))
+                {
+                    <div style="line-height: 1.4; white-space: pre-line; text-align: left;">@explanation</div>
+                }
+                else
+                {
+                    <div style="color: var(--kuttab-text-light);">@Loc["NoExplanationAvailable"]</div>
+                }
+            </div>
+        }
+        <div style="color: var(--kuttab-green); font-weight: 600; font-size: 0.9rem; margin-top: 0.5rem;">
+            @_statusText
+        </div>
+    </div>
+}
+
+@if (_searchResults.Count > 0)
+{
+    <div class="card-panel" style="padding: 0;">
+        <div style="max-height: 60vh; overflow-y: auto;">
+            @for (int i = 0; i < _searchResults.Count; i++)
+            {
+                var idx = i;
+                var aya = _searchResults[idx];
+                <div class="aya-item @(idx == _selectedIndex ? "selected" : "")" @onclick="() => SelectAya(idx)">
+                    <div class="aya-ref">@Loc["Surah"] @aya.SurahNumber : @Loc["Aya"] @aya.AyaNumber</div>
+                    <div class="aya-text" dir="rtl">@((MarkupString)HighlightAya(aya))</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="controls-fixed">
+        <div class="d-flex gap-2 justify-content-center flex-wrap mb-1">
+            <button class="btn-kuttab" @onclick="PlaySelected" disabled="@(_selectedIndex < 0)">@Loc["PlaySingle"]</button>
+            <button class="btn-kuttab-outline" @onclick="PlayAll">@Loc["PlayAll"]</button>
+            <button class="btn-kuttab-outline" @onclick="StopPlayback">@Loc["Stop"]</button>
+            @if (_selectedIndex >= 0)
+            {
+                @if (!_isRecording)
+                {
+                    <button class="btn-kuttab" style="background: #C62828;" @onclick="StartRecording">@Loc["YourRecordingBottomLabel"]</button>
+                }
+                else
+                {
+                    <button class="btn-kuttab" style="background: #C62828;" @onclick="StopRecording">@Loc["Stop"]</button>
+                }
+                @if (_hasRecording)
+                {
+                    <button class="btn-kuttab-outline" @onclick="PlayRecording">@Loc["PlaySingle"]</button>
+                    <button class="btn-kuttab-outline" style="color: #C62828; border-color: #C62828;" @onclick="DeleteRecording">@Loc["DeleteRecording"]</button>
+                }
+            }
+        </div>
+        @if (!string.IsNullOrEmpty(_recordingStatus))
+        {
+            <div class="text-center mt-1" style="font-size: 0.75rem; color: var(--kuttab-text-light);">@_recordingStatus</div>
+        }
+    </div>
+}
+
+
+@code {
+    private List<CategoryInfo> _categories = new();
+    private List<RuleInfo> _allRules = new();
+    private List<RuleInfo> _filteredRules = new();
+    private List<QuranAya> _searchResults = new();
+    private string _selectedCategory = "";
+    private string _selectedRuleName = "";
+    private string _statusText = "";
+    private bool _isSearching;
+    private int _selectedIndex = -1;
+    private string _selectedReciter = "Husary_128kbps";
+    private string _selectedRuleGroup = "";
+    private bool _showRuleExplanation = false;
+
+    // Recording state
+    private bool _isRecording;
+    private bool _hasRecording;
+    private string _recordingStatus = "";
+    private string? _recordingBlobUrl;
+    
+    // Audio playback state
+    private DotNetObjectReference<Home>? _dotNetRef;
+    private bool _isPlayingAll = false;
+
+    private class CategoryInfo { public string Id { get; set; } = ""; public string DisplayName { get; set; } = ""; }
+    private class RuleInfo { public string Name { get; set; } = ""; public string Group { get; set; } = ""; public string DisplayName { get; set; } = ""; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Loc.LanguageChanged += OnLanguageChanged;
+        _dotNetRef = DotNetObjectReference.Create(this);
+        await SearchService.LoadQuranTextAsync();
+        await SearchService.LoadRulesAsync();
+
+        // Build categories and rules from the loaded data
+        var rules = SearchService.GetRules();
+        var lang = Loc.CurrentLanguage;
+        _allRules = rules.Select(r => new RuleInfo
+        {
+            Name = r.Name,
+            Group = r.Group ?? "",
+            DisplayName = RuleNameTranslator.GetLocalizedName(r.Name, lang)
+        }).ToList();
+
+        var groups = rules.Select(r => r.Group).Distinct().ToList();
+        _categories = groups.Select(g => new CategoryInfo
+        {
+            Id = g ?? "",
+            DisplayName = RuleGroupTranslator.GetGroupTitle(g, lang)
+        }).ToList();
+
+        _filteredRules = _allRules;
+        _statusText = Loc.GetString("ReadyLoadedRules", rules.Count);
+    }
+
+    private void OnCategoryChanged(ChangeEventArgs e)
+    {
+        _selectedCategory = e.Value?.ToString() ?? "";
+        _filteredRules = string.IsNullOrEmpty(_selectedCategory)
+            ? _allRules
+            : _allRules.Where(r => r.Group == _selectedCategory).ToList();
+        _selectedRuleName = "";
+    }
+
+    private void OnRuleChanged(ChangeEventArgs e)
+    {
+        _selectedRuleName = e.Value?.ToString() ?? "";
+        _selectedRuleGroup = _allRules.FirstOrDefault(r => r.Name == _selectedRuleName)?.Group ?? "";
+    }
+
+    private async Task DoSearch()
+    {
+        if (string.IsNullOrEmpty(_selectedRuleName)) return;
+
+        _isSearching = true;
+        _statusText = Loc["Searching"];
+        _searchResults.Clear();
+        _selectedIndex = -1;
+        StateHasChanged();
+
+        try
+        {
+            await Task.Yield();
+            var results = SearchService.SearchByRuleName(_selectedRuleName);
+            _searchResults = results;
+            _statusText = Loc.GetString("FoundMatches", results.Count);
+        }
+        catch (Exception ex)
+        {
+            _statusText = Loc.GetString("SearchError", ex.Message);
+        }
+        finally
+        {
+            _isSearching = false;
+        }
+    }
+
+    private void SelectAya(int index)
+    {
+        _selectedIndex = index;
+    }
+
+    private void ToggleRuleExplanation()
+    {
+        _showRuleExplanation = !_showRuleExplanation;
+        StateHasChanged();
+    }
+
+    private string HighlightAya(QuranAya aya)
+    {
+        if (aya.MatchPositions == null || aya.MatchPositions.Count == 0)
+            return System.Net.WebUtility.HtmlEncode(aya.Text);
+
+        var text = aya.Text;
+        var sb = new System.Text.StringBuilder();
+        int lastEnd = 0;
+        var group = _selectedRuleGroup;
+
+        foreach (var match in aya.MatchPositions.OrderBy(m => m.Start))
+        {
+            if (match.Start > lastEnd)
+                sb.Append(System.Net.WebUtility.HtmlEncode(text.Substring(lastEnd, match.Start - lastEnd)));
+
+            var matchText = text.Substring(match.Start, match.Length);
+            sb.Append($"<span class=\"tajweed-{group} tajweed-highlight-{group}\" style=\"font-weight:700\">");
+            sb.Append(System.Net.WebUtility.HtmlEncode(matchText));
+            sb.Append("</span>");
+            lastEnd = match.Start + match.Length;
+        }
+
+        if (lastEnd < text.Length)
+            sb.Append(System.Net.WebUtility.HtmlEncode(text.Substring(lastEnd)));
+
+        return sb.ToString();
+    }
+
+    private async Task PlaySelected()
+    {
+        if (_selectedIndex < 0 || _selectedIndex >= _searchResults.Count) return;
+        var aya = _searchResults[_selectedIndex];
+        var url = GetAudioUrl(aya.SurahNumber, aya.AyaNumber);
+        await JS.InvokeVoidAsync("AudioInterop.play", url);
+    }
+
+    private async Task PlayAll()
+    {
+        if (_searchResults.Count == 0) return;
+        
+        _isPlayingAll = true;
+        _selectedIndex = 0;
+        
+        // Initialize AudioInterop with DotNet reference
+        await JS.InvokeVoidAsync("AudioInterop.init", _dotNetRef);
+        
+        // Play first ayah
+        var aya = _searchResults[0];
+        await JS.InvokeVoidAsync("AudioInterop.play", GetAudioUrl(aya.SurahNumber, aya.AyaNumber));
+    }
+
+    private async Task StopPlayback()
+    {
+        _isPlayingAll = false;
+        await JS.InvokeVoidAsync("AudioInterop.stop");
+    }
+
+    private string GetAudioUrl(int surah, int aya)
+    {
+        var surahStr = surah.ToString("D3");
+        var ayaStr = aya.ToString("D3");
+        return $"https://everyayah.com/data/{_selectedReciter}/{surahStr}{ayaStr}.mp3";
+    }
+
+    // --- Recording methods ---
+    private async Task StartRecording()
+    {
+        if (_selectedIndex < 0 || _selectedIndex >= _searchResults.Count) return;
+        var aya = _searchResults[_selectedIndex];
+        try
+        {
+            var started = await JS.InvokeAsync<bool>("RecordingInterop.start");
+            if (started)
+            {
+                _isRecording = true;
+                _recordingStatus = Loc["Recording"];
+            }
+            else
+            {
+                _recordingStatus = Loc["RecordingPermissionDenied"];
+            }
+        }
+        catch (Exception ex)
+        {
+            _recordingStatus = $"Error: {ex.Message}";
+        }
+    }
+
+    private async Task StopRecording()
+    {
+        try
+        {
+            _recordingBlobUrl = await JS.InvokeAsync<string>("RecordingInterop.stop");
+            _isRecording = false;
+            _hasRecording = !string.IsNullOrEmpty(_recordingBlobUrl);
+            _recordingStatus = _hasRecording ? Loc["RecordingSaved"] : "";
+        }
+        catch (Exception ex)
+        {
+            _isRecording = false;
+            _recordingStatus = $"Error: {ex.Message}";
+        }
+    }
+
+    private async Task PlayRecording()
+    {
+        if (!string.IsNullOrEmpty(_recordingBlobUrl))
+        {
+            await JS.InvokeVoidAsync("AudioInterop.play", _recordingBlobUrl);
+            _recordingStatus = Loc["PlayingRecording"];
+        }
+    }
+
+    private async Task DeleteRecording()
+    {
+        if (!string.IsNullOrEmpty(_recordingBlobUrl))
+        {
+            await JS.InvokeVoidAsync("RecordingInterop.deleteRecording");
+        }
+        _recordingBlobUrl = null;
+        _hasRecording = false;
+        _recordingStatus = Loc["RecordingDeleted"];
+    }
+
+    // --- Language change handler ---
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(() =>
+        {
+            var lang = Loc.CurrentLanguage;
+            foreach (var r in _allRules)
+                r.DisplayName = RuleNameTranslator.GetLocalizedName(r.Name, lang);
+            foreach (var c in _categories)
+                c.DisplayName = RuleGroupTranslator.GetGroupTitle(c.Id, lang);
+            StateHasChanged();
+        });
+    }
+
+    [JSInvokable]
+    public async Task OnPlaybackEnded()
+    {
+        if (!_isPlayingAll) return;
+        
+        _selectedIndex++;
+        if (_selectedIndex < _searchResults.Count)
+        {
+            // Play next ayah
+            var aya = _searchResults[_selectedIndex];
+            await JS.InvokeVoidAsync("AudioInterop.play", GetAudioUrl(aya.SurahNumber, aya.AyaNumber));
+        }
+        else
+        {
+            // Finished playing all
+            _isPlayingAll = false;
+            _selectedIndex = -1;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        Loc.LanguageChanged -= OnLanguageChanged;
+        _dotNetRef?.Dispose();
+    }
+}

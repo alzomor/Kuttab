@@ -1,0 +1,69 @@
+﻿@inherits LayoutComponentBase
+@implements IDisposable
+@inject LocalizationService Loc
+@inject IJSRuntime JS
+
+<div class="app-container">
+    <nav class="nav-side">
+        <div class="nav-header">
+            <h1>كُتّاب - Kuttab</h1>
+        </div>
+        <div class="nav-links">
+            <NavLink href="" Match="NavLinkMatch.All">
+                <span class="nav-icon">📖</span>
+                <span>@Loc.GetString("Search")</span>
+            </NavLink>
+            <NavLink href="hifz">
+                <span class="nav-icon">🧠</span>
+                <span>@Loc.GetString("HifzMode")</span>
+            </NavLink>
+            <NavLink href="recitation">
+                <span class="nav-icon">🎧</span>
+                <span>@Loc.GetString("RecitationMode")</span>
+            </NavLink>
+            <NavLink href="donate">
+                <span class="nav-icon">💚</span>
+                <span>@Loc.GetString("DonateTitle")</span>
+            </NavLink>
+            <NavLink href="settings">
+                <span class="nav-icon">⚙️</span>
+                <span>@Loc.GetString("Settings")</span>
+            </NavLink>
+            <NavLink href="info">
+                <span class="nav-icon">ℹ️</span>
+                <span>@Loc.GetString("Info")</span>
+            </NavLink>
+        </div>
+    </nav>
+    
+    <main class="main-content">
+        <div class="page-content">
+            @Body
+        </div>
+    </main>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        Loc.LanguageChanged += OnLanguageChanged;
+        // Set initial text direction based on default language
+        var dir = Loc.IsRightToLeft ? "rtl" : "ltr";
+        await JS.InvokeVoidAsync("UtilsInterop.setDirection", dir);
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(async () =>
+        {
+            var dir = Loc.IsRightToLeft ? "rtl" : "ltr";
+            await JS.InvokeVoidAsync("UtilsInterop.setDirection", dir);
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        Loc.LanguageChanged -= OnLanguageChanged;
+    }
+}

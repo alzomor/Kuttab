@@ -1,0 +1,439 @@
+@page "/hifz"
+@implements IDisposable
+@inject QuranSearchService SearchService
+@inject LocalizationService Loc
+@inject IJSRuntime JS
+@inject IFileService FileService
+@using Kuttab.Core.Services
+@using System.Text.RegularExpressions
+
+<PageTitle>Kuttab - @Loc["HifzMode"]</PageTitle>
+
+@if (!_sessionStarted)
+{
+    <div class="card-panel">
+        <h5 style="color: var(--kuttab-green); font-weight: 700;">@Loc["HifzMode"]</h5>
+        
+        <div class="mb-2">
+            <label class="form-label">@Loc["Surah"]</label>
+            <select class="form-select" @onchange="OnSurahChanged">
+                @for (int s = 1; s <= 114; s++)
+                {
+                    var sNum = s;
+                    <option value="@sNum" selected="@(sNum == _selectedSurah)">@sNum - @SurahInfo.GetSurahName(sNum)</option>
+                }
+            </select>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6">
+                <label class="form-label">@Loc["FromAya"]</label>
+                <input type="number" class="form-control" min="1" max="@_maxAya" @bind="_fromAya" />
+            </div>
+            <div class="col-6">
+                <label class="form-label">@Loc["ToAya"]</label>
+                <input type="number" class="form-control" min="1" max="@_maxAya" @bind="_toAya" />
+            </div>
+        </div>
+        <button class="btn-kuttab w-100" @onclick="StartSession">▶️ @Loc["HifzMode"]</button>
+    </div>
+}
+else
+{
+    <div class="card-panel">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <button class="btn-kuttab-outline" @onclick="PrevPage" disabled="@(_currentPage <= 1)">◀</button>
+            <span style="font-weight: 600; color: var(--kuttab-green);">
+                @Loc["Surah"] @_selectedSurah - @SurahInfo.GetSurahName(_selectedSurah)
+                &nbsp; (@Loc["Aya"] @_fromAya - @_toAya)
+            </span>
+            <button class="btn-kuttab-outline" @onclick="NextPage" disabled="@(_currentPage >= _totalPages)">▶</button>
+        </div>
+
+        <div class="progress-kuttab mb-2">
+            <div class="progress-bar" style="width: @(_progressPercent)%"></div>
+        </div>
+        <div class="text-center mb-2" style="font-size: 0.85rem; color: var(--kuttab-text-light);">
+            @_statusText
+        </div>
+    </div>
+
+    <div class="card-panel" id="pageContent">
+        <div class="quran-text" dir="rtl">
+            @((MarkupString)_renderedPage)
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(_recognizedText))
+    {
+        <div class="card-panel" style="background: #E8F5E9;">
+            <div style="font-size: 0.8rem; color: var(--kuttab-green-dark); font-weight: 600;">@Loc["HifzHeard"]:</div>
+            <div dir="rtl" style="font-family: var(--font-arabic);">@_recognizedText</div>
+        </div>
+    }
+
+    <div class="controls-fixed">
+        <div class="d-flex gap-2 justify-content-center">
+            @if (!_isListening)
+            {
+                <button class="btn-kuttab" @onclick="StartListening">@Loc["HifzStartListening"]</button>
+            }
+            else
+            {
+                <button class="btn-kuttab" style="background: #C62828;" @onclick="StopListening">@Loc["Stop"]</button>
+            }
+            <button class="btn-kuttab-outline" @onclick="ResetPage">@Loc["HifzReset"]</button>
+            <button class="btn-kuttab-outline" @onclick="EndSession">@Loc["HifzEnd"]</button>
+        </div>
+    </div>
+}
+
+@code {
+    // Setup state
+    private int _selectedSurah = 1;
+    private int _fromAya = 1;
+    private int _toAya = 7;
+    private int _maxAya = 7;
+    private bool _sessionStarted;
+
+    // Page state
+    private int _currentPage = 1;
+    private int _totalPages = 1;
+    private string _renderedPage = "";
+    private string _statusText = "";
+    private double _progressPercent = 0;
+    private string _recognizedText = "";
+    private bool _isListening;
+
+    // Page data
+    private QuranPageService? _pageService;
+    private Dictionary<string, string> _quranTextCache = new();
+    private List<PageAyaData> _pageAyas = new();
+    private int _currentAyaIdx = 0;
+
+    private enum WordState { Hidden, Revealed, Skipped }
+
+    private class PageAyaData
+    {
+        public int Surah;
+        public int AyaNumber;
+        public string FullText = "";
+        public List<string> Words = new();
+        public List<WordState> WordStates = new();
+        public bool InRange;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Loc.LanguageChanged += OnLocLanguageChanged;
+        await SearchService.LoadQuranTextAsync();
+
+        // Load quran text cache
+        var content = await FileService.ReadAllTextAsync("quran-uthmani-ver1.2.txt");
+        foreach (var line in content.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = line.Split('|');
+            if (parts.Length >= 3)
+            {
+                _quranTextCache[$"{parts[0]}|{parts[1]}"] = parts[2].Trim();
+            }
+        }
+
+        // Load page service
+        _pageService = new QuranPageService();
+        var xmlContent = await FileService.ReadAllTextAsync("quran-data.xml");
+        _pageService.LoadFromXml(xmlContent);
+
+        _maxAya = SurahInfo.GetAyaCount(_selectedSurah);
+        _toAya = _maxAya;
+    }
+
+    private void OnSurahChanged(ChangeEventArgs e)
+    {
+        _selectedSurah = int.Parse(e.Value?.ToString() ?? "1");
+        _maxAya = SurahInfo.GetAyaCount(_selectedSurah);
+        _fromAya = 1;
+        _toAya = _maxAya;
+    }
+
+    private void StartSession()
+    {
+        if (_toAya < _fromAya) _toAya = _fromAya;
+        _sessionStarted = true;
+
+        // Calculate total pages for range
+        if (_pageService != null)
+        {
+            int startPage = _pageService.GetPageForAya(_selectedSurah, _fromAya);
+            int endPage = _pageService.GetPageForAya(_selectedSurah, _toAya);
+            _totalPages = Math.Max(1, endPage - startPage + 1);
+            _currentPage = 1;
+        }
+
+        LoadCurrentPage();
+    }
+
+    private void LoadCurrentPage()
+    {
+        if (_pageService == null) return;
+
+        int startPage = _pageService.GetPageForAya(_selectedSurah, _fromAya);
+        int actualPage = startPage + _currentPage - 1;
+        var ayaRefs = _pageService.GetAyasOnPage(actualPage);
+
+        _pageAyas.Clear();
+        _currentAyaIdx = 0;
+
+        foreach (var aRef in ayaRefs)
+        {
+            var key = $"{aRef.Sura}|{aRef.Aya}";
+            if (!_quranTextCache.TryGetValue(key, out var text)) continue;
+
+            bool inRange = (aRef.Sura == _selectedSurah &&
+                           aRef.Aya >= _fromAya && aRef.Aya <= _toAya);
+
+            var words = SplitWords(text);
+            var states = words.Select(_ => inRange ? WordState.Hidden : WordState.Revealed).ToList();
+
+            _pageAyas.Add(new PageAyaData
+            {
+                Surah = aRef.Sura,
+                AyaNumber = aRef.Aya,
+                FullText = text,
+                Words = words,
+                WordStates = states,
+                InRange = inRange
+            });
+        }
+
+        RenderPage();
+        UpdateProgress();
+        _statusText = Loc["HifzStopped"];
+        _recognizedText = "";
+    }
+
+    private List<string> SplitWords(string text)
+    {
+        return text.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+    }
+
+    private void RenderPage()
+    {
+        var sb = new System.Text.StringBuilder();
+
+        foreach (var aya in _pageAyas)
+        {
+            // Surah name for ayah 1
+            if (aya.AyaNumber == 1)
+            {
+                sb.Append($"<div class=\"surah-name\">﴿ سورة {SurahInfo.GetSurahName(aya.Surah)} ﴾</div>");
+
+                // Bismillah for all surahs except 9
+                if (aya.Surah != 9 && aya.Surah != 1)
+                {
+                    sb.Append("<div class=\"bismillah\">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>");
+                }
+            }
+
+            sb.Append("<div style=\"margin-bottom: 0.5rem;\">");
+            for (int w = 0; w < aya.Words.Count; w++)
+            {
+                var css = aya.WordStates[w] switch
+                {
+                    WordState.Hidden => "word-hidden",
+                    WordState.Revealed => aya.InRange ? "word-revealed" : "word-normal",
+                    WordState.Skipped => "word-skipped",
+                    _ => "word-normal"
+                };
+                sb.Append($"<span class=\"{css}\">{System.Net.WebUtility.HtmlEncode(aya.Words[w])}</span> ");
+            }
+            // Aya marker
+            sb.Append($"<span style=\"color: var(--kuttab-gold); font-size: 0.9em;\">﴿{aya.AyaNumber}﴾</span>");
+            sb.Append("</div>");
+        }
+
+        _renderedPage = sb.ToString();
+    }
+
+    private void UpdateProgress()
+    {
+        int totalWords = 0, revealedWords = 0;
+        foreach (var aya in _pageAyas.Where(a => a.InRange))
+        {
+            totalWords += aya.Words.Count;
+            revealedWords += aya.WordStates.Count(s => s == WordState.Revealed);
+        }
+        _progressPercent = totalWords > 0 ? (revealedWords * 100.0 / totalWords) : 0;
+    }
+
+    private async Task StartListening()
+    {
+        var available = await JS.InvokeAsync<bool>("SpeechInterop.isAvailable");
+        if (!available)
+        {
+            _statusText = "Speech recognition is not available in this browser. Please use Chrome or Edge.";
+            return;
+        }
+
+        var dotNetRef = DotNetObjectReference.Create(this);
+        await JS.InvokeAsync<bool>("SpeechInterop.init", dotNetRef, "ar");
+        var started = await JS.InvokeAsync<bool>("SpeechInterop.start");
+        if (started)
+        {
+            _isListening = true;
+            _statusText = Loc["HifzListening"];
+        }
+    }
+
+    private async Task StopListening()
+    {
+        await JS.InvokeVoidAsync("SpeechInterop.stop");
+        _isListening = false;
+        _statusText = Loc["HifzStopped"];
+    }
+
+    [JSInvokable]
+    public void OnPartialResult(string[] results)
+    {
+        if (results.Length > 0)
+        {
+            _recognizedText = results[0];
+            ProcessRecognizedText(results);
+            StateHasChanged();
+        }
+    }
+
+    [JSInvokable]
+    public void OnFinalResult(string[] results)
+    {
+        if (results.Length > 0)
+        {
+            _recognizedText = results[0];
+            ProcessRecognizedText(results);
+            StateHasChanged();
+        }
+    }
+
+    [JSInvokable]
+    public void OnSpeechError(string error)
+    {
+        _statusText = $"Error: {error}";
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnListeningStarted()
+    {
+        _isListening = true;
+        _statusText = Loc["HifzListening"];
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnListeningStopped()
+    {
+        _isListening = false;
+        _statusText = Loc["HifzStopped"];
+        StateHasChanged();
+    }
+
+    private void ProcessRecognizedText(string[] results)
+    {
+        if (_currentAyaIdx >= _pageAyas.Count) return;
+
+        var currentAya = _pageAyas[_currentAyaIdx];
+        if (!currentAya.InRange)
+        {
+            _currentAyaIdx++;
+            if (_currentAyaIdx >= _pageAyas.Count) return;
+            currentAya = _pageAyas[_currentAyaIdx];
+        }
+
+        // Match words
+        foreach (var result in results)
+        {
+            var spokenWords = result.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var spoken in spokenWords)
+            {
+                var normalizedSpoken = QuranWordMatcher.Normalize(spoken);
+                if (string.IsNullOrWhiteSpace(normalizedSpoken)) continue;
+
+                // Find next hidden word
+                for (int w = 0; w < currentAya.Words.Count; w++)
+                {
+                    if (currentAya.WordStates[w] != WordState.Hidden) continue;
+
+                    var normalizedExpected = QuranWordMatcher.Normalize(currentAya.Words[w]);
+                    if (QuranWordMatcher.IsWordMatch(normalizedSpoken, normalizedExpected))
+                    {
+                        currentAya.WordStates[w] = WordState.Revealed;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Check if current aya is complete
+        if (currentAya.InRange && currentAya.WordStates.All(s => s != WordState.Hidden))
+        {
+            _currentAyaIdx++;
+            _statusText = Loc["HifzAyaComplete"];
+
+            // Check if all done
+            if (_pageAyas.Where(a => a.InRange).All(a => a.WordStates.All(s => s != WordState.Hidden)))
+            {
+                _statusText = Loc["HifzSessionComplete"];
+            }
+        }
+
+        RenderPage();
+        UpdateProgress();
+    }
+
+    private void PrevPage()
+    {
+        if (_currentPage > 1)
+        {
+            _currentPage--;
+            LoadCurrentPage();
+        }
+    }
+
+    private void NextPage()
+    {
+        if (_currentPage < _totalPages)
+        {
+            _currentPage++;
+            LoadCurrentPage();
+        }
+    }
+
+    private void ResetPage()
+    {
+        foreach (var aya in _pageAyas.Where(a => a.InRange))
+        {
+            for (int i = 0; i < aya.WordStates.Count; i++)
+                aya.WordStates[i] = WordState.Hidden;
+        }
+        _currentAyaIdx = 0;
+        _recognizedText = "";
+        RenderPage();
+        UpdateProgress();
+    }
+
+    private void EndSession()
+    {
+        _sessionStarted = false;
+        _isListening = false;
+        _ = JS.InvokeVoidAsync("SpeechInterop.stop");
+    }
+
+    private void OnLocLanguageChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Loc.LanguageChanged -= OnLocLanguageChanged;
+    }
+}

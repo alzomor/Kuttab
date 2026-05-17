@@ -1,0 +1,107 @@
+@page "/info"
+@implements IDisposable
+@inject LocalizationService Loc
+@inject IJSRuntime JS
+
+<PageTitle>Kuttab - @Loc["Info"]</PageTitle>
+
+<div class="card-panel text-center">
+    <h4 style="color: var(--kuttab-green); font-weight: 700;">كُتّاب - Kuttab</h4>
+    <p style="color: var(--kuttab-text-light);">@Loc["AppSubtitle"]</p>
+    <p style="font-size: 0.85rem; color: #888;">v0.95 — Build: @_buildTime</p>
+</div>
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["AppDescription"]</h6>
+    <ul style="font-size: 0.9rem; padding-inline-start: 1.2rem; color: var(--kuttab-text-light);">
+        <li>@Loc["ShowTajweedRules"]</li>
+        <li>@Loc["SelectTajweedRule"]</li>
+        <li>@Loc["RecitationMode"]</li>
+        <li>@Loc["HifzMode"]</li>
+        <li>@Loc["OnlineAudio"]</li>
+    </ul>
+</div>
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["DataSources"]</h6>
+
+    <div style="background: #F8F9FA; padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem;">
+        <div style="font-weight: 700; color: #444; font-size: 0.9rem;">@Loc["QuranTextSource"]</div>
+        <div style="font-size: 0.8rem; color: #666;">Quran text and metadata provided by Tanzil.net</div>
+        <a href="https://tanzil.net" target="_blank" style="font-size: 0.8rem; color: #1565C0;">https://tanzil.net</a>
+    </div>
+
+    <div style="background: #F8F9FA; padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem;">
+        <div style="font-weight: 700; color: #444; font-size: 0.9rem;">@Loc["AudioFilesSource"]</div>
+        <div style="font-size: 0.8rem; color: #666;">Audio recitations from EveryAyah.com</div>
+        <a href="https://everyayah.com" target="_blank" style="font-size: 0.8rem; color: #1565C0;">https://everyayah.com</a>
+    </div>
+
+    <div style="background: #F8F9FA; padding: 0.75rem; border-radius: 8px;">
+        <div style="font-weight: 700; color: #444; font-size: 0.9rem;">@Loc["TajweedRulesSource"]</div>
+        <div style="font-size: 0.8rem; color: #666;">Tajweed rules reference from Usul.ai</div>
+        <a href="https://usul.ai" target="_blank" style="font-size: 0.8rem; color: #1565C0;">https://usul.ai</a>
+    </div>
+</div>
+
+<div class="card-panel">
+    <h6 style="color: #D32F2F; font-weight: 700;">@Loc["DisclaimerTitle"]</h6>
+    <div style="background: #FFF3E0; padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem;">
+        <div style="font-weight: 700; color: #E65100; font-size: 0.85rem;">@Loc["TrainingDisclaimerTitle"]</div>
+        <div style="font-size: 0.8rem; color: #666;">@Loc["TrainingDisclaimerContent"]</div>
+    </div>
+    <div style="background: #FFF3E0; padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem;">
+        <div style="font-size: 0.8rem; color: #666; font-style: italic;">@Loc["GeneralDisclaimerContent"]</div>
+    </div>
+</div>
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["ContactEmail"]</h6>
+    <div style="background: #F8F9FA; padding: 0.75rem; border-radius: 8px;">
+        <a href="mailto:almanar.backup@gmail.com" style="font-size: 0.85rem; color: #1565C0;">almanar.backup@gmail.com</a>
+    </div>
+</div>
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["PrivacyPolicy"]</h6>
+    <a href="https://ai-solutions.al-manar.de/privacy-policy.html" target="_blank" style="color: var(--kuttab-green);">
+        @Loc["ViewPrivacyPolicy"]
+    </a>
+</div>
+
+<div class="card-panel text-center">
+    <button class="btn-kuttab" @onclick="ShareApp">@Loc["ShareButton"]</button>
+</div>
+
+<div class="card-panel text-center" style="background: #E8F5E9;">
+    <p style="font-family: var(--font-arabic); font-size: 1.1rem; color: var(--kuttab-green-dark); margin: 0; direction: rtl;">
+        جزاكم الله خيراً
+    </p>
+</div>
+
+@code {
+    private string _buildTime = "2026-04-06 12:00:00"; // Auto-updated by build.py
+
+    protected override void OnInitialized()
+    {
+        Loc.LanguageChanged += OnLocLanguageChanged;
+    }
+
+    private async Task ShareApp()
+    {
+        await JS.InvokeVoidAsync("UtilsInterop.share",
+            "Kuttab - Tajweed Trainer",
+            Loc["ShareAppInfo"],
+            "https://kuttab.app");
+    }
+
+    private void OnLocLanguageChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Loc.LanguageChanged -= OnLocLanguageChanged;
+    }
+}

@@ -1,0 +1,245 @@
+@page "/settings"
+@implements IDisposable
+@inject LocalizationService Loc
+@inject LocalStorageService Storage
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+<PageTitle>Kuttab - @Loc["Settings"]</PageTitle>
+
+<div class="card-panel">
+    <h5 style="color: var(--kuttab-green); font-weight: 700;">@Loc["Settings"]</h5>
+</div>
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["LanguageSettings"]</h6>
+    <div class="mb-2">
+        <label class="form-label">@Loc["SelectLanguage"]</label>
+        <select class="form-select" @onchange="OnLanguageChanged">
+            @foreach (var lang in Loc.AvailableLanguages)
+            {
+                <option value="@lang.Code" selected="@(lang.Code == _selectedLanguage)">@lang.Name</option>
+            }
+        </select>
+    </div>
+</div>
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["DisplaySettings"]</h6>
+    <div class="mb-2">
+        <label class="form-label">@Loc["FontSize"]</label>
+        <select class="form-select" @onchange="OnFontSizeChanged">
+            @foreach (var size in _fontSizes)
+            {
+                <option value="@size" selected="@(size == _fontSize)">@size px</option>
+            }
+        </select>
+    </div>
+    <div class="mb-2">
+        <label class="form-label">@Loc["QuranTextVersion"]</label>
+        <select class="form-select" @onchange="OnQuranTextChanged">
+            <option value="quran-uthmani-ver1.2.txt" selected="@(_quranText == "quran-uthmani-ver1.2.txt")">@Loc["QuranTextUthmaniClean"]</option>
+            <option value="quran-uthmani.txt" selected="@(_quranText == "quran-uthmani.txt")">@Loc["QuranTextUthmaniOriginal"]</option>
+        </select>
+    </div>
+</div>
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["SearchDomainTitle"]</h6>
+    <div class="mb-2">
+        <label class="form-label">@Loc["SearchIn"]</label>
+        <select class="form-select" @onchange="OnSearchDomainChanged">
+            <option value="whole" selected="@(_searchDomain == "whole")">@Loc["WholeQuran"]</option>
+            <option value="single" selected="@(_searchDomain == "single")">@Loc["SingleSurah"]</option>
+            <option value="range" selected="@(_searchDomain == "range")">@Loc["SurahRange"]</option>
+        </select>
+    </div>
+
+    @if (_searchDomain == "single")
+    {
+        <div class="mb-2">
+            <label class="form-label">@Loc["Surah"]</label>
+            <select class="form-select" @bind="_singleSurah">
+                @for (int s = 1; s <= 114; s++)
+                {
+                    var sNum = s;
+                    <option value="@sNum">@sNum - @SurahInfo.GetSurahName(sNum)</option>
+                }
+            </select>
+        </div>
+    }
+
+    @if (_searchDomain == "range")
+    {
+        <div class="row">
+            <div class="col-6 mb-2">
+                <label class="form-label">@Loc["FromSurah"]</label>
+                <select class="form-select" @bind="_startSurah">
+                    @for (int s = 1; s <= 114; s++)
+                    {
+                        var sNum = s;
+                        <option value="@sNum">@sNum - @SurahInfo.GetSurahName(sNum)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-6 mb-2">
+                <label class="form-label">@Loc["ToSurah"]</label>
+                <select class="form-select" @bind="_endSurah">
+                    @for (int s = 1; s <= 114; s++)
+                    {
+                        var sNum = s;
+                        <option value="@sNum">@sNum - @SurahInfo.GetSurahName(sNum)</option>
+                    }
+                </select>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["OnlineResourcesTitle"]</h6>
+    <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" id="onlineAudio" @bind="_useOnlineAudio" />
+        <label class="form-check-label" for="onlineAudio">@Loc["OnlineAudio"]</label>
+    </div>
+    <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" id="onlineImages" @bind="_useOnlineImages" />
+        <label class="form-check-label" for="onlineImages">@Loc["OnlineImages"]</label>
+    </div>
+</div>
+
+<div class="card-panel">
+    <h6 style="color: var(--kuttab-green-dark); font-weight: 700;">@Loc["SelectReciter"]</h6>
+    <select class="form-select" @bind="_selectedReciter">
+        <option value="Abdul_Basit_Murattal_192kbps">@Loc["ReciterAbdulBasit"]</option>
+        <option value="Ayman_Sowaid_64kbps">@Loc["ReciterAymanSowaid"]</option>
+        <option value="Husary_128kbps">@Loc["ReciterHusary"]</option>
+        <option value="Husary_Muallim_128kbps">@Loc["ReciterHusaryMuallim"]</option>
+        <option value="Menshawi_32kbps">@Loc["ReciterMenshawi"]</option>
+        <option value="Mohammad_al_Tablaway_128kbps">@Loc["ReciterTablaway"]</option>
+        <option value="Mustafa_Ismail_48kbps">@Loc["ReciterMustafaIsmail"]</option>
+        <option value="Muhammad_Ayyoub_128kbps">@Loc["ReciterAyyoub"]</option>
+        <option value="mahmoud_ali_al_banna_32kbps">@Loc["ReciterBanna"]</option>
+    </select>
+</div>
+
+<div class="card-panel">
+    <div class="d-flex gap-2">
+        <button class="btn-kuttab flex-fill" @onclick="SaveSettings">@Loc["Save"]</button>
+        <button class="btn-kuttab-outline flex-fill" @onclick="Cancel">@Loc["Cancel"]</button>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(_saveMessage))
+{
+    <div class="card-panel text-center" style="color: var(--kuttab-green); font-weight: 600;">
+        @_saveMessage
+    </div>
+}
+
+@code {
+    private string _selectedLanguage = "en";
+    private int _fontSize = 20;
+    private string _quranText = "quran-uthmani-ver1.2.txt";
+    private string _searchDomain = "whole";
+    private int _singleSurah = 1;
+    private int _startSurah = 1;
+    private int _endSurah = 114;
+    private bool _useOnlineAudio = true;
+    private bool _useOnlineImages = true;
+    private string _selectedReciter = "Husary_128kbps";
+    private string _saveMessage = "";
+
+    private int[] _fontSizes = { 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32 };
+
+    protected override async Task OnInitializedAsync()
+    {
+        Loc.LanguageChanged += OnLocLanguageChanged;
+        // Load saved settings
+        var savedLanguage = await Storage.GetStringAsync("language");
+        if (!string.IsNullOrEmpty(savedLanguage))
+        {
+            _selectedLanguage = savedLanguage;
+        }
+        else
+        {
+            // Use LocalizationService current language as default
+            _selectedLanguage = Loc.CurrentLanguage;
+        }
+        
+        var fs = await Storage.GetStringAsync("fontSize");
+        if (int.TryParse(fs, out var parsedFs)) _fontSize = parsedFs;
+        _quranText = await Storage.GetStringAsync("quranText") ?? "quran-uthmani-ver1.2.txt";
+        _searchDomain = await Storage.GetStringAsync("searchDomain") ?? "whole";
+        _selectedReciter = await Storage.GetStringAsync("reciter") ?? "Husary_128kbps";
+        _useOnlineAudio = (await Storage.GetStringAsync("onlineAudio")) != "false";
+        _useOnlineImages = (await Storage.GetStringAsync("onlineImages")) != "false";
+
+        var ss = await Storage.GetStringAsync("singleSurah");
+        if (int.TryParse(ss, out var parsedSs)) _singleSurah = parsedSs;
+        var startS = await Storage.GetStringAsync("startSurah");
+        if (int.TryParse(startS, out var parsedStart)) _startSurah = parsedStart;
+        var endS = await Storage.GetStringAsync("endSurah");
+        if (int.TryParse(endS, out var parsedEnd)) _endSurah = parsedEnd;
+    }
+
+    private async Task OnLanguageChanged(ChangeEventArgs e)
+    {
+        _selectedLanguage = e.Value?.ToString() ?? "en";
+        Loc.CurrentLanguage = _selectedLanguage;
+        var dir = Loc.IsRightToLeft ? "rtl" : "ltr";
+        await JS.InvokeVoidAsync("UtilsInterop.setDirection", dir);
+        StateHasChanged();
+    }
+
+    private void OnLocLanguageChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnFontSizeChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var size))
+            _fontSize = size;
+    }
+
+    private void OnQuranTextChanged(ChangeEventArgs e)
+    {
+        _quranText = e.Value?.ToString() ?? "quran-uthmani-ver1.2.txt";
+    }
+
+    private void OnSearchDomainChanged(ChangeEventArgs e)
+    {
+        _searchDomain = e.Value?.ToString() ?? "whole";
+    }
+
+    private async Task SaveSettings()
+    {
+        await Storage.SetStringAsync("language", _selectedLanguage);
+        await Storage.SetStringAsync("fontSize", _fontSize.ToString());
+        await Storage.SetStringAsync("quranText", _quranText);
+        await Storage.SetStringAsync("searchDomain", _searchDomain);
+        await Storage.SetStringAsync("reciter", _selectedReciter);
+        await Storage.SetStringAsync("onlineAudio", _useOnlineAudio.ToString().ToLower());
+        await Storage.SetStringAsync("onlineImages", _useOnlineImages.ToString().ToLower());
+        await Storage.SetStringAsync("singleSurah", _singleSurah.ToString());
+        await Storage.SetStringAsync("startSurah", _startSurah.ToString());
+        await Storage.SetStringAsync("endSurah", _endSurah.ToString());
+
+        _saveMessage = "✅ " + Loc["SettingsSaved"];
+        StateHasChanged();
+        await Task.Delay(2000);
+        _saveMessage = "";
+        StateHasChanged();
+    }
+
+    private void Cancel()
+    {
+        Nav.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        Loc.LanguageChanged -= OnLocLanguageChanged;
+    }
+}
