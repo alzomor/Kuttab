@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#1B5E20" />
     <meta name="description" content="Kuttab - Tajweed Trainer PWA" />
     <title>Kuttab - كُتّاب</title>
-    <base href="/" />
+    <base href="/kuttab/" />
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -37,7 +37,7 @@
     <script src="js/recordingInterop.js"></script>
     <script src="js/utilsInterop.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
+    <script>navigator.serviceWorker.register('service-worker.js', { scope: '/kuttab/' });</script>
 </body>
 
 </html>

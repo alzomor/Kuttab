@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  website:
+    image: nginx:alpine
+    container_name: ai-website
+    restart: unless-stopped
+    volumes:
+      - ./client/dist:/usr/share/nginx/html:ro
+      - ./kuttab:/usr/share/nginx/kuttab:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ai-website.rule=Host(`ai-solutions.al-manar.de`)"
+      - "traefik.http.routers.ai-website.entrypoints=web,websecure"
+      - "traefik.http.routers.ai-website.tls=true"
+      - "traefik.http.routers.ai-website.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.ai-website.loadbalancer.server.port=80"
+    networks:
+      - n8n_default
+
+networks:
+  n8n_default:
+    external: true
