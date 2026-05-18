@@ -406,5 +406,103 @@
       "endTime": "2026-04-15T23:59:59Z"
     },
     "createdAt": "2026-04-04T11:00:00Z"
+  },
+  {
+    "id": "dhul_hijjah_10_days_ar",
+    "title": "🕋 هنيئًا لكم عشر ذي الحجة!",
+    "message": "بسم الله الرحمن الرحيم\n\nأبشروا بأعظم أيام الدنيا!\n\nقال رسول الله ﷺ: «ما من أيامٍ العملُ الصالحُ فيها أحبُّ إلى الله من هذه الأيام» يعني أيامَ العشر. قالوا: يا رسول الله، ولا الجهادُ في سبيل الله؟ قال: «ولا الجهادُ في سبيل الله، إلا رجلٌ خرج بنفسه وماله فلم يرجع من ذلك بشيء»\n\nاغتنم هذه الأيام المباركة مع تطبيق كُتّاب:\n\n📖 تعلّم أحكام التجويد وأتقن تلاوتك\n🎧 استمع إلى القرآن الكريم وتدبّر آياته\n🧠 احفظ القرآن مع وضع الحفظ التفاعلي\n\nفكل حرف تقرأه من كتاب الله لك به حسنة، والحسنة بعشر أمثالها\n\nاجعل هذه العشر بداية عهد جديد مع القرآن 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["ar"],
+    "schedule": {
+      "startTime": "2026-05-18T00:00:00Z",
+      "endTime": "2026-05-25T23:59:59Z"
+    },
+    "createdAt": "2026-05-18T06:00:00Z"
+  },
+  {
+    "id": "dhul_hijjah_10_days_en",
+    "title": "🕋 Blessed First 10 Days of Dhul Hijjah!",
+    "message": "In the Name of Allah, the Most Gracious, the Most Merciful\n\nRejoice — the greatest days of the year are here!\n\nThe Prophet ﷺ said: \"There are no days in which righteous deeds are more beloved to Allah than these days\" — meaning the first ten days of Dhul Hijjah. They said: \"Not even Jihad in the cause of Allah?\" He said: \"Not even Jihad, except for a man who goes out with his life and wealth and returns with nothing.\"\n\nMake the most of these blessed days with Kuttab:\n\n📖 Learn Tajweed rules and perfect your recitation\n🎧 Listen to the Holy Quran and reflect upon its verses\n🧠 Memorize the Quran with the interactive Hifz mode\n\nEvery letter you recite from the Book of Allah earns you a reward, and each reward is multiplied tenfold.\n\nLet these ten days be a new beginning with the Quran 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["en"],
+    "schedule": {
+      "startTime": "2026-05-18T00:00:00Z",
+      "endTime": "2026-05-25T23:59:59Z"
+    },
+    "createdAt": "2026-05-18T06:00:00Z"
+  },
+  {
+    "id": "dhul_hijjah_10_days_de",
+    "title": "🕋 Gesegnete ersten 10 Tage von Dhul Hijjah!",
+    "message": "Im Namen Allahs, des Allerbarmers, des Barmherzigen\n\nFreut euch — die bedeutendsten Tage des Jahres sind da!\n\nDer Prophet ﷺ sagte: «Es gibt keine Tage, an denen gute Taten Allah lieber sind als diese Tage» — gemeint sind die ersten zehn Tage von Dhul Hijjah. Sie fragten: «Nicht einmal der Jihad auf dem Weg Allahs?» Er sagte: «Nicht einmal der Jihad, außer ein Mann, der mit seinem Leben und Vermögen auszieht und mit nichts davon zurückkehrt.»\n\nNutzen Sie diese gesegneten Tage mit Kuttab:\n\n📖 Tajweed-Regeln lernen und Ihre Rezitation perfektionieren\n🎧 Den Heiligen Quran hören und über seine Verse nachdenken\n🧠 Den Quran auswendig lernen mit dem interaktiven Hifz-Modus\n\nJeder Buchstabe, den Sie aus dem Buch Allahs rezitieren, bringt Ihnen eine Belohnung — und jede Belohnung wird verzehnfacht.\n\nLassen Sie diese zehn Tage ein neuer Anfang mit dem Quran sein 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["de"],
+    "schedule": {
+      "startTime": "2026-05-18T00:00:00Z",
+      "endTime": "2026-05-25T23:59:59Z"
+    },
+    "createdAt": "2026-05-18T06:00:00Z"
+  },
+  {
+    "id": "dhul_hijjah_10_days_es",
+    "title": "🕋 ¡Benditos primeros 10 días de Dhul Hijjah!",
+    "message": "En el Nombre de Allah, el Clemente, el Misericordioso\n\n¡Alegraos — los días más grandiosos del año han llegado!\n\nEl Profeta ﷺ dijo: «No hay días en los que las buenas obras sean más amadas por Allah que estos días» — refiriéndose a los primeros diez días de Dhul Hijjah. Preguntaron: «¿Ni siquiera el Yihad por la causa de Allah?» Dijo: «Ni siquiera el Yihad, excepto un hombre que sale con su vida y su riqueza y no regresa con nada.»\n\nAprovecha estos días benditos con Kuttab:\n\n📖 Aprende las reglas de Tajweed y perfecciona tu recitación\n🎧 Escucha el Sagrado Corán y reflexiona sobre sus versículos\n🧠 Memoriza el Corán con el modo interactivo de Hifz\n\nCada letra que recitas del Libro de Allah te otorga una recompensa, y cada recompensa se multiplica por diez.\n\nQue estos diez días sean un nuevo comienzo con el Corán 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["es"],
+    "schedule": {
+      "startTime": "2026-05-18T00:00:00Z",
+      "endTime": "2026-05-25T23:59:59Z"
+    },
+    "createdAt": "2026-05-18T06:00:00Z"
+  },
+  {
+    "id": "dhul_hijjah_10_days_tr",
+    "title": "🕋 Zilhicce'nin İlk 10 Günü Mübarek Olsun!",
+    "message": "Rahman ve Rahim olan Allah'ın adıyla\n\nSevinin — yılın en faziletli günleri geldi!\n\nPeygamberimiz ﷺ buyurdu: «Salih amelin Allah'a en sevimli olduğu günler bu günlerdir» — yani Zilhicce'nin ilk on günü. Dediler ki: «Allah yolunda cihad da mı değil?» Buyurdu: «Allah yolunda cihad da değil, ancak canı ve malıyla çıkıp hiçbir şeyle dönmeyen kişi hariç.»\n\nBu mübarek günleri Kuttab ile değerlendirin:\n\n📖 Tecvid kurallarını öğrenin ve tilavetinizi mükemmelleştirin\n🎧 Kur'an-ı Kerim'i dinleyin ve ayetlerini tefekkür edin\n🧠 İnteraktif Hıfz modu ile Kur'an'ı ezberleyin\n\nAllah'ın Kitabı'ndan okuduğunuz her harf için bir sevap kazanırsınız ve her sevap on katıyla çarpılır.\n\nBu on gün Kur'an ile yeni bir başlangıç olsun 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["tr"],
+    "schedule": {
+      "startTime": "2026-05-18T00:00:00Z",
+      "endTime": "2026-05-25T23:59:59Z"
+    },
+    "createdAt": "2026-05-18T06:00:00Z"
+  },
+  {
+    "id": "dhul_hijjah_10_days_fr",
+    "title": "🕋 Bénis soient les 10 premiers jours de Dhul Hijjah!",
+    "message": "Au Nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux\n\nRéjouissez-vous — les jours les plus grandioses de l'année sont là!\n\nLe Prophète ﷺ a dit: «Il n'y a pas de jours où les bonnes œuvres sont plus aimées d'Allah que ces jours» — c'est-à-dire les dix premiers jours de Dhul Hijjah. Ils demandèrent: «Pas même le Jihad dans le sentier d'Allah?» Il dit: «Pas même le Jihad, sauf un homme qui sort avec sa vie et ses biens et ne revient avec rien.»\n\nProfitez de ces jours bénis avec Kuttab:\n\n📖 Apprenez les règles du Tajweed et perfectionnez votre récitation\n🎧 Écoutez le Saint Coran et méditez sur ses versets\n🧠 Mémorisez le Coran avec le mode interactif de Hifz\n\nChaque lettre que vous récitez du Livre d'Allah vous rapporte une récompense, et chaque récompense est multipliée par dix.\n\nQue ces dix jours soient un nouveau départ avec le Coran 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["fr"],
+    "schedule": {
+      "startTime": "2026-05-18T00:00:00Z",
+      "endTime": "2026-05-25T23:59:59Z"
+    },
+    "createdAt": "2026-05-18T06:00:00Z"
+  },
+  {
+    "id": "dhul_hijjah_10_days_ja",
+    "title": "🕋 ズル・ヒッジャの最初の10日間おめでとうございます！",
+    "message": "慈悲深く慈愛あまねきアッラーの御名において\n\n喜んでください — 一年で最も偉大な日々がやってきました！\n\n預言者ﷺは言われました：「善い行いがアッラーにこれほど愛される日々はない」— すなわちズル・ヒッジャの最初の十日間です。教友たちは尋ねました：「アッラーの道でのジハードも？」預言者は言われました：「ジハードも同様だ。ただし、命と財産を持って出て何も持ち帰らなかった者は別である。」\n\nKuttabでこの祝福された日々を最大限に活かしましょう：\n\n📖 タジウィードの規則を学び、朗誦を完璧にする\n🎧 聖クルアーンを聴き、その節を深く考える\n🧠 インタラクティブなヒフズモードでクルアーンを暗記する\n\nアッラーの書から一文字朗誦するたびに報奨を得、その報奨は十倍に増やされます。\n\nこの十日間をクルアーンとの新たな始まりにしましょう 🤲",
+    "type": "announcement",
+    "actionUrl": "",
+    "isActive": true,
+    "targetAudience": ["ja"],
+    "schedule": {
+      "startTime": "2026-05-18T00:00:00Z",
+      "endTime": "2026-05-25T23:59:59Z"
+    },
+    "createdAt": "2026-05-18T06:00:00Z"
   }
 ]
