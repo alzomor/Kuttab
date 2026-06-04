@@ -248,7 +248,6 @@ html, body {
     flex: 1;
     margin-left: 0;
     height: 100vh;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     transition: margin 0.3s ease;
@@ -293,10 +292,18 @@ html, body {
     overflow-y: auto;
     overflow-x: hidden;
     padding: 1rem;
+    padding-bottom: 1rem;
     max-width: 800px;
     margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
+}
+
+@media (max-width: 576px) {
+    .page-content {
+        padding: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
 }
 
 /* ===== Responsive ===== */
@@ -583,16 +590,56 @@ html, body {
 /* ===== Sticky Bottom Controls ===== */
 .controls-fixed {
     position: sticky;
-    bottom: -1rem; /* cancel out page-content bottom padding */
+    bottom: 0;
     background: white;
     border-top: 1px solid var(--kuttab-border);
     padding: 0.6rem 1rem;
+    padding-bottom: calc(0.6rem + env(safe-area-inset-bottom)); /* iPhone safe area */
     z-index: 10;
     box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-    margin: 0 -1rem; /* bleed to page-content edges */
+    margin: 0 -1rem; /* Bleed to page-content edges */
+    margin-bottom: -1rem; /* Stick to very bottom */
 }
+
+.controls-fixed .d-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.controls-fixed .btn-kuttab,
+.controls-fixed .btn-kuttab-outline {
+    flex: 1 1 auto;
+    min-width: 80px;
+    max-width: 140px;
+    white-space: nowrap;
+}
+
 @media (max-width: 576px) {
-    .controls-fixed { margin: 0 -0.5rem; bottom: -0.5rem; }
+    .controls-fixed {
+        padding: 0.5rem;
+        padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+        margin: 0 -0.5rem;
+        margin-bottom: -0.5rem;
+    }
+    
+    .controls-fixed .btn-kuttab,
+    .controls-fixed .btn-kuttab-outline {
+        flex: 1 1 calc(50% - 0.5rem);
+        min-width: 70px;
+        max-width: none;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .controls-fixed .btn-kuttab,
+    .controls-fixed .btn-kuttab-outline {
+        flex: 1 1 100%;
+        font-size: 0.8rem;
+    }
 }
 
 /* ===== Tajweed Highlight Colors ===== */
