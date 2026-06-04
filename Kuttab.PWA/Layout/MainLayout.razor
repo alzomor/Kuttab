@@ -41,6 +41,13 @@
             </NavLink>
         </div>
         <div class="nav-footer">
+            @if (_isPWAInstallable)
+            {
+                <button class="pwa-install-btn" @onclick="InstallPWA">
+                    <span class="pwa-install-icon">📲</span>
+                    <span>@Loc.GetString("InstallApp")</span>
+                </button>
+            }
             <a href="https://play.google.com/store/apps/details?id=com.kuttab.app" target="_blank" class="nav-play-link" title="Get it on Google Play">
                 <svg xmlns="http://www.w3.org/2000/svg" width="155" height="46" viewBox="0 0 155 46">
                     <rect width="155" height="46" rx="6" fill="#1a1a1a" stroke="#888" stroke-width="0.8"/>
@@ -72,6 +79,9 @@
         // Set initial text direction based on default language
         var dir = Loc.IsRightToLeft ? "rtl" : "ltr";
         await JS.InvokeVoidAsync("UtilsInterop.setDirection", dir);
+        
+        // Check for PWA installability
+        await CheckPWAInstallable();
     }
 
     private void OnLanguageChanged(object? sender, EventArgs e)
@@ -86,6 +96,7 @@
 
     private bool _isMenuOpen = false;
     private System.Timers.Timer? _autoHideTimer;
+    private bool _isPWAInstallable = false;
 
     protected override void OnInitialized()
     {
@@ -133,6 +144,20 @@
             _autoHideTimer?.Stop();
             _autoHideTimer?.Start();
         }
+    }
+
+    private async Task CheckPWAInstallable()
+    {
+        _isPWAInstallable = await JS.InvokeAsync<bool>("PWAInterop.isInstallable");
+        if (_isPWAInstallable)
+        {
+            StateHasChanged();
+        }
+    }
+
+    private async Task InstallPWA()
+    {
+        await JS.InvokeVoidAsync("PWAInterop.install");
     }
 
     public void Dispose()
