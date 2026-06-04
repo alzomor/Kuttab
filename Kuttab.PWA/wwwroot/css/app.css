@@ -63,6 +63,58 @@ html, body {
     min-height: 100vh;
 }
 
+/* ===== Menu Toggle Button ===== */
+.menu-toggle-btn {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 90;
+    background: var(--kuttab-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.menu-toggle-btn:hover {
+    background: var(--kuttab-green-light);
+    transform: scale(1.05);
+}
+
+[dir="rtl"] .menu-toggle-btn {
+    left: auto;
+    right: 1rem;
+}
+
+/* Hide toggle button when menu is open */
+.menu-open .menu-toggle-btn {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ===== Menu Overlay (for mobile) ===== */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.menu-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 /* ===== Side Navigation ===== */
 .nav-side {
     width: 280px;
@@ -76,11 +128,48 @@ html, body {
     height: 100vh;
     z-index: 100;
     box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.nav-side.open {
+    transform: translateX(0);
 }
 
 .nav-header {
     padding: 1.5rem 1rem;
     border-bottom: 1px solid rgba(255,255,255,0.2);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Close button inside nav */
+.nav-close-btn {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.8);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.nav-close-btn:hover {
+    color: white;
+    background: rgba(255,255,255,0.1);
+}
+
+[dir="rtl"] .nav-close-btn {
+    left: auto;
+    right: 0.75rem;
 }
 
 .nav-header h1 {
@@ -157,21 +246,34 @@ html, body {
 /* ===== Main Content ===== */
 .main-content {
     flex: 1;
-    margin-left: 280px;
+    margin-left: 0;
     height: 100vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    transition: margin 0.3s ease;
 }
 
-[dir="rtl"] .main-content {
-    margin-left: 0;
-    margin-right: 280px;
+/* When menu is open on desktop - push content */
+@media (min-width: 769px) {
+    .menu-open .main-content {
+        margin-left: 280px;
+    }
+    
+    [dir="rtl"] .menu-open .main-content {
+        margin-left: 0;
+        margin-right: 280px;
+    }
 }
 
 [dir="rtl"] .nav-side {
     left: auto;
     right: 0;
+    transform: translateX(100%);
+}
+
+[dir="rtl"] .nav-side.open {
+    transform: translateX(0);
 }
 
 /* ===== Cards & Panels ===== */
@@ -200,61 +302,60 @@ html, body {
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
     .nav-side {
-        width: 240px;
-    }
-    .main-content {
-        margin-left: 240px;
-    }
-    [dir="rtl"] .main-content {
-        margin-left: 0;
-        margin-right: 240px;
+        width: 280px; /* Keep full width on tablet */
     }
 }
 
 @media (max-width: 576px) {
-    .app-container {
-        flex-direction: column;
-    }
     .nav-side {
-        width: 100%;
-        height: auto;
-        position: relative;
+        width: 85%; /* Take most of screen on mobile */
+        max-width: 300px;
     }
+    
+    .menu-toggle-btn {
+        top: 0.75rem;
+        left: 0.75rem;
+        padding: 0.5rem 0.6rem;
+        font-size: 1.1rem;
+    }
+    
+    [dir="rtl"] .menu-toggle-btn {
+        left: auto;
+        right: 0.75rem;
+    }
+    
     .nav-header {
-        padding: 1rem;
+        padding: 1.25rem 1rem;
     }
+    
+    .nav-close-btn {
+        left: 0.5rem;
+        font-size: 1.1rem;
+    }
+    
+    [dir="rtl"] .nav-close-btn {
+        left: auto;
+        right: 0.5rem;
+    }
+    
     .nav-links {
-        flex-direction: row;
-        flex-wrap: wrap;
-        padding: 0.5rem;
-        gap: 0.5rem;
+        padding: 0.75rem 0;
     }
+    
     .nav-side a {
-        flex: 1;
-        min-width: calc(33.333% - 0.5rem);
-        flex-direction: column;
-        text-align: center;
-        padding: 0.5rem;
-        margin: 0;
+        padding: 0.6rem 1rem;
+        font-size: 0.95rem;
     }
-    .nav-side a .nav-icon {
-        margin-right: 0;
-        margin-bottom: 0.25rem;
-    }
+    
     .nav-footer {
-        padding: 0.5rem;
-        border-top: none;
+        padding: 0.75rem;
     }
-    [dir="rtl"] .nav-side a .nav-icon {
-        margin-left: 0;
+    
+    .nav-footer a.nav-play-link svg {
+        width: 140px;
+        height: 42px;
     }
-    .main-content {
-        margin-left: 0;
-        margin-right: 0;
-    }
-    [dir="rtl"] .main-content {
-        margin-right: 0;
-    }
+    
     .quran-text { font-size: 1.2rem; line-height: 2; }
     .page-content { padding: 0.5rem; }
 }

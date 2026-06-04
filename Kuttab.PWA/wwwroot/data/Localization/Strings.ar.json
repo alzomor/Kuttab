@@ -246,5 +246,7 @@
   "PrivacyPolicy": "سياسة الخصوصية",
   "ViewPrivacyPolicy": "عرض سياسة الخصوصية",
   "SingleRuleTraining": "تدريب على حكم واحد",
-  "Experimental": "تجريبي"
+  "Experimental": "تجريبي",
+  "Menu": "القائمة",
+  "Close": "إغلاق"
 }

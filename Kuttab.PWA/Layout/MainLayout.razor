@@ -2,10 +2,20 @@
 @implements IDisposable
 @inject LocalizationService Loc
 @inject IJSRuntime JS
+@inject NavigationManager Nav
 
-<div class="app-container">
-    <nav class="nav-side">
+<div class="app-container @(_isMenuOpen ? "menu-open" : "menu-closed")">
+    <!-- Menu Toggle Button - Fixed position, visible when menu is closed -->
+    <button class="menu-toggle-btn" @onclick="ToggleMenu" title="@Loc.GetString("Menu")">
+        <span class="menu-icon">☰</span>
+    </button>
+    
+    <!-- Overlay for mobile - closes menu when clicked -->
+    <div class="menu-overlay @(_isMenuOpen ? "visible" : "")" @onclick="CloseMenu"></div>
+    
+    <nav class="nav-side @(_isMenuOpen ? "open" : "closed")">
         <div class="nav-header">
+            <button class="nav-close-btn" @onclick="CloseMenu" title="@Loc.GetString("Close")">✕</button>
             <h1>كُتّاب - Kuttab</h1>
         </div>
         <div class="nav-links">
@@ -74,8 +84,61 @@
         });
     }
 
+    private bool _isMenuOpen = false;
+    private System.Timers.Timer? _autoHideTimer;
+
+    protected override void OnInitialized()
+    {
+        // Auto-hide timer - closes menu after 5 seconds of inactivity
+        _autoHideTimer = new System.Timers.Timer(5000);
+        _autoHideTimer.Elapsed += (s, e) => InvokeAsync(CloseMenu);
+        _autoHideTimer.AutoReset = false;
+        
+        // Close menu when navigation occurs
+        Nav.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        InvokeAsync(CloseMenu);
+    }
+
+    private void ToggleMenu()
+    {
+        _isMenuOpen = !_isMenuOpen;
+        if (_isMenuOpen)
+        {
+            // Reset auto-hide timer when menu opens
+            _autoHideTimer?.Stop();
+            _autoHideTimer?.Start();
+        }
+        StateHasChanged();
+    }
+
+    private void CloseMenu()
+    {
+        if (_isMenuOpen)
+        {
+            _isMenuOpen = false;
+            _autoHideTimer?.Stop();
+            StateHasChanged();
+        }
+    }
+
+    private void OnMenuInteraction()
+    {
+        // Reset auto-hide timer on any interaction
+        if (_isMenuOpen)
+        {
+            _autoHideTimer?.Stop();
+            _autoHideTimer?.Start();
+        }
+    }
+
     public void Dispose()
     {
         Loc.LanguageChanged -= OnLanguageChanged;
+        Nav.LocationChanged -= OnLocationChanged;
+        _autoHideTimer?.Dispose();
     }
 }

@@ -245,5 +245,7 @@
   "PrivacyPolicy": "Privacy Policy",
   "ViewPrivacyPolicy": "View Privacy Policy",
   "SingleRuleTraining": "Single Rule Training",
-  "Experimental": "Experimental"
+  "Experimental": "Experimental",
+  "Menu": "Menu",
+  "Close": "Close"
 }

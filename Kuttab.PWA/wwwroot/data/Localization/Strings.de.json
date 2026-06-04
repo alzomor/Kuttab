@@ -240,5 +240,7 @@
   "PrivacyPolicy": "Datenschutzrichtlinie",
   "ViewPrivacyPolicy": "Datenschutzrichtlinie anzeigen",
   "SingleRuleTraining": "Einzelregel-Training",
-  "Experimental": "Experimentell"
+  "Experimental": "Experimentell",
+  "Menu": "Menü",
+  "Close": "Schließen"
 }
