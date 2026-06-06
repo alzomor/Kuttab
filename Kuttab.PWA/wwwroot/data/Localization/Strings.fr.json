@@ -230,5 +230,10 @@
   "PrivacyPolicy": "Politique de Confidentialité",
   "ViewPrivacyPolicy": "Voir la Politique de Confidentialité",
   "SingleRuleTraining": "Entraînement par Règle",
-  "Experimental": "Expérimental"
+  "Experimental": "Expérimental",
+  "Menu": "Menu",
+  "Close": "Fermer",
+  "InstallApp": "Installer l'App",
+  "Show": "Afficher",
+  "Hide": "Masquer"
 }

@@ -230,5 +230,10 @@
   "PrivacyPolicy": "Gizlilik Politikası",
   "ViewPrivacyPolicy": "Gizlilik Politikasını Görüntüle",
   "SingleRuleTraining": "Tek Kural Eğitimi",
-  "Experimental": "Deneysel"
+  "Experimental": "Deneysel",
+  "Menu": "Menü",
+  "Close": "Kapat",
+  "InstallApp": "Uygulamayı Yükle",
+  "Show": "Göster",
+  "Hide": "Gizle"
 }

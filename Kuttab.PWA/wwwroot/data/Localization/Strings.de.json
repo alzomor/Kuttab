@@ -243,5 +243,7 @@
   "Experimental": "Experimentell",
   "Menu": "Menü",
   "Close": "Schließen",
-  "InstallApp": "App installieren"
+  "InstallApp": "App installieren",
+  "Show": "Anzeigen",
+  "Hide": "Ausblenden"
 }

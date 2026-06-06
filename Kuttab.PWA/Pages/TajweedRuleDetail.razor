@@ -16,8 +16,12 @@
 
 @if (!string.IsNullOrEmpty(_explanation))
 {
-    <div class="card-panel" dir="rtl" style="font-family: var(--font-arabic); line-height: 2; text-align: right;">
-        @((MarkupString)_explanation)
+    <div class="card-panel text-center">
+        <button class="btn-kuttab-outline mb-2" @onclick="ToggleExplanation">@Loc["RuleExplanation"]</button>
+        
+        <div dir="rtl" style="font-family: var(--font-arabic); line-height: 2; text-align: right; display: @(_showExplanation ? "block" : "none");">
+            @((MarkupString)_explanation)
+        </div>
     </div>
 }
 
@@ -44,6 +48,7 @@
 
     private Kuttab.Core.Models.TajweedRule? _rule;
     private string _explanation = "";
+    private bool _showExplanation = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,6 +60,11 @@
             var explanation = TajweedRulesExplanation.GetExplanation(_rule.Name, Loc.CurrentLanguage);
             _explanation = System.Net.WebUtility.HtmlEncode(explanation).Replace("\n", "<br/>");
         }
+    }
+
+    private void ToggleExplanation()
+    {
+        _showExplanation = !_showExplanation;
     }
 
     private async Task ShareRule()

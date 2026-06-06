@@ -249,5 +249,7 @@
   "Experimental": "تجريبي",
   "Menu": "القائمة",
   "Close": "إغلاق",
-  "InstallApp": "تثبيت التطبيق"
+  "InstallApp": "تثبيت التطبيق",
+  "Show": "إظهار",
+  "Hide": "إخفاء"
 }

@@ -248,5 +248,7 @@
   "Experimental": "Experimental",
   "Menu": "Menu",
   "Close": "Close",
-  "InstallApp": "Install App"
+  "InstallApp": "Install App",
+  "Show": "Show",
+  "Hide": "Hide"
 }

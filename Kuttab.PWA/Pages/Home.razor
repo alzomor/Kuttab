@@ -50,7 +50,7 @@
         {
             <button class="btn-kuttab-outline mb-2" @onclick="ToggleRuleExplanation">@Loc["RuleExplanation"]</button>
             
-            <div id="ruleExplanationPanel" class="@(_showRuleExplanation ? "" : "d-none")" style="margin-top: 1rem; padding: 1rem; border: 2px solid var(--kuttab-green); border-radius: 8px; background: #f0f8f0;">
+            <div id="ruleExplanationPanel" style="margin-top: 1rem; padding: 1rem; border: 2px solid var(--kuttab-green); border-radius: 8px; background: #f0f8f0; display: @(_showRuleExplanation ? "block" : "none");">
                 <h6 style="color: var(--kuttab-green-dark); font-weight: 700; margin-bottom: 0.5rem;">@Loc["RuleExplanationTitle"]</h6>
                 <div class="mb-2" style="font-weight: 600;">
                     @Loc["RuleNameLabel"]: @(RuleNameTranslator.GetLocalizedName(_selectedRuleName, Loc.CurrentLanguage))

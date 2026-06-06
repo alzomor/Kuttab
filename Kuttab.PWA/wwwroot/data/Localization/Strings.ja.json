@@ -230,5 +230,10 @@
   "PrivacyPolicy": "プライバシーポリシー",
   "ViewPrivacyPolicy": "プライバシーポリシーを表示",
   "SingleRuleTraining": "単一規則トレーニング",
-  "Experimental": "実験的"
+  "Experimental": "実験的",
+  "Menu": "メニュー",
+  "Close": "閉じる",
+  "InstallApp": "アプリをインストール",
+  "Show": "表示",
+  "Hide": "非表示"
 }
