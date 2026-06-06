@@ -148,11 +148,16 @@
 
     private async Task CheckPWAInstallable()
     {
-        _isPWAInstallable = await JS.InvokeAsync<bool>("PWAInterop.isInstallable");
-        if (_isPWAInstallable)
+        try
         {
-            StateHasChanged();
+            var result = await JS.InvokeAsync<object>("PWAInterop.isInstallable");
+            _isPWAInstallable = result?.ToString()?.ToLower() == "true";
         }
+        catch
+        {
+            _isPWAInstallable = false;
+        }
+        StateHasChanged();
     }
 
     private async Task InstallPWA()
