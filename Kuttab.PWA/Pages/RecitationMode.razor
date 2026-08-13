@@ -392,7 +392,12 @@
     };
 
     private static bool IsDiacritic(char c)
-        => (c >= '\u064B' && c <= '\u0652') || c == '\u0670';
+        => (c >= '\u064B' && c <= '\u065F') ||  // Arabic diacritics/harakat
+           (c >= '\u0610' && c <= '\u061A') ||  // Arabic signs
+           (c >= '\u06D6' && c <= '\u06ED') ||  // Quranic annotations/stop signs
+           c == '\u0640' ||                     // Tatweel (kashida)
+           c == '\u0670' ||                     // Superscript alef
+           c == '\u200D';                       // Zero-width joiner
 
     private string HighlightAyaWithTajweed(string ayaText)
     {
@@ -447,9 +452,6 @@
             if (connectBefore) sb.Append(ZWJ);
 
             sb.Append(System.Net.WebUtility.HtmlEncode(ayaText.Substring(start, baseContentLen)));
-
-            // ZWJ after last base letter, before trailing diacritics
-            if (connectAfter) sb.Append(ZWJ);
 
             // Include trailing diacritics INSIDE the span (critical for proper shaping)
             if (trailingDiacriticsLen > 0)
