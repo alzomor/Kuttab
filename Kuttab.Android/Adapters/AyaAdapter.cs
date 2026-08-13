@@ -157,8 +157,8 @@ public class AyaViewHolder : RecyclerView.ViewHolder
         _matchedPart = itemView.FindViewById<TextView>(Resource.Id.matchedPart) 
             ?? throw new InvalidOperationException("matchedPart not found");
         
-        itemView.Click += (s, e) => clickListener(AdapterPosition);
-        itemView.LongClick += (s, e) => longClickListener(AdapterPosition);
+        itemView.Click += (s, e) => clickListener(BindingAdapterPosition);
+        itemView.LongClick += (s, e) => longClickListener(BindingAdapterPosition);
     }
     
     public void Bind(QuranAya aya)
@@ -484,11 +484,11 @@ public class AyaViewHolder : RecyclerView.ViewHolder
         }
         
         // Set selection/playing background
-        if (AdapterPosition == _adapter.GetPlayingPosition())
+        if (BindingAdapterPosition == _adapter.GetPlayingPosition())
         {
             _itemView.SetBackgroundColor(Color.ParseColor("#C8E6C9")); // Light green for currently playing
         }
-        else if (AdapterPosition == _adapter.GetSelectedPosition())
+        else if (BindingAdapterPosition == _adapter.GetSelectedPosition())
         {
             _itemView.SetBackgroundColor(Color.ParseColor("#E3F2FD")); // Light blue for selected
         }
