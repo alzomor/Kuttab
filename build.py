@@ -137,7 +137,7 @@ def build_android_apk():
     cmd = [
         android_dotnet_cmd, "publish",
         "-c", "Release",
-        "-f", "net9.0-android",
+        "-f", "net9.0-android36",
         "Kuttab.Android.csproj"
     ]
     
@@ -146,10 +146,10 @@ def build_android_apk():
         return False
     
     # Find the generated APK (universal APK goes to publish subfolder)
-    apk_search_dir = os.path.join(android_project_dir, "bin/Release/net9.0-android/publish")
+    apk_search_dir = os.path.join(android_project_dir, "bin/Release/net9.0-android36/publish")
     if not os.path.exists(apk_search_dir):
         # Fallback to non-publish path
-        apk_search_dir = os.path.join(android_project_dir, "bin/Release/net9.0-android")
+        apk_search_dir = os.path.join(android_project_dir, "bin/Release/net9.0-android36")
     
     if not os.path.exists(apk_search_dir):
         print("❌ APK output directory not found")
